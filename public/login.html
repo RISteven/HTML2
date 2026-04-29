@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<!-- Declaración del tipo de documento. Le dice al navegador que es HTML5. -->
+<html lang="es">
+<!-- lang="es" indica que el contenido está en español (útil para lectores de pantalla). -->
+
+<head>
+  <meta charset="UTF-8">
+  <!-- UTF-8 permite mostrar caracteres especiales como tildes y ñ. -->
+
+  <title>Login</title>
+  <!-- Texto que aparece en la pestaña del navegador. -->
+
+  <link rel="stylesheet" href="/css/styles.css">
+  <!-- Vincula el archivo de estilos CSS para darle diseño a la página. -->
+</head>
+
+<body>
+
+  <div class="container">
+    <!-- Contenedor principal que centra el contenido en la pantalla. -->
+
+    <div class="card">
+      <!-- Caja blanca con sombra donde se muestra el formulario. -->
+
+      <h2>Acceso al Sistema</h2>
+      <!-- Título visible del formulario. -->
+
+      <form id="formularioLogin">
+        <!-- Formulario con id="formularioLogin" para identificarlo desde JavaScript. -->
+
+        <input type="text" id="usuario" placeholder="Usuario" required>
+        <!-- Campo de texto para el nombre de usuario.
+             placeholder: texto gris de ayuda que desaparece al escribir.
+             required: el navegador no permite enviar el formulario si está vacío. -->
+
+        <input type="password" id="clave" placeholder="Contraseña" required>
+        <!-- Campo de contraseña: muestra puntos en lugar de letras. -->
+
+        <button type="submit" class="btn primario">Ingresar</button>
+        <!-- Botón que dispara el evento "submit" del formulario. -->
+
+      </form>
+
+      <div id="mensaje"></div>
+      <!-- Div vacío donde JavaScript escribirá los mensajes de error o éxito. -->
+
+    </div>
+  </div>
+
+  <script>
+    // Buscamos el formulario en el documento por su id y lo guardamos en una variable.
+    const formulario = document.getElementById('formularioLogin');
+
+    // Buscamos el div de mensajes para poder escribir en él luego.
+    const divMensaje  = document.getElementById('mensaje');
+
+    // Escuchamos el evento "submit", que ocurre cuando el usuario hace clic en "Ingresar".
+    formulario.addEventListener('submit', async (evento) => {
+
+      // Cancelamos el comportamiento por defecto del formulario (que recargaría la página).
+      evento.preventDefault();
+
+      // Armamos un objeto con los datos que escribió el usuario.
+      const credenciales = {
+        usuario: document.getElementById('usuario').value,  // Valor del campo usuario
+        clave:   document.getElementById('clave').value     // Valor del campo contraseña
+      };
+
+      try {
+        // fetch() envía los datos al servidor sin recargar la página.
+        // method: 'POST' indica que estamos enviando datos (no solo pidiendo).
+        // headers: le avisa al servidor que los datos vienen en formato JSON.
+        // body: convierte el objeto a texto JSON para enviarlo.
+        const respuesta = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(credenciales)
+        });
+
+        // Convertimos la respuesta del servidor de texto JSON a objeto JavaScript.
+        const resultado = await respuesta.json();
+
+        if (resultado.success) {
+          // Si el login fue exitoso, redirigimos al menú principal.
+          window.location.href = 'menu.html';
+        } else {
+          // Si las credenciales son incorrectas, mostramos el mensaje de error.
+          divMensaje.textContent = resultado.message;
+        }
+
+      } catch (error) {
+        // Si el servidor no responde o hay un problema de red, mostramos este mensaje.
+        divMensaje.textContent = 'No se pudo conectar con el servidor';
+      }
+    });
+  </script>
+
+</body>
+</html>

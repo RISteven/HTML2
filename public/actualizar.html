@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Modificación de Usuario</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="card">
+
+      <h2>Modificación de Usuario</h2>
+
+      <form id="formularioModificacion">
+
+        <input type="text" id="nombre" placeholder="Nombre del usuario a modificar" required>
+        <!-- El nombre identifica qué usuario se va a modificar. -->
+
+        <input type="password" id="passw" placeholder="Nueva contraseña" required>
+        <!-- La nueva contraseña que reemplazará a la anterior. -->
+
+        <button type="submit" class="btn primario">Modificar</button>
+        <!-- Al hacer clic, envía los datos al servidor para actualizar. -->
+
+        <button type="button" class="btn secundario" onclick="window.location.href='menu.html'">Volver</button>
+
+      </form>
+
+      <div id="mensaje"></div>
+      <!-- Muestra el resultado de la operación. -->
+
+    </div>
+  </div>
+
+  <script>
+    const formulario = document.getElementById('formularioModificacion');
+    const divMensaje = document.getElementById('mensaje');
+
+    formulario.addEventListener('submit', async (evento) => {
+      evento.preventDefault();
+
+      // Leemos el nombre del usuario a modificar.
+      const nombre = document.getElementById('nombre').value;
+
+      // Armamos el objeto con la nueva contraseña.
+      const datosActualizar = {
+        passw: document.getElementById('passw').value
+      };
+
+      try {
+        // Enviamos la petición PUT al servidor.
+        // PUT se usa cuando actualizamos un recurso que ya existe.
+        // El nombre va en la URL: /api/usuarios/Richard (por ejemplo).
+        // Los datos nuevos van en el body en formato JSON.
+        const respuesta = await fetch(`/api/usuarios/${nombre}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(datosActualizar)
+        });
+
+        // Leemos la respuesta del servidor.
+        const resultado = await respuesta.json();
+
+        // Mostramos el mensaje resultante ("Usuario modificado" o "no encontrado").
+        divMensaje.textContent = resultado.mensaje;
+
+        // Si fue exitoso, limpiamos el formulario.
+        if (resultado.exito) formulario.reset();
+
+      } catch (error) {
+        divMensaje.textContent = 'No se pudo conectar con el servidor';
+      }
+    });
+  </script>
+
+</body>
+</html>

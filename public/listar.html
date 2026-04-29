@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Listado de Usuarios</title>
+  <link rel="stylesheet" href="/css/styles.css">
+
+  <style>
+    /* Estilos propios de esta página, adicionales al archivo styles.css */
+
+    table {
+      width: 100%;              /* La tabla ocupa todo el ancho disponible */
+      border-collapse: collapse; /* Elimina el espacio doble entre bordes de celdas */
+      margin-top: 16px;          /* Separación superior respecto al título */
+    }
+
+    th, td {
+      padding: 10px 14px;        /* Espacio interno de cada celda (arriba/abajo y lados) */
+      text-align: left;          /* Texto alineado a la izquierda */
+      border-bottom: 1px solid #ddd; /* Línea separadora entre filas */
+      font-size: 14px;
+    }
+
+    th {
+      background-color: #3b82f6; /* Fondo azul para los encabezados */
+      color: white;              /* Texto blanco en los encabezados */
+    }
+
+    tr:hover {
+      background-color: #f0f4ff; /* Al pasar el mouse sobre una fila, cambia de color */
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <h1>Listado de Usuarios</h1>
+  </div>
+
+  <div class="container">
+    <div class="card">
+
+      <div id="mensaje"></div>
+      <!-- Muestra mensajes de error o aviso (ej: "No hay usuarios registrados"). -->
+
+      <table id="tablaUsuarios">
+        <thead>
+          <!-- Encabezados de columna de la tabla -->
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Email</th>
+            <th>Fecha creación</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+
+        <tbody id="cuerpoTabla">
+          <!-- Las filas de datos se agregan aquí desde JavaScript. -->
+          <!-- Empieza vacío y se llena al cargar la página. -->
+        </tbody>
+      </table>
+
+      <br>
+      <button class="btn secundario" onclick="window.location.href='menu.html'">Volver</button>
+
+    </div>
+  </div>
+
+  <script>
+    // Obtenemos referencias al cuerpo de la tabla y al div de mensajes.
+    const cuerpoTabla = document.getElementById('cuerpoTabla');
+    const divMensaje  = document.getElementById('mensaje');
+
+    // Función asíncrona que pide la lista de usuarios al servidor y la muestra en la tabla.
+    async function cargarUsuarios() {
+      try {
+        // GET /api/usuarios: pedimos todos los usuarios al servidor.
+        // No necesita method ni body porque GET solo pide datos, no los envía.
+        const respuesta = await fetch('/api/usuarios');
+
+        // Convertimos la respuesta a un objeto JavaScript.
+        const resultado = await respuesta.json();
+
+        // Si el servidor informó un error, lo mostramos y salimos de la función.
+        if (!resultado.exito) {
+          divMensaje.textContent = resultado.mensaje;
+          return; // "return" detiene la ejecución del resto de la función
+        }
+
+        // Recorremos el arreglo de usuarios con forEach.
+        // Cada "usuario" es un objeto con las columnas de la tabla Oracle.
+        // Oracle devuelve los nombres de columna en MAYÚSCULAS.
+        resultado.usuarios.forEach(usuario => {
+
+          // Creamos una fila HTML (<tr>) para este usuario.
+          const fila = document.createElement('tr');
+
+          // Formateamos la fecha de creación al estilo argentino (dd/mm/aaaa).
+          // El operador "?" verifica si existe el valor antes de formatearlo.
+          const fechaFormateada = usuario.FECHA_CREACION
+            ? new Date(usuario.FECHA_CREACION).toLocaleDateString('es-AR')
+            : '-'; // Si no hay fecha, mostramos un guión
+
+          // Construimos el HTML interno de la fila con los datos del usuario.
+          // El operador "??" muestra '-' si el valor es null o undefined.
+          fila.innerHTML = `
+            <td>${usuario.ID_USUARIO}</td>
+            <td>${usuario.NOMBRE}</td>
+            <td>${usuario.APELLIDO}</td>
+            <td>${usuario.EMAIL}</td>
+            <td>${fechaFormateada}</td>
+            <td>${usuario.ESTADO ?? '-'}</td>
+          `;
+
+          // Agregamos la fila al cuerpo de la tabla en la página.
+          cuerpoTabla.appendChild(fila);
+        });
+
+        // Si el arreglo vino vacío, avisamos que no hay datos.
+        if (resultado.usuarios.length === 0) {
+          divMensaje.textContent = 'No hay usuarios registrados.';
+        }
+
+      } catch (error) {
+        // Error de red o el servidor no está corriendo.
+        divMensaje.textContent = 'No se pudo conectar con el servidor';
+      }
+    }
+
+    // Llamamos a la función inmediatamente al cargar la página.
+    // No esperamos a que el usuario haga clic en nada.
+    cargarUsuarios();
+  </script>
+
+</body>
+</html>

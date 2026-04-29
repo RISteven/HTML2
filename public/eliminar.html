@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Baja de Usuario</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="card">
+
+      <h2>Baja de Usuario</h2>
+
+      <form id="formularioBaja">
+
+        <input type="text" id="nombre" placeholder="Nombre del usuario a eliminar" required>
+        <!-- El nombre identifica al usuario que se eliminará de la base de datos. -->
+
+        <button type="submit" class="btn primario">Eliminar</button>
+        <!-- Al hacer clic, JavaScript pide confirmación antes de proceder. -->
+
+        <button type="button" class="btn secundario" onclick="window.location.href='menu.html'">Volver</button>
+
+      </form>
+
+      <div id="mensaje"></div>
+      <!-- Muestra el resultado de la eliminación. -->
+
+    </div>
+  </div>
+
+  <script>
+    const formulario = document.getElementById('formularioBaja');
+    const divMensaje = document.getElementById('mensaje');
+
+    formulario.addEventListener('submit', async (evento) => {
+      evento.preventDefault();
+
+      // Leemos el nombre del usuario que se desea eliminar.
+      const nombre = document.getElementById('nombre').value;
+
+      // confirm() muestra una ventana emergente con los botones Aceptar y Cancelar.
+      // Si el usuario hace clic en Cancelar, "confirmado" será false y no se elimina nada.
+      const confirmado = confirm(`¿Está seguro que desea eliminar al usuario "${nombre}"?`);
+      if (!confirmado) return; // Salimos sin hacer nada si el usuario canceló
+
+      try {
+        // Enviamos la petición DELETE al servidor.
+        // DELETE se usa para eliminar un recurso existente.
+        // El nombre va en la URL: /api/usuarios/Richard
+        // No necesita body porque el nombre ya viene en la URL.
+        const respuesta = await fetch(`/api/usuarios/${nombre}`, {
+          method: 'DELETE'
+        });
+
+        // Leemos la respuesta del servidor.
+        const resultado = await respuesta.json();
+
+        // Mostramos el mensaje ("Usuario eliminado" o "no encontrado").
+        divMensaje.textContent = resultado.mensaje;
+
+        // Si fue exitoso, limpiamos el formulario.
+        if (resultado.exito) formulario.reset();
+
+      } catch (error) {
+        divMensaje.textContent = 'No se pudo conectar con el servidor';
+      }
+    });
+  </script>
+
+</body>
+</html>

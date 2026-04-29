@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <!-- UTF-8 soporta tildes, ñ y otros caracteres especiales. -->
+
+  <title>Menú ABM Usuarios</title>
+  <!-- ABM significa: Alta, Baja y Modificación (operaciones básicas sobre datos). -->
+
+  <link rel="stylesheet" href="/css/styles.css">
+  <!-- Cargamos los estilos visuales de la aplicación. -->
+</head>
+
+<body>
+
+  <div class="header">
+    <!-- Barra superior de la página con el título del sistema. -->
+    <h1>Panel de Administración de Usuarios</h1>
+  </div>
+
+  <div class="container">
+    <!-- Contenedor centrado que agrupa las opciones del menú. -->
+
+    <div class="card">
+      <!-- Caja visual con los botones de navegación. -->
+
+      <h2>Opciones</h2>
+
+      <div class="btn-group">
+        <!-- Grupo de botones, uno por cada operación disponible. -->
+
+        <button class="btn primario" onclick="window.location.href='crear.html'">Alta</button>
+        <!-- Al hacer clic, navega a la página para registrar un nuevo usuario. -->
+
+        <button class="btn secundario" onclick="window.location.href='listar.html'">Consulta</button>
+        <!-- Navega a la página que muestra la lista de todos los usuarios. -->
+
+        <button class="btn primario" onclick="window.location.href='actualizar.html'">Modificación</button>
+        <!-- Navega a la página para cambiar la contraseña de un usuario. -->
+
+        <button class="btn secundario" onclick="window.location.href='eliminar.html'">Baja</button>
+        <!-- Navega a la página para eliminar un usuario del sistema. -->
+
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

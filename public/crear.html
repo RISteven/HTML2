@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Alta de Usuario</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="card">
+
+      <h2>Alta de Usuario</h2>
+
+      <form id="formularioAlta">
+        <!-- Formulario con cuatro campos obligatorios para registrar un nuevo usuario. -->
+
+        <input type="text" id="nombre" placeholder="Nombre" required>
+        <!-- Campo para el nombre. type="text" acepta cualquier texto. -->
+
+        <input type="text" id="apellido" placeholder="Apellido" required>
+        <!-- Campo para el apellido. -->
+
+        <input type="email" id="email" placeholder="Email" required>
+        <!-- type="email" valida automáticamente que tenga el formato correcto (ej: a@b.com). -->
+
+        <input type="password" id="passw" placeholder="Contraseña" required>
+        <!-- type="password" oculta lo que escribe el usuario con puntos. -->
+
+        <button type="submit" class="btn primario">Guardar</button>
+        <!-- Al hacer clic dispara el evento submit y JavaScript envía los datos al servidor. -->
+
+        <button type="button" class="btn secundario" onclick="window.location.href='menu.html'">Volver</button>
+        <!-- type="button" NO dispara el submit. Solo ejecuta el onclick para volver al menú. -->
+
+      </form>
+
+      <div id="mensaje"></div>
+      <!-- Aquí aparece el resultado de la operación: éxito o error. -->
+
+    </div>
+  </div>
+
+  <script>
+    // Referenciamos el formulario y el div de mensajes.
+    const formulario = document.getElementById('formularioAlta');
+    const divMensaje = document.getElementById('mensaje');
+
+    // Cuando el usuario hace clic en "Guardar" se dispara este evento.
+    formulario.addEventListener('submit', async (evento) => {
+
+      // Evitamos que el formulario recargue la página (comportamiento por defecto).
+      evento.preventDefault();
+
+      // Recolectamos los valores de los cuatro campos en un objeto.
+      const datosUsuario = {
+        nombre:   document.getElementById('nombre').value,
+        apellido: document.getElementById('apellido').value,
+        email:    document.getElementById('email').value,
+        passw:    document.getElementById('passw').value
+      };
+
+      try {
+        // Enviamos los datos al servidor con método POST (creación de nuevo recurso).
+        // La URL /api/usuarios corresponde a la ruta definida en routes/usuarios.js.
+        const respuesta = await fetch('/api/usuarios', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }, // Le decimos al servidor que mandamos JSON
+          body: JSON.stringify(datosUsuario)               // Convertimos el objeto a texto JSON
+        });
+
+        // Leemos la respuesta del servidor como objeto JavaScript.
+        const resultado = await respuesta.json();
+
+        // Mostramos el mensaje que devolvió el servidor ("Usuario guardado" o el error).
+        divMensaje.textContent = resultado.mensaje;
+
+        // Si fue exitoso, limpiamos el formulario para poder cargar otro usuario.
+        if (resultado.exito) formulario.reset();
+
+      } catch (error) {
+        // Error de red: el servidor no está corriendo o no hay conexión.
+        divMensaje.textContent = 'No se pudo conectar con el servidor';
+      }
+    });
+  </script>
+
+</body>
+</html>

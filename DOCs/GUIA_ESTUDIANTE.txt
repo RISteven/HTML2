@@ -1,0 +1,411 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║        GUÍA COMPLETA — APLICACIÓN WEB CON NODE.JS Y ORACLE XE 21c          ║
+║                     Para estudiantes que inician en programación web         ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+Esta guía explica paso a paso cómo instalar todo lo necesario, configurar el
+proyecto y ejecutar una aplicación web que se conecta a Oracle para gestionar
+usuarios (Alta, Baja, Modificación y Consulta).
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ÍNDICE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  1. ¿Qué es Node.js y por qué lo usamos?
+  2. ¿Qué es Oracle XE y qué rol cumple?
+  3. Arquitectura de la aplicación
+  4. Instalación de Oracle XE 21c
+  5. Instalación de Node.js
+  6. Creación y configuración del proyecto Node
+  7. Instalación de dependencias (paquetes)
+  8. Configuración de la conexión a Oracle
+  9. Estructura de carpetas del proyecto
+ 10. Tabla de usuarios en Oracle
+ 11. Ejecución del servidor
+ 12. Uso de la aplicación en el navegador
+ 13. Resumen de rutas y operaciones
+ 14. Errores frecuentes y soluciones
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. ¿QUÉ ES NODE.JS Y POR QUÉ LO USAMOS?
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Node.js es un entorno que permite ejecutar JavaScript fuera del navegador,
+directamente en el servidor (la computadora que sirve la aplicación).
+
+¿Por qué lo usamos en lugar de PHP, Java u otro lenguaje?
+
+  ✔ Usa JavaScript, el mismo lenguaje que ya conocemos del navegador.
+  ✔ Es muy liviano y rápido para manejar muchas peticiones a la vez.
+  ✔ Tiene un ecosistema enorme de librerías listas para usar (npm).
+  ✔ Express (su framework web más popular) permite crear un servidor
+    con pocas líneas de código.
+
+En esta aplicación Node cumple el rol de SERVIDOR: recibe las peticiones
+del navegador, consulta la base de datos Oracle y devuelve los resultados.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+2. ¿QUÉ ES ORACLE XE Y QUÉ ROL CUMPLE?
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Oracle XE (Express Edition) es la versión gratuita de Oracle Database.
+Es un motor de base de datos relacional: almacena datos en tablas con filas
+y columnas, y permite consultarlos con SQL.
+
+  XEPDB1 es el nombre de la base de datos (PDB = Pluggable DataBase) que
+  viene creada por defecto en Oracle XE 21c.
+
+En esta aplicación Oracle cumple el rol de ALMACÉN DE DATOS: guarda los
+registros de usuarios de forma permanente en el disco.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+3. ARQUITECTURA DE LA APLICACIÓN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  [Navegador]  ──fetch()──►  [Node.js / Express]  ──SQL──►  [Oracle XE]
+  (HTML/JS)    ◄──JSON────   (server.js / routes)  ◄──datos─  (tabla usuarios)
+
+  Paso a paso de una operación:
+  1. El usuario llena un formulario en el navegador y hace clic en un botón.
+  2. JavaScript usa fetch() para enviar los datos al servidor Node.
+  3. Node recibe la petición, arma la consulta SQL y la envía a Oracle.
+  4. Oracle ejecuta el SQL y devuelve el resultado a Node.
+  5. Node convierte el resultado a JSON y lo envía al navegador.
+  6. JavaScript muestra el resultado en la página (mensaje o tabla).
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+4. INSTALACIÓN DE ORACLE XE 21c
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PASO 1 — Descargar Oracle XE 21c
+  · Ir a: https://www.oracle.com/database/technologies/xe-downloads.html
+  · Descargar: "Oracle Database 21c Express Edition for Windows x64"
+  · El archivo se llama: OracleXE213_Win64.zip (aproximadamente 1.5 GB)
+
+PASO 2 — Instalar
+  · Descomprimir el ZIP descargado.
+  · Ejecutar setup.exe como Administrador (clic derecho → Ejecutar como admin).
+  · Seguir el asistente de instalación:
+      - Aceptar los términos de licencia.
+      - Elegir carpeta de instalación (dejar la predeterminada).
+      - IMPORTANTE: anotar la contraseña que se establece para el usuario SYS.
+  · Esperar a que termine (puede demorar 10-15 minutos).
+
+PASO 3 — Verificar que Oracle está corriendo
+  · Abrir el menú Inicio → Servicios (o buscar "Servicios" en Windows).
+  · Verificar que el servicio "OracleServiceXE" está en estado "En ejecución".
+  · Si no está corriendo, hacer clic derecho → Iniciar.
+
+PASO 4 — Acceder a Oracle con SQL Developer
+  · Descargar SQL Developer desde:
+    https://www.oracle.com/tools/downloads/sqldev-downloads.html
+  · Instalar y abrir SQL Developer.
+  · Crear una nueva conexión:
+      - Nombre de conexión: XE_local (o cualquier nombre)
+      - Usuario: system  (o SYS con rol SYSDBA)
+      - Contraseña: la que anotaste durante la instalación
+      - Tipo de conexión: Basic
+      - Nombre del host: localhost
+      - Puerto: 1521
+      - SID: XE   (o Service Name: XEPDB1)
+  · Hacer clic en "Conectar".
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+5. INSTALACIÓN DE NODE.JS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PASO 1 — Descargar Node.js
+  · Ir a: https://nodejs.org
+  · Descargar la versión LTS (Long Term Support) — es la más estable.
+  · El instalador se llama: node-v##.##.#-x64.msi
+
+PASO 2 — Instalar
+  · Ejecutar el archivo .msi descargado.
+  · Aceptar todos los pasos con los valores predeterminados.
+  · Asegurarse de que la opción "Add to PATH" esté marcada (viene marcada por defecto).
+
+PASO 3 — Verificar la instalación
+  · Abrir PowerShell o CMD y escribir:
+
+      node --version
+
+  · Debe mostrar algo como: v20.11.0
+  · También verificar npm (gestor de paquetes de Node):
+
+      npm --version
+
+  · Debe mostrar algo como: 10.2.4
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+6. CREACIÓN Y CONFIGURACIÓN DEL PROYECTO NODE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PASO 1 — Crear la carpeta del proyecto
+  · Crear una carpeta en el disco, por ejemplo: C:\proyectos\miapp\
+
+PASO 2 — Crear la subcarpeta js dentro del proyecto
+  · Dentro de miapp\, crear la carpeta js\
+
+PASO 3 — Inicializar el proyecto Node dentro de js\
+  · Abrir PowerShell, navegar a la carpeta js:
+
+      cd C:\proyectos\miapp\js
+
+  · Ejecutar:
+
+      npm init -y
+
+  · Esto crea automáticamente el archivo package.json con la configuración
+    básica del proyecto. El "-y" acepta todos los valores predeterminados.
+
+  · El package.json generado se verá así:
+    {
+      "name": "js",
+      "version": "1.0.0",
+      "main": "server.js",
+      "scripts": {
+        "start": "node server.js"
+      }
+    }
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+7. INSTALACIÓN DE DEPENDENCIAS (PAQUETES)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Los paquetes son librerías de código ya escritas que instalamos para no
+tener que programar todo desde cero.
+
+Desde la carpeta js\ ejecutar:
+
+    npm install express body-parser oracledb
+
+¿Qué instala cada uno?
+
+  · express     → Framework para crear el servidor web y las rutas HTTP.
+  · body-parser → Permite leer los datos que envían los formularios HTML.
+  · oracledb    → Driver (conector) para comunicarse con Oracle Database.
+
+Después de instalarse, aparecerá una carpeta llamada node_modules\ con
+todos los archivos de las librerías, y el package.json se actualizará
+con las dependencias instaladas.
+
+  NOTA: La carpeta node_modules\ puede tener cientos de MB.
+  Nunca se copia ni se sube a GitHub. Si se comparte el proyecto,
+  solo se comparten los archivos del código fuente y se vuelve a
+  ejecutar "npm install" para reinstalarlas.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+8. CONFIGURACIÓN DE LA CONEXIÓN A ORACLE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+El archivo js\db.js contiene los datos de conexión a Oracle:
+
+    const oracledb = require('oracledb');
+
+    const configuracion = {
+      user:          "prg2",             // Usuario de Oracle
+      password:      "curso2026",        // Contraseña del usuario
+      connectString: "localhost/XEPDB1"  // Host/Base de datos
+    };
+
+    module.exports = configuracion;
+
+Partes del connectString:
+  · localhost  → La base de datos está en la misma computadora.
+  · XEPDB1    → Nombre de la base de datos pluggable de Oracle XE 21c.
+
+Para crear el usuario "prg2" en Oracle, ejecutar en SQL Developer
+conectado como SYSTEM o SYS:
+
+    -- Cambiar al contenedor XEPDB1
+    ALTER SESSION SET CONTAINER = XEPDB1;
+
+    -- Crear el usuario
+    CREATE USER prg2 IDENTIFIED BY curso2026;
+
+    -- Darle permisos para conectarse y crear objetos
+    GRANT CONNECT, RESOURCE TO prg2;
+    GRANT UNLIMITED TABLESPACE TO prg2;
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+9. ESTRUCTURA DE CARPETAS DEL PROYECTO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+miapp\
+│
+├── js\                        ← Código del servidor (Node.js)
+│   ├── server.js              ← Punto de entrada: arranca el servidor
+│   ├── db.js                  ← Configuración de conexión a Oracle
+│   ├── package.json           ← Información del proyecto y dependencias
+│   └── node_modules\          ← Librerías instaladas (no tocar)
+│
+├── routes\                    ← Rutas HTTP (qué hacer con cada petición)
+│   ├── login.js               ← Ruta POST /api/login
+│   └── usuarios.js            ← Rutas GET/POST/PUT/DELETE /api/usuarios
+│
+├── public\                    ← Archivos HTML que ve el navegador
+│   ├── login.html             ← Pantalla de acceso al sistema
+│   ├── menu.html              ← Menú principal (Alta/Consulta/Modif./Baja)
+│   ├── crear.html             ← Formulario para agregar un usuario
+│   ├── listar.html            ← Tabla con todos los usuarios
+│   ├── actualizar.html        ← Formulario para modificar contraseña
+│   └── eliminar.html          ← Formulario para eliminar un usuario
+│
+└── css\                       ← Estilos visuales
+    └── styles.css             ← Diseño de botones, tarjetas, colores, etc.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+10. TABLA DE USUARIOS EN ORACLE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Conectado en SQL Developer con el usuario PRG2, ejecutar el siguiente
+script para crear la tabla que usa la aplicación:
+
+    CREATE TABLE usuarios (
+        id_usuario     NUMBER          GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+        nombre         VARCHAR2(100)   NOT NULL,
+        apellido       VARCHAR2(100)   NOT NULL,
+        email          VARCHAR2(150)   NOT NULL,
+        passw          VARCHAR2(100)   NOT NULL,
+        fecha_creacion DATE            DEFAULT SYSDATE,
+        estado         VARCHAR2(20)    DEFAULT 'ACTIVO'
+    );
+
+Explicación de cada columna:
+  · id_usuario     → Número único autoincremental. Oracle lo genera solo.
+  · nombre         → Texto de hasta 100 caracteres. Obligatorio (NOT NULL).
+  · apellido       → Texto de hasta 100 caracteres. Obligatorio.
+  · email          → Texto de hasta 150 caracteres. Obligatorio.
+  · passw          → Contraseña del usuario. Obligatorio.
+  · fecha_creacion → Se completa automáticamente con la fecha actual (SYSDATE).
+  · estado         → Por defecto vale 'ACTIVO'.
+
+Para verificar que la tabla se creó correctamente:
+
+    SELECT * FROM usuarios;
+
+Para insertar un usuario de prueba:
+
+    INSERT INTO usuarios (nombre, apellido, email, passw)
+    VALUES ('Richard', 'Paredes', 'richard@email.com', '1234');
+
+    COMMIT;
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+11. EJECUCIÓN DEL SERVIDOR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PASO 1 — Verificar que Oracle XE está corriendo
+  · Menú Inicio → Servicios → "OracleServiceXE" debe estar "En ejecución".
+
+PASO 2 — Abrir PowerShell o CMD
+
+PASO 3 — Navegar a la carpeta js del proyecto
+
+    cd C:\Información\proyectos\HTML2\js
+
+PASO 4 — Iniciar el servidor
+
+    node server.js
+
+PASO 5 — Verificar que arrancó correctamente
+  · Debe aparecer en la terminal:
+
+    Servidor corriendo en http://localhost:3000
+
+  · Si aparece un error, leer la sección 14 de errores frecuentes.
+
+PASO 6 — Dejar la terminal abierta
+  · El servidor funciona mientras la terminal esté abierta.
+  · Para detenerlo: presionar Ctrl + C en la terminal.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+12. USO DE LA APLICACIÓN EN EL NAVEGADOR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Con el servidor corriendo, abrir el navegador y escribir:
+
+    http://localhost:3000/login.html
+
+IMPORTANTE: Siempre usar "localhost" como dirección.
+NO usar la dirección "reenviada" que muestra VS Code en el panel de puertos,
+ya que esa URL puede no funcionar correctamente.
+
+Flujo de uso:
+  1. Login       → Ingresar usuario y contraseña de un registro existente.
+  2. Menú        → Elegir la operación deseada.
+  3. Alta        → Completar formulario con nombre, apellido, email y contraseña.
+  4. Consulta    → Ver la lista completa de usuarios registrados.
+  5. Modificación → Escribir el nombre y la nueva contraseña.
+  6. Baja        → Escribir el nombre y confirmar la eliminación.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+13. RESUMEN DE RUTAS Y OPERACIONES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Método  │ URL                    │ Acción              │ Archivo origen
+  ────────┼────────────────────────┼─────────────────────┼───────────────
+  POST    │ /api/login             │ Verificar acceso    │ login.html
+  GET     │ /api/usuarios          │ Listar usuarios     │ listar.html
+  POST    │ /api/usuarios          │ Crear usuario       │ crear.html
+  PUT     │ /api/usuarios/:nombre  │ Modificar contraseña│ actualizar.html
+  DELETE  │ /api/usuarios/:nombre  │ Eliminar usuario    │ eliminar.html
+
+Los métodos HTTP indican la intención de la operación:
+  · GET    → Solo pide datos (no modifica nada).
+  · POST   → Crea un recurso nuevo.
+  · PUT    → Actualiza un recurso existente.
+  · DELETE → Elimina un recurso existente.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+14. ERRORES FRECUENTES Y SOLUCIONES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ERROR: "Cannot find module '../routes/login'"
+  CAUSA:  Se ejecutó "node server.js" desde la carpeta raíz en lugar de js\.
+  FIX:    cd js   →   node server.js
+
+ERROR: "ORA-12541: no listener"
+  CAUSA:  Oracle no está corriendo.
+  FIX:    Iniciar el servicio OracleServiceXE desde el panel de Servicios de Windows.
+
+ERROR: "ORA-01017: invalid username/password"
+  CAUSA:  El usuario o contraseña en db.js no coinciden con los de Oracle.
+  FIX:    Verificar user y password en js\db.js.
+
+ERROR: "ORA-00942: la tabla o vista no existe"
+  CAUSA:  La tabla "usuarios" no fue creada en el esquema del usuario.
+  FIX:    Ejecutar el CREATE TABLE de la sección 10 en SQL Developer.
+
+ERROR: "ORA-00904: identificador no válido"
+  CAUSA:  Un nombre de columna en el SQL no coincide con el de la tabla.
+  FIX:    Verificar los nombres exactos con:
+          SELECT column_name FROM user_tab_columns WHERE table_name = 'USUARIOS';
+
+ERROR: "EADDRINUSE: address already in use :::3000"
+  CAUSA:  El puerto 3000 ya lo está usando otro proceso (servidor anterior).
+  FIX:    Cerrar la terminal anterior o cambiar el puerto en server.js.
+
+ERROR: La página no carga (ERR_CONNECTION_REFUSED)
+  CAUSA:  El servidor Node no está corriendo.
+  FIX:    Ir a la carpeta js\ y ejecutar "node server.js".
+
+ERROR: Los estilos no se ven (página sin diseño)
+  CAUSA:  El archivo css\styles.css no existe o tiene otro nombre.
+  FIX:    Verificar que el archivo exista en la carpeta css\ del proyecto.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CHECKLIST FINAL — Antes de ejecutar la aplicación
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  [ ] Oracle XE 21c instalado y el servicio OracleServiceXE corriendo
+  [ ] Usuario prg2 creado en Oracle con permisos
+  [ ] Tabla "usuarios" creada en el esquema de prg2
+  [ ] Al menos un registro en la tabla para poder hacer login
+  [ ] Node.js instalado (verificado con "node --version")
+  [ ] Dependencias instaladas (npm install dentro de la carpeta js\)
+  [ ] Datos correctos en js\db.js (usuario, contraseña, connectString)
+  [ ] Terminal abierta en la carpeta js\ con "node server.js" ejecutado
+  [ ] Navegador abierto en http://localhost:3000/login.html
+
+Si todos los puntos están marcados, la aplicación debe funcionar correctamente.

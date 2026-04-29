@@ -1,0 +1,100 @@
+/* Fuente y colores base */
+body {
+    font-family: "Segoe UI", Arial, sans-serif; /* Define la tipografía principal del sitio */
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb); /* Fondo degradado diagonal en tonos celestes */
+    margin: 0; /* Elimina márgenes por defecto del navegador */
+    padding: 0; /* Elimina relleno interno por defecto */
+    color: #333; /* Color de texto base (gris oscuro para buena legibilidad) */
+}
+
+/* Encabezado */
+.header {
+    background: #0d47a1; /* Color de fondo azul oscuro */
+    color: white; /* Texto en blanco para contraste */
+    padding: 40px 20px; /* Espacio interno: 40px arriba/abajo y 20px a los lados */
+    text-align: center; /* Centra el contenido horizontalmente */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2); /* Sombra debajo del encabezado para dar profundidad */
+}
+
+/* Contenedor principal */
+.container {
+    display: flex; /* Activa Flexbox para organizar elementos */
+    justify-content: center; /* Centra horizontalmente el contenido */
+    padding: 40px 20px; /* Espacio interno alrededor del contenedor */
+}
+
+/* Tarjeta */
+.card {
+    background: white; /* Fondo blanco para contraste con el degradado */
+    padding: 30px; /* Espacio interno amplio */
+    border-radius: 12px; /* Esquinas redondeadas */
+    width: 100%; /* Ocupa todo el ancho disponible */
+    max-width: 450px; /* Limita el ancho máximo para que no se estire demasiado */
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15); /* Sombra suave para efecto de tarjeta elevada */
+    animation: fadeIn 0.8s ease-in-out; /* Aplica animación de entrada suave */
+}
+
+/* Botones */
+.btn-group {
+    margin-top:40px; /* Espacio superior para separar los botones del texto */
+    display: flex; /* Usa Flexbox para alinear los botones en fila */
+    gap: 15px; /* Espacio entre los botones */
+}
+
+.btn {
+    flex: 1; /* Cada botón ocupa el mismo espacio dentro del grupo */
+    padding: 12px 30px; /* Espacio interno para que el botón sea cómodo */
+    border: none; /* Elimina borde por defecto */
+    border-radius: 8px; /* Esquinas redondeadas */
+    cursor: pointer; /* Cambia el cursor a “mano” al pasar por encima */
+    font-size: 15px; /* Tamaño de texto del botón */
+    transition: 0.3s ease; /* Transición suave para efectos hover */
+}
+
+.btn.primario {
+    background-color: #1976d2; /* Azul principal */
+    color: white; /* Texto en blanco */
+}
+
+.btn.btn.primario:hover {
+    background-color: #0d47a1; /* Azul más oscuro al pasar el mouse */
+}
+
+.btn.secundario {
+    background-color: #36c54e; /* Verde para botón secundario */
+    color: white; /* Texto en blanco */
+}
+
+.btn.secundario:hover {
+    background-color: #9a0007; /* Rojo oscuro al pasar el mouse (efecto contraste) */
+}
+
+/* NUEVO: Estilo para inputs */
+input {
+    width: 100%;              /* Ocupa todo el ancho disponible */
+    padding: 12px;            /* Espacio interno cómodo para escribir */
+    border-radius: 6px;       /* Esquinas redondeadas */
+    border: 1px solid #90caf9;/* Borde azul claro */
+    margin-bottom: 15px;      /* Separación entre campos */
+}
+
+/* NUEVO: Efecto al enfocar */
+input:focus {
+    border-color: #1976d2; /* Cambia el color del borde al azul más intenso */
+    outline: none;         /* Elimina el borde de enfoque por defecto del navegador */
+}
+
+/* NUEVO: Animación fadeIn aplicada a la tarjeta */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); } /* Empieza invisible y desplazada hacia abajo */
+    to   { opacity: 1; transform: translateY(0); }    /* Termina visible y en su posición normal */
+}
+
+/* Pie de página */
+.footer {
+    background: #263238; /* Fondo gris oscuro */
+    color: white;        /* Texto en blanco */
+    text-align: center;  /* Centra el texto */
+    padding: 15px;       /* Espacio interno */
+    margin-top: 40px;    /* Separación respecto al contenido principal */
+}
