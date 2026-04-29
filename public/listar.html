@@ -15,19 +15,19 @@
       margin-top: 16px;          /* Separación superior respecto al título */
     }
 
-    th, td {
+    .encabezado-columna, .celda-dato {
       padding: 10px 14px;        /* Espacio interno de cada celda (arriba/abajo y lados) */
       text-align: left;          /* Texto alineado a la izquierda */
       border-bottom: 1px solid #ddd; /* Línea separadora entre filas */
       font-size: 14px;
     }
 
-    th {
+    .encabezado-columna {
       background-color: #3b82f6; /* Fondo azul para los encabezados */
       color: white;              /* Texto blanco en los encabezados */
     }
 
-    tr:hover {
+    .fila-usuario:hover {
       background-color: #f0f4ff; /* Al pasar el mouse sobre una fila, cambia de color */
     }
   </style>
@@ -48,13 +48,13 @@
       <table id="tablaUsuarios">
         <thead>
           <!-- Encabezados de columna de la tabla -->
-          <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Apellido</th>
-            <th>Email</th>
-            <th>Fecha creación</th>
-            <th>Estado</th>
+          <tr class="fila-encabezado">
+            <th class="encabezado-columna">ID</th>
+            <th class="encabezado-columna">Nombre</th>
+            <th class="encabezado-columna">Apellido</th>
+            <th class="encabezado-columna">Email</th>
+            <th class="encabezado-columna">Fecha creación</th>
+            <th class="encabezado-columna">Estado</th>
           </tr>
         </thead>
 
@@ -98,6 +98,7 @@
 
           // Creamos una fila HTML (<tr>) para este usuario.
           const fila = document.createElement('tr');
+          fila.className = 'fila-usuario';
 
           // Formateamos la fecha de creación al estilo argentino (dd/mm/aaaa).
           // El operador "?" verifica si existe el valor antes de formatearlo.
@@ -108,12 +109,12 @@
           // Construimos el HTML interno de la fila con los datos del usuario.
           // El operador "??" muestra '-' si el valor es null o undefined.
           fila.innerHTML = `
-            <td>${usuario.ID_USUARIO}</td>
-            <td>${usuario.NOMBRE}</td>
-            <td>${usuario.APELLIDO}</td>
-            <td>${usuario.EMAIL}</td>
-            <td>${fechaFormateada}</td>
-            <td>${usuario.ESTADO ?? '-'}</td>
+            <td class="celda-dato">${usuario.ID_USUARIO}</td>
+            <td class="celda-dato">${usuario.NOMBRE}</td>
+            <td class="celda-dato">${usuario.APELLIDO}</td>
+            <td class="celda-dato">${usuario.EMAIL}</td>
+            <td class="celda-dato">${fechaFormateada}</td>
+            <td class="celda-dato">${usuario.ESTADO ?? '-'}</td>
           `;
 
           // Agregamos la fila al cuerpo de la tabla en la página.

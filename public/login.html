@@ -67,13 +67,21 @@
       };
 
       try {
-        // fetch() envía los datos al servidor sin recargar la página.
-        // method: 'POST' indica que estamos enviando datos (no solo pidiendo).
-        // headers: le avisa al servidor que los datos vienen en formato JSON.
-        // body: convierte el objeto a texto JSON para enviarlo.
+        // await pausa la ejecución hasta que el servidor responda.
+        // fetch('/api/login', ...) hace una petición HTTP a esa ruta del servidor.
+        // El resultado (respuesta del servidor) queda guardado en "respuesta".
         const respuesta = await fetch('/api/login', {
+
+          // method: 'POST' → enviamos datos al servidor (no solo los pedimos como haría GET).
           method: 'POST',
+
+          // headers → metadatos que acompañan la petición.
+          // 'Content-Type': 'application/json' le avisa al servidor que el cuerpo viene en formato JSON.
           headers: { 'Content-Type': 'application/json' },
+
+          // body → el contenido que se envía al servidor.
+          // JSON.stringify(credenciales) convierte el objeto { usuario, clave } a texto JSON,
+          // ya que HTTP solo puede transportar texto, no objetos JavaScript directamente.
           body: JSON.stringify(credenciales)
         });
 
