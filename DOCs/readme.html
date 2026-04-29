@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conectar Node.js con Oracle XE</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f2f5;
+      color: #333;
+      padding: 2rem;
+    }
+
+    h1 {
+      text-align: center;
+      color: #1a1a2e;
+      font-size: 1.8rem;
+      margin-bottom: 2rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 3px solid #e94560;
+    }
+
+    .step {
+      background: #fff;
+      border-radius: 8px;
+      padding: 1.5rem 1.75rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border-left: 5px solid #e94560;
+    }
+
+    .step h2 {
+      font-size: 1.1rem;
+      color: #e94560;
+      margin-bottom: 0.75rem;
+    }
+
+    .step p {
+      margin-bottom: 0.75rem;
+      line-height: 1.6;
+    }
+
+    pre {
+      background: #1a1a2e;
+      color: #c9d1d9;
+      border-radius: 6px;
+      padding: 1rem 1.25rem;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 0.88rem;
+      overflow-x: auto;
+      margin-top: 0.5rem;
+    }
+
+    .lang-label {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: #e94560;
+      color: #fff;
+      border-radius: 4px 4px 0 0;
+      padding: 0.2rem 0.6rem;
+      margin-top: 0.75rem;
+    }
+
+    .comment { color: #8b949e; }
+    .keyword { color: #ff7b72; }
+    .string  { color: #a5d6ff; }
+    .func    { color: #d2a8ff; }
+
+    .file-tree {
+      background: #1a1a2e;
+      color: #c9d1d9;
+      border-radius: 6px;
+      padding: 1rem 1.25rem;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 0.88rem;
+      margin-top: 0.5rem;
+    }
+
+    .url {
+      display: inline-block;
+      background: #eef6ff;
+      border: 1px solid #b3d4f0;
+      border-radius: 4px;
+      padding: 0.2rem 0.6rem;
+      font-family: monospace;
+      color: #0969da;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Conectar Node.js con Oracle XE y usar Login</h1>
+
+  <!-- Paso 1 -->
+  <div class="step">
+    <h2>Paso 1 — Instalar el cliente de Oracle para Node.js</h2>
+    <p>En tu proyecto, ejecutá:</p>
+    <span class="lang-label">PowerShell</span>
+    <pre>npm install oracledb</pre>
+    <p>Esto instala el driver oficial de Oracle para Node.js.</p>
+  </div>
+
+  <!-- Paso 2 -->
+  <div class="step">
+    <h2>Paso 2 — Configurar la conexión</h2>
+    <p>Crea un archivo <strong>db.js</strong> con la configuración:</p>
+    <span class="lang-label">JavaScript — db.js</span>
+    <pre><span class="keyword">const</span> oracledb = <span class="func">require</span>(<span class="string">'oracledb'</span>);
+
+<span class="keyword">const</span> config = {
+  user:          <span class="string">"system"</span>,             <span class="comment">// Usuario de Oracle</span>
+  password:      <span class="string">"tu_contraseña"</span>,      <span class="comment">// Contraseña definida en la instalación</span>
+  connectString: <span class="string">"localhost/XEPDB1"</span>    <span class="comment">// Puede ser XE o XEPDB1 según tu instalación</span>
+};
+
+module.exports = config;</pre>
+  </div>
+
+  <!-- Paso 3 -->
+  <div class="step">
+    <h2>Paso 3 — Crear el servidor con Express</h2>
+    <p>En <strong>server.js</strong>:</p>
+    <span class="lang-label">JavaScript — server.js</span>
+    <pre><span class="keyword">const</span> express    = <span class="func">require</span>(<span class="string">'express'</span>);
+<span class="keyword">const</span> oracledb   = <span class="func">require</span>(<span class="string">'oracledb'</span>);
+<span class="keyword">const</span> bodyParser = <span class="func">require</span>(<span class="string">'body-parser'</span>);
+<span class="keyword">const</span> config     = <span class="func">require</span>(<span class="string">'./db'</span>);
+
+<span class="keyword">const</span> app = <span class="func">express</span>();
+app.<span class="func">use</span>(bodyParser.<span class="func">urlencoded</span>({ extended: <span class="keyword">true</span> }));
+app.<span class="func">use</span>(bodyParser.<span class="func">json</span>());
+
+<span class="comment">// Ruta de login</span>
+app.<span class="func">post</span>(<span class="string">'/login'</span>, <span class="keyword">async</span> (req, res) =&gt; {
+  <span class="keyword">const</span> { usuario, clave } = req.body;
+
+  <span class="keyword">try</span> {
+    <span class="keyword">const</span> connection = <span class="keyword">await</span> oracledb.<span class="func">getConnection</span>(config);
+
+    <span class="keyword">const</span> result = <span class="keyword">await</span> connection.<span class="func">execute</span>(
+      <span class="string">`SELECT * FROM usuario WHERE nombre = :usuario AND clave = :clave`</span>,
+      [usuario, clave]
+    );
+
+    <span class="keyword">await</span> connection.<span class="func">close</span>();
+
+    <span class="keyword">if</span> (result.rows.length &gt; <span class="string">0</span>) {
+      res.<span class="func">send</span>(<span class="string">"Login exitoso. Bienvenido "</span> + usuario);
+    } <span class="keyword">else</span> {
+      res.<span class="func">status</span>(<span class="string">401</span>).<span class="func">send</span>(<span class="string">"Usuario o contraseña incorrectos"</span>);
+    }
+
+  } <span class="keyword">catch</span> (err) {
+    console.<span class="func">error</span>(err);
+    res.<span class="func">status</span>(<span class="string">500</span>).<span class="func">send</span>(<span class="string">"Error en el servidor"</span>);
+  }
+});
+
+app.<span class="func">listen</span>(<span class="string">3000</span>, () =&gt; {
+  console.<span class="func">log</span>(<span class="string">"Servidor corriendo en http://localhost:3000"</span>);
+});</pre>
+  </div>
+
+  <!-- Paso 4 -->
+  <div class="step">
+    <h2>Paso 4 — Crear el formulario HTML</h2>
+    <p>En tu carpeta <strong>public/index.html</strong>:</p>
+    <span class="lang-label">HTML — public/index.html</span>
+    <pre><span class="keyword">&lt;!DOCTYPE html&gt;</span>
+<span class="keyword">&lt;html&gt;</span>
+<span class="keyword">&lt;head&gt;</span>
+  <span class="keyword">&lt;title&gt;</span>Login<span class="keyword">&lt;/title&gt;</span>
+<span class="keyword">&lt;/head&gt;</span>
+<span class="keyword">&lt;body&gt;</span>
+  <span class="keyword">&lt;form</span> action=<span class="string">"/login"</span> method=<span class="string">"POST"</span><span class="keyword">&gt;</span>
+    <span class="keyword">&lt;label&gt;</span>Usuario:<span class="keyword">&lt;/label&gt;</span>
+    <span class="keyword">&lt;input</span> type=<span class="string">"text"</span> name=<span class="string">"usuario"</span> required<span class="keyword">&gt;</span>
+    <span class="keyword">&lt;br&gt;</span>
+    <span class="keyword">&lt;label&gt;</span>Contraseña:<span class="keyword">&lt;/label&gt;</span>
+    <span class="keyword">&lt;input</span> type=<span class="string">"password"</span> name=<span class="string">"clave"</span> required<span class="keyword">&gt;</span>
+    <span class="keyword">&lt;br&gt;</span>
+    <span class="keyword">&lt;button</span> type=<span class="string">"submit"</span><span class="keyword">&gt;</span>Ingresar<span class="keyword">&lt;/button&gt;</span>
+  <span class="keyword">&lt;/form&gt;</span>
+<span class="keyword">&lt;/body&gt;</span>
+<span class="keyword">&lt;/html&gt;</span></pre>
+  </div>
+
+  <!-- Paso 5 -->
+  <div class="step">
+    <h2>Paso 5 — Probar el login</h2>
+    <p>Ejecutá el servidor:</p>
+    <span class="lang-label">PowerShell</span>
+    <pre>node server.js</pre>
+    <p>Abrí en el navegador:</p>
+    <div class="url">http://localhost:3000/index.html</div>
+  </div>
+
+  <!-- Paso 6 — Inicializar proyecto -->
+  <div class="step">
+    <h2>Paso 6 — Inicializar el proyecto Node (carpeta js)</h2>
+    <p>Conectar Node a Oracle. En la carpeta <strong>js</strong>, ejecutá:</p>
+    <span class="lang-label">PowerShell</span>
+    <pre>npm init -y
+npm install express oracledb body-parser</pre>
+    <p>Verificá que se instalaron. En la carpeta del proyecto deberías ver:</p>
+    <div class="file-tree">/node_modules
+package.json
+package-lock.json
+server.js
+db.js</div>
+  </div>
+
+</body>
+</html>
