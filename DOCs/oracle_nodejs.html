@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oracle XE + Node.js — Guía de Integración | PR2 Columbia</title>
+<style>
+  :root {
+    --col-p:      #0b6967;
+    --col-pd:     #094f4d;
+    --col-pl:     #0e8a87;
+    --col-acc:    #c47a28;
+    --col-accl:   #e8a84e;
+    --col-bg:     #f2f8f8;
+    --col-surf:   #ffffff;
+    --col-code:   #0a2424;
+    --col-codehl: #133535;
+    --col-txt:    #172828;
+    --col-mid:    #3d5e5e;
+    --col-soft:   #6e8f8f;
+    --col-bdr:    #bdd8d8;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--col-bg);
+    color: var(--col-txt);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  header {
+    background: linear-gradient(135deg, var(--col-pd) 0%, var(--col-p) 60%, var(--col-pl) 100%);
+    color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 3px 12px rgba(9,79,77,0.4);
+  }
+  .header-top {
+    display: flex; align-items: center; gap: 16px;
+    padding: 14px 32px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+  }
+  .header-badge {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase; white-space: nowrap;
+  }
+  .header-title { flex: 1; }
+  .header-title h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.3px; }
+  .header-title p  { font-size: 0.78rem; opacity: 0.78; margin-top: 2px; }
+  .header-meta { font-size: 0.72rem; opacity: 0.65; text-align: right; line-height: 1.5; }
+
+  .nav-bar {
+    display: flex; flex-wrap: wrap; gap: 4px;
+    padding: 8px 32px;
+    background: var(--col-pd); overflow-x: auto;
+  }
+  .nav-bar a {
+    color: rgba(255,255,255,0.8); text-decoration: none;
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.5px;
+    padding: 4px 10px; border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.15);
+    transition: all 0.2s; white-space: nowrap;
+  }
+  .nav-bar a:hover {
+    background: rgba(255,255,255,0.15); color: #fff;
+    border-color: rgba(255,255,255,0.4);
+  }
+
+  main { max-width: 1000px; margin: 0 auto; padding: 28px 24px 60px; }
+
+  section {
+    background: var(--col-surf); border-radius: 12px;
+    margin-bottom: 24px; border: 1px solid var(--col-bdr);
+    overflow: hidden; box-shadow: 0 2px 8px rgba(11,105,103,0.07);
+  }
+  .sec-header {
+    background: linear-gradient(90deg, var(--col-p) 0%, var(--col-pl) 100%);
+    color: #fff; padding: 14px 24px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .sec-num {
+    background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 6px; width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 0.8rem; flex-shrink: 0;
+  }
+  .sec-header h2 { font-size: 1rem; font-weight: 700; letter-spacing: -0.2px; }
+  .sec-body { padding: 22px 24px; }
+
+  .subsec { border-left: 3px solid var(--col-p); margin: 18px 0; padding-left: 16px; }
+  .subsec h3 {
+    font-size: 0.88rem; font-weight: 700; color: var(--col-p);
+    text-transform: uppercase; letter-spacing: 0.8px;
+    margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+  }
+  .subsec h3::before {
+    content: ''; display: inline-block; width: 6px; height: 6px;
+    background: var(--col-acc); border-radius: 50%;
+  }
+
+  .code-wrap {
+    background: var(--col-code); border-radius: 8px;
+    margin: 12px 0; overflow: hidden; border: 1px solid #1a4040;
+  }
+  .code-label {
+    background: var(--col-codehl); color: var(--col-accl);
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 1.2px;
+    text-transform: uppercase; padding: 5px 14px;
+    border-bottom: 1px solid #1a4040;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .code-label::before { content: '●'; color: var(--col-acc); font-size: 0.7rem; }
+  pre {
+    padding: 16px; overflow-x: auto;
+    font-family: 'Cascadia Code', 'Consolas', 'Fira Code', monospace;
+    font-size: 0.82rem; line-height: 1.6; color: #d4efef; tab-size: 4;
+  }
+  .kw  { color: #7dd8d6; font-weight: 600; }
+  .str { color: #a8d8a8; }
+  .cmt { color: #5a8888; font-style: italic; }
+  .num { color: var(--col-accl); }
+  .fn  { color: #9ecfcf; }
+  .ps  { color: #b8d4d4; }
+
+  code {
+    background: rgba(11,105,103,0.12); color: var(--col-pd);
+    border: 1px solid var(--col-bdr); border-radius: 4px;
+    padding: 1px 6px;
+    font-family: 'Cascadia Code', 'Consolas', monospace; font-size: 0.82em;
+  }
+
+  .info-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 12px 0; }
+  .info-table th {
+    background: var(--col-p); color: #fff; padding: 8px 14px;
+    text-align: left; font-size: 0.75rem; letter-spacing: 0.5px; font-weight: 700;
+  }
+  .info-table td { padding: 8px 14px; border-bottom: 1px solid var(--col-bdr); vertical-align: top; }
+  .info-table tr:nth-child(even) td { background: #f5fbfb; }
+  .info-table tr:last-child td { border-bottom: none; }
+  .info-table td:first-child { font-weight: 600; color: var(--col-p); font-family: monospace; }
+
+  .nota {
+    background: rgba(196,122,40,0.08); border: 1px solid rgba(196,122,40,0.3);
+    border-left: 4px solid var(--col-acc); border-radius: 6px;
+    padding: 11px 16px; margin: 12px 0; font-size: 0.85rem; color: #5a3a0a;
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .nota::before { content: '⚠'; font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+
+  .tip {
+    background: rgba(11,105,103,0.07); border: 1px solid rgba(11,105,103,0.25);
+    border-left: 4px solid var(--col-p); border-radius: 6px;
+    padding: 11px 16px; margin: 12px 0; font-size: 0.85rem; color: var(--col-pd);
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .tip::before { content: '💡'; font-size: 0.9rem; flex-shrink: 0; margin-top: 1px; }
+
+  p { color: var(--col-mid); margin-bottom: 10px; font-size: 0.9rem; }
+  ul, ol { padding-left: 20px; margin-bottom: 10px; }
+  li { color: var(--col-mid); font-size: 0.9rem; margin-bottom: 4px; }
+  li strong { color: var(--col-txt); }
+
+  .steps { counter-reset: step; list-style: none; padding: 0; margin: 12px 0; }
+  .steps li { counter-increment: step; display: flex; gap: 14px; align-items: flex-start; margin-bottom: 12px; }
+  .steps li::before {
+    content: counter(step); background: var(--col-p); color: #fff;
+    border-radius: 50%; width: 24px; height: 24px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.72rem; font-weight: 800; flex-shrink: 0; margin-top: 2px;
+  }
+  .steps li span { color: var(--col-mid); font-size: 0.88rem; }
+
+  .endpoint-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin: 12px 0; }
+  .endpoint-table th { background: var(--col-p); color: #fff; padding: 8px 12px; text-align: left; }
+  .endpoint-table td { padding: 7px 12px; border-bottom: 1px solid var(--col-bdr); vertical-align: top; }
+  .endpoint-table tr:nth-child(even) td { background: #f5fbfb; }
+  .endpoint-table tr:last-child td { border-bottom: none; }
+  .method { display: inline-block; padding: 2px 8px; border-radius: 4px; font-weight: 700; font-size: 0.7rem; }
+  .get    { background: #d4edda; color: #0d6b4f; }
+  .post   { background: #d0eaff; color: #0b4e80; }
+  .put    { background: #fff3cd; color: #7a5200; }
+  .patch  { background: #e8d4f5; color: #5a1a8f; }
+  .delete { background: #f8d7da; color: #842029; }
+
+  footer {
+    background: var(--col-pd); color: rgba(255,255,255,0.7);
+    text-align: center; padding: 20px; font-size: 0.78rem; line-height: 1.8;
+  }
+  footer strong { color: #fff; }
+
+  @media (max-width: 680px) {
+    .header-top { padding: 12px 16px; flex-wrap: wrap; }
+    .nav-bar { padding: 8px 16px; }
+    main { padding: 16px 12px 40px; }
+    .sec-body { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="header-badge">PR2 · Node.js</div>
+    <div class="header-title">
+      <h1>Oracle XE 21c + Node.js — Guía de Integración</h1>
+      <p>Express · oracledb (modo Thin) · REST API · HTML5 · Unidades 10, 11 y 12</p>
+    </div>
+    <div class="header-meta">
+      Universidad Columbia del Paraguay<br>
+      Programación 2 · 2025
+    </div>
+  </div>
+  <nav class="nav-bar">
+    <a href="#s1">1. Instalación</a>
+    <a href="#s2">2. Conexión básica</a>
+    <a href="#s3">3. Pool de conexiones</a>
+    <a href="#s4">4. Módulo DB</a>
+    <a href="#s5">5. CRUD completo</a>
+    <a href="#s6">6. API REST</a>
+    <a href="#s7">7. Frontend HTML5</a>
+    <a href="#s8">8. Manejo de errores</a>
+    <a href="#s9">9. Variables .env</a>
+    <a href="#s10">10. Proyecto paso a paso</a>
+    <a href="#s11">11. Probar la API</a>
+  </nav>
+</header>
+
+<main>
+
+<!-- ══════════════════════════════════════════════════════════ SECCIÓN 1 -->
+<section id="s1">
+  <div class="sec-header"><div class="sec-num">1</div><h2>Instalación y Configuración del Entorno</h2></div>
+  <div class="sec-body">
+
+    <div class="tip">Antes de empezar, verificar que Oracle XE está corriendo: <code>Get-Service "OracleServiceXE"</code> debe mostrar <strong>Running</strong>.</div>
+
+    <div class="subsec"><h3>Requisitos previos</h3>
+      <ul>
+        <li>Oracle XE 21c instalado y corriendo (ver <em>oracle.html</em> sección 2)</li>
+        <li>PDB <strong>XEPDB1</strong> abierta en modo READ WRITE (ver <em>oracle.html</em> sección 4)</li>
+        <li>Usuario <code>admin_web</code> creado en XEPDB1 (ver <em>oracle.html</em> sección 5)</li>
+        <li>Tablas del proyecto creadas (ver <em>oracle.html</em> sección 7)</li>
+        <li><strong>Node.js v18+</strong> instalado</li>
+      </ul>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-label">PowerShell — Verificar Node.js e inicializar proyecto</div>
+      <pre><span class="cmt"># Verificar versión de Node.js (requiere v18+):</span>
+node --version
+npm  --version
+
+<span class="cmt"># Crear carpeta e inicializar proyecto:</span>
+mkdir proyecto-web-oracle
+<span class="kw">cd</span>    proyecto-web-oracle
+npm   <span class="kw">init</span> -y</pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-label">PowerShell — Instalar dependencias</div>
+      <pre><span class="cmt"># Dependencias de producción:</span>
+npm install oracledb   <span class="cmt"># Driver Oracle para Node.js (v6+ soporta modo Thin)</span>
+npm install express    <span class="cmt"># Servidor web y API REST</span>
+npm install dotenv     <span class="cmt"># Variables de entorno desde .env</span>
+npm install cors       <span class="cmt"># Habilitar peticiones cross-origin del navegador</span>
+
+<span class="cmt"># Dependencia de desarrollo:</span>
+npm install nodemon --save-dev   <span class="cmt"># Reinicio automático al guardar cambios</span></pre>
+    </div>
+
+    <div class="subsec"><h3>Modo Thin vs Modo Thick</h3>
+      <table class="info-table">
+        <tr><th>Modo</th><th>Descripción</th><th>¿Cuándo usar?</th></tr>
+        <tr><td>THIN (recomendado)</td><td>No requiere Oracle Instant Client instalado. Solo oracledb v6+.</td><td>Clase, Oracle XE 21c, desarrollo local</td></tr>
+        <tr><td>THICK</td><td>Requiere Oracle Instant Client en <code>C:\oracle\instantclient_21_x</code>. Más funciones avanzadas.</td><td>Producción enterprise, Advanced Queuing, DRCP</td></tr>
+      </table>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-label">Estructura de carpetas del proyecto</div>
+      <pre>proyecto-web-oracle/
+├── .env                      <span class="cmt">← Credenciales Oracle XE (NO subir a Git)</span>
+├── .gitignore
+├── package.json
+├── server.js                 <span class="cmt">← Punto de entrada principal</span>
+├── db/
+│   ├── pool.js               <span class="cmt">← Pool de conexiones Oracle XE</span>
+│   └── db.js                 <span class="cmt">← Métodos CRUD reutilizables</span>
+├── models/
+│   ├── usuarioModel.js
+│   ├── productoModel.js
+│   └── pedidoModel.js
+├── routes/
+│   ├── usuarios.js
+│   ├── productos.js
+│   └── pedidos.js
+├── middleware/
+│   └── errorHandler.js
+└── public/
+    ├── index.html
+    └── js/
+        └── app.js</pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-label">package.json — Configurar scripts de inicio</div>
+      <pre>{
+  <span class="str">"scripts"</span>: {
+    <span class="str">"start"</span>: <span class="str">"node server.js"</span>,
+    <span class="str">"dev"</span>:   <span class="str">"nodemon server.js"</span>
+  }
+}</pre>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ SECCIÓN 2 -->
+<section id="s2">
+  <div class="sec-header"><div class="sec-num">2</div><h2>Conexión Básica a Oracle XE con oracledb (Modo Thin)</h2></div>
+  <div class="sec-body">
+
+    <p>Antes de construir el servidor completo, conviene probar la conexión con un script simple.</p>
+
+    <div class="code-wrap">
+      <div class="code-label">db/connection.js — Módulo de conexión simple</div>
+      <pre><span class="kw">const</span> oracledb = <span class="fn">require</span>(<span class="str">'oracledb'</span>);
+
+<span class="cmt">// MODO THIN: no requiere Oracle Client adicional</span>
+<span class="cmt">// Compatible con Oracle XE 21c y la PDB XEPDB1</span>
+oracledb.thin = <span class="kw">true</span>;   <span class="cmt">// Activar explícitamente modo Thin</span>
+
+<span class="kw">const</span> configuracionOracle = {
+    user:          <span class="str">'admin_web'</span>,
+    password:      <span class="str">'AdminWeb2024#'</span>,
+    connectString: <span class="str">'localhost:1521/XEPDB1'</span>   <span class="cmt">// PDB de Oracle XE 21c</span>
+};
+
+<span class="cmt">// Abrir una conexión individual (para pruebas o transacciones manuales)</span>
+<span class="kw">async function</span> <span class="fn">obtenerConexion</span>() {
+    <span class="kw">try</span> {
+        <span class="kw">const</span> conexion = <span class="kw">await</span> oracledb.<span class="fn">getConnection</span>(configuracionOracle);
+        console.<span class="fn">log</span>(<span class="str">'Conexión a Oracle XE (XEPDB1) exitosa'</span>);
+        <span class="kw">return</span> conexion;
+    } <span class="kw">catch</span> (errorDeConexion) {
+        console.<span class="fn">error</span>(<span class="str">'Error al conectar a Oracle XE:'</span>, errorDeConexion.message);
+        <span class="kw">throw</span> errorDeConexion;
+    }
+}
+
+<span class="cmt">// Cerrar la conexión de forma segura (usar en bloque finally)</span>
+<span class="kw">async function</span> <span class="fn">cerrarConexion</span>(conexion) {
+    <span class="kw">if</span> (conexion) {
+        <span class="kw">try</span> {
+            <span class="kw">await</span> conexion.<span class="fn">close</span>();
+        } <span class="kw">catch</span> (errorAlCerrar) {
+            console.<span class="fn">error</span>(<span class="str">'Error al cerrar conexión:'</span>, errorAlCerrar.message);
+        }
+    }
+}
+
+module.exports = { obtenerConexion, cerrarConexion };</pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-label">test_conexion.js — Script de prueba antes de iniciar el servidor</div>
+      <pre><span class="kw">const</span> { obtenerConexion, cerrarConexion } = <span class="fn">require</span>(<span class="str">'./db/connection'</span>);
+
+<span class="kw">async function</span> <span class="fn">probarConexionConOracle</span>() {
+    <span class="kw">let</span> conexion;
+    <span class="kw">try</span> {
+        conexion = <span class="kw">await</span> <span class="fn">obtenerConexion</span>();
+
+        <span class="cmt">// PASO 1: Verificar versión del motor Oracle XE</span>
+        <span class="kw">const</span> resultadoVersion = <span class="kw">await</span> conexion.<span class="fn">execute</span>(
+            <span class="str">"SELECT banner FROM v$version WHERE banner LIKE 'Oracle%' AND ROWNUM = 1"</span>
+        );
+        console.<span class="fn">log</span>(<span class="str">'Motor:'</span>, resultadoVersion.rows[<span class="num">0</span>][<span class="num">0</span>]);
+
+        <span class="cmt">// PASO 2: Verificar que estamos conectados a la PDB correcta</span>
+        <span class="kw">const</span> resultadoPDB = <span class="kw">await</span> conexion.<span class="fn">execute</span>(
+            <span class="str">"SELECT SYS_CONTEXT('USERENV','CON_NAME') AS pdb FROM dual"</span>
+        );
+        console.<span class="fn">log</span>(<span class="str">'PDB activa:'</span>, resultadoPDB.rows[<span class="num">0</span>][<span class="num">0</span>]);
+
+        <span class="cmt">// PASO 3: Contar tablas del esquema admin_web</span>
+        <span class="kw">const</span> resultadoTablas = <span class="kw">await</span> conexion.<span class="fn">execute</span>(
+            <span class="str">"SELECT COUNT(*) AS total FROM user_tables"</span>
+        );
+        console.<span class="fn">log</span>(<span class="str">'Tablas en esquema admin_web:'</span>, resultadoTablas.rows[<span class="num">0</span>][<span class="num">0</span>]);
+
+    } <span class="kw">catch</span> (error) {
+        console.<span class="fn">error</span>(<span class="str">'Error:'</span>, error.message);
+        console.<span class="fn">error</span>(<span class="str">'Verifique: 1) OracleServiceXE activo  2) XEPDB1 abierta  3) usuario admin_web existe'</span>);
+    } <span class="kw">finally</span> {
+        <span class="cmt">// El bloque finally garantiza que la conexión SIEMPRE se cierra</span>
+        <span class="kw">await</span> <span class="fn">cerrarConexion</span>(conexion);
+    }
+}
+
+<span class="fn">probarConexionConOracle</span>();</pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-label">PowerShell — Ejecutar el test de conexión</div>
+      <pre>node test_conexion.js
+
+<span class="cmt"># Si falla, verificar Oracle XE:</span>
+<span class="ps">Get-Service</span> <span class="str">"OracleServiceXE"</span>
+sqlplus sys/Oracle21c#@localhost:<span class="num">1521</span>/XE <span class="kw">as</span> sysdba
+<span class="kw">SHOW PDBS</span>;
+<span class="kw">ALTER PLUGGABLE DATABASE</span> XEPDB1 <span class="kw">OPEN</span>;</pre>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ SECCIÓN 3 -->
+<section id="s3">
+  <div class="sec-header"><div class="sec-num">3</div><h2>Pool de Conexiones — Conexión Eficiente</h2></div>
+  <div class="sec-body">
+
+    <p>El <strong>pool</strong> mantiene conexiones pre-abiertas para reutilizarlas. Evita la sobrecarga de abrir/cerrar una conexión en cada petición HTTP, lo que es crítico en una API REST.</p>
+
+    <div class="nota">Para Oracle XE 21c, <code>poolMax</code> no debe superar ~10 por los límites de la edición (2 CPUs, 2 GB RAM).</div>
+
+    <div class="code-wrap">
+      <div class="code-label">db/pool.js — Pool de conexiones Oracle XE</div>
+      <pre><span class="kw">const</span> oracledb = <span class="fn">require</span>(<span class="str">'oracledb'</span>);
+
+oracledb.thin = <span class="kw">true</span>;   <span class="cmt">// Modo Thin — sin Oracle Client adicional</span>
+
+<span class="cmt">// Configuración del pool usando variables de entorno (ver sección 9 — .env)</span>
+<span class="kw">const</span> configuracionPool = {
+    user:          process.env.DB_USER     || <span class="str">'admin_web'</span>,
+    password:      process.env.DB_PASSWORD || <span class="str">'AdminWeb2024#'</span>,
+    connectString: process.env.DB_CONNECT  || <span class="str">'localhost:1521/XEPDB1'</span>,
+
+    <span class="cmt">// Ajuste para Oracle XE 21c (límite de 2 CPUs y 2 GB RAM):</span>
+    poolMin:       <span class="num">1</span>,    <span class="cmt">// Mínimo de conexiones siempre abiertas</span>
+    poolMax:       <span class="num">5</span>,    <span class="cmt">// Máximo simultáneo (XE: no superar 10)</span>
+    poolIncrement: <span class="num">1</span>,    <span class="cmt">// Conexiones adicionales por demanda</span>
+    poolTimeout:   <span class="num">60</span>,   <span class="cmt">// Segundos de inactividad antes de cerrar</span>
+
+    <span class="cmt">// Retornar filas como objetos { COLUMNA: valor } en vez de arrays</span>
+    outFormat: oracledb.OUT_FORMAT_OBJECT
+};
+
+<span class="cmt">// Crear el pool al iniciar el servidor (llamar una sola vez)</span>
+<span class="kw">async function</span> <span class="fn">iniciarPool</span>() {
+    <span class="kw">try</span> {
+        <span class="kw">await</span> oracledb.<span class="fn">createPool</span>(configuracionPool);
+        console.<span class="fn">log</span>(<span class="str">`Pool Oracle XE iniciado: ${configuracionPool.connectString}`</span>);
+    } <span class="kw">catch</span> (errorDePool) {
+        console.<span class="fn">error</span>(<span class="str">'Error al crear pool Oracle XE:'</span>, errorDePool.message);
+        <span class="kw">throw</span> errorDePool;
+    }
+}
+
+<span class="cmt">// Cerrar el pool al apagar el servidor</span>
+<span class="kw">async function</span> <span class="fn">cerrarPool</span>() {
+    <span class="kw">try</span> {
+        <span class="kw">await</span> oracledb.<span class="fn">getPool</span>().<span class="fn">close</span>(<span class="num">10</span>);  <span class="cmt">// Espera 10s para que terminen las queries</span>
+        console.<span class="fn">log</span>(<span class="str">'Pool Oracle XE cerrado correctamente'</span>);
+    } <span class="kw">catch</span> (errorAlCerrar) {
+        console.<span class="fn">error</span>(<span class="str">'Error al cerrar pool:'</span>, errorAlCerrar.message);
+    }
+}
+
+<span class="cmt">// Función base para ejecutar cualquier query usando el pool</span>
+<span class="kw">async function</span> <span class="fn">ejecutarQuery</span>(consultaSQL, parametros = [], opcionesExtra = {}) {
+    <span class="kw">let</span> conexionDelPool;
+    <span class="kw">try</span> {
+        conexionDelPool = <span class="kw">await</span> oracledb.<span class="fn">getConnection</span>();   <span class="cmt">// Tomar del pool</span>
+        <span class="kw">const</span> resultadoConsulta = <span class="kw">await</span> conexionDelPool.<span class="fn">execute</span>(consultaSQL, parametros, {
+            outFormat:  oracledb.OUT_FORMAT_OBJECT,
+            autoCommit: <span class="kw">true</span>,
+            ...opcionesExtra
+        });
+        <span class="kw">return</span> resultadoConsulta;
+    } <span class="kw">catch</span> (errorDeQuery) {
+        console.<span class="fn">error</span>(<span class="str">'Error en query Oracle XE:'</span>, errorDeQuery.message);
+        <span class="kw">throw</span> errorDeQuery;
+    } <span class="kw">finally</span> {
+        <span class="cmt">// Siempre devolver la conexión al pool (incluso si hubo error)</span>
+        <span class="kw">if</span> (conexionDelPool) <span class="kw">await</span> conexionDelPool.<span class="fn">close</span>();
+    }
+}
+
+module.exports = { iniciarPool, cerrarPool, ejecutarQuery };</pre>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ SECCIÓN 4 -->
+<section id="s4">
+  <div class="sec-header"><div class="sec-num">4</div><h2>Módulo de Base de Datos Reutilizable</h2></div>
+  <div class="sec-body">
+
+    <p>Este módulo encapsula las operaciones más comunes sobre el pool para que los modelos no repitan lógica de conexión.</p>
+
+    <div class="code-wrap">
+      <div class="code-label">db/db.js — Métodos CRUD genéricos sobre Oracle XE</div>
+      <pre><span class="kw">const</span> { ejecutarQuery } = <span class="fn">require</span>(<span class="str">'./pool'</span>);
+<span class="kw">const</span> oracledb = <span class="fn">require</span>(<span class="str">'oracledb'</span>);
+
+<span class="kw">const</span> db = {
+
+    <span class="cmt">// SELECT — Devuelve un array de objetos [{ COL: valor }, ...]</span>
+    <span class="kw">async</span> <span class="fn">query</span>(consultaSQL, parametros = []) {
+        <span class="kw">const</span> resultado = <span class="kw">await</span> <span class="fn">ejecutarQuery</span>(consultaSQL, parametros);
+        <span class="kw">return</span> resultado.rows;   <span class="cmt">// Devuelve el arreglo de filas</span>
+    },
+
+    <span class="cmt">// SELECT — Devuelve solo el primer objeto, o null si no existe</span>
+    <span class="kw">async</span> <span class="fn">queryOne</span>(consultaSQL, parametros = []) {
+        <span class="kw">const</span> resultado = <span class="kw">await</span> <span class="fn">ejecutarQuery</span>(consultaSQL, parametros);
+        <span class="kw">return</span> resultado.rows[<span class="num">0</span>] || <span class="kw">null</span>;   <span class="cmt">// null si no encontró</span>
+    },
+
+    <span class="cmt">// INSERT / UPDATE / DELETE — Devuelve cantidad de filas afectadas</span>
+    <span class="kw">async</span> <span class="fn">execute</span>(consultaSQL, parametros = []) {
+        <span class="kw">const</span> resultado = <span class="kw">await</span> <span class="fn">ejecutarQuery</span>(consultaSQL, parametros, { autoCommit: <span class="kw">true</span> });
+        <span class="kw">return</span> {
+            filasAfectadas: resultado.rowsAffected,
+            datosRetornados: resultado.outBinds
+        };
+    },
+
+    <span class="cmt">// INSERT con retorno del ID generado (usando RETURNING INTO)</span>
+    <span class="kw">async</span> <span class="fn">insertarConId</span>(consultaSQL, parametros = {}) {
+        <span class="kw">const</span> resultado = <span class="kw">await</span> <span class="fn">ejecutarQuery</span>(consultaSQL, parametros, {
+            autoCommit: <span class="kw">true</span>,
+            outFormat:  oracledb.OUT_FORMAT_OBJECT
+        });
+        <span class="kw">return</span> resultado.outBinds;
+    }
+};
+
+module.exports = db;</pre>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ SECCIÓN 5 -->
+<section id="s5">
+  <div class="sec-header"><div class="sec-num">5</div><h2>CRUD Completo — Modelos del Proyecto WEB</h2></div>
+  <div class="sec-body">
+
+    <div class="subsec"><h3>models/usuarioModel.js</h3>
+      <div class="code-wrap">
+        <div class="code-label">JavaScript — Modelo de usuarios con operaciones CRUD</div>
+        <pre><span class="kw">const</span> db = <span class="fn">require</span>(<span class="str">'../db/db'</span>);
+
+<span class="kw">const</span> UsuarioModel = {
+
+    <span class="cmt">// Listar todos los usuarios con su rol asignado</span>
+    <span class="kw">async</span> <span class="fn">listarTodos</span>() {
+        <span class="kw">const</span> consultaListadoCompleto = <span class="str">`
+            SELECT u.USUARIO_ID,
+                   u.NOMBRE || ' ' || u.APELLIDO AS NOMBRE_COMPLETO,
+                   u.EMAIL, u.USERNAME,
+                   r.NOMBRE AS ROL, u.ACTIVO,
+                   TO_CHAR(u.FECHA_REGISTRO, 'DD/MM/YYYY') AS FECHA_REGISTRO
+            FROM   usuarios u
+            JOIN   roles r ON u.rol_id = r.rol_id
+            ORDER  BY u.nombre
+        `</span>;
+        <span class="kw">return await</span> db.<span class="fn">query</span>(consultaListadoCompleto);
+    },
+
+    <span class="cmt">// Buscar un usuario por su ID numérico</span>
+    <span class="kw">async</span> <span class="fn">buscarPorId</span>(idDeUsuario) {
+        <span class="kw">const</span> consultaPorId = <span class="str">`
+            SELECT u.*, r.nombre AS nombre_rol
+            FROM   usuarios u JOIN roles r ON u.rol_id = r.rol_id
+            WHERE  u.usuario_id = :idDeUsuario
+        `</span>;
+        <span class="kw">return await</span> db.<span class="fn">queryOne</span>(consultaPorId, [idDeUsuario]);
+    },
+
+    <span class="cmt">// Buscar usuario por email (para login)</span>
+    <span class="kw">async</span> <span class="fn">buscarPorEmail</span>(emailBuscado) {
+        <span class="kw">const</span> consultaPorEmail = <span class="str">`
+            SELECT u.*, r.nombre AS nombre_rol
+            FROM   usuarios u JOIN roles r ON u.rol_id = r.rol_id
+            WHERE  LOWER(u.email) = LOWER(:emailBuscado) AND u.activo = 'S'
+        `</span>;
+        <span class="kw">return await</span> db.<span class="fn">queryOne</span>(consultaPorEmail, [emailBuscado]);
+    },
+
+    <span class="cmt">// Insertar un nuevo usuario (los parámetros nombrados evitan SQL Injection)</span>
+    <span class="kw">async</span> <span class="fn">crear</span>(datosDelNuevoUsuario) {
+        <span class="kw">const</span> consultaInsercion = <span class="str">`
+            INSERT INTO usuarios
+                (rol_id, nombre, apellido, email, username, password_hash, telefono)
+            VALUES
+                (:rol_id, :nombre, :apellido, :email, :username, :password_hash, :telefono)
+        `</span>;
+        <span class="kw">return await</span> db.<span class="fn">execute</span>(consultaInsercion, {
+            rol_id:        datosDelNuevoUsuario.rol_id,
+            nombre:        datosDelNuevoUsuario.nombre,
+            apellido:      datosDelNuevoUsuario.apellido,
+            email:         datosDelNuevoUsuario.email,
+            username:      datosDelNuevoUsuario.username,
+            password_hash: datosDelNuevoUsuario.password_hash,
+            telefono:      datosDelNuevoUsuario.telefono || <span class="kw">null</span>
+        });
+    },
+
+    <span class="cmt">// Actualizar datos de un usuario existente</span>
+    <span class="kw">async</span> <span class="fn">actualizar</span>(idDeUsuario, datosActualizados) {
+        <span class="kw">const</span> consultaActualizacion = <span class="str">`
+            UPDATE usuarios
+            SET    nombre   = :nombre,
+                   apellido = :apellido,
+                   telefono = :telefono,
+                   activo   = :activo
+            WHERE  usuario_id = :idDeUsuario
+        `</span>;
+        <span class="kw">return await</span> db.<span class="fn">execute</span>(consultaActualizacion, {
+            nombre:      datosActualizados.nombre,
+            apellido:    datosActualizados.apellido,
+            telefono:    datosActualizados.telefono || <span class="kw">null</span>,
+            activo:      datosActualizados.activo || <span class="str">'S'</span>,
+            idDeUsuario: idDeUsuario
+        });
+    },
+
+    <span class="cmt">// Baja lógica: marcar como inactivo en vez de borrar físicamente</span>
+    <span class="kw">async</span> <span class="fn">eliminar</span>(idDeUsuario) {
+        <span class="kw">return await</span> db.<span class="fn">execute</span>(
+            <span class="str">"UPDATE usuarios SET activo = 'N' WHERE usuario_id = :idDeUsuario"</span>,
+            [idDeUsuario]
+        );
+    }
+};
+
+module.exports = UsuarioModel;</pre>
+      </div>
+    </div>
+
+    <div class="subsec"><h3>models/productoModel.js</h3>
+      <div class="code-wrap">
+        <div class="code-label">JavaScript — Modelo de productos</div>
+        <pre><span class="kw">const</span> db = <span class="fn">require</span>(<span class="str">'../db/db'</span>);
+
+<span class="kw">const</span> ProductoModel = {
+
+    <span class="cmt">// Listar productos activos con nombre de categoría</span>
+    <span class="kw">async</span> <span class="fn">listarActivos</span>() {
+        <span class="kw">const</span> consultaProductosActivos = <span class="str">`
+            SELECT p.PRODUCTO_ID, c.NOMBRE AS CATEGORIA,
+                   p.NOMBRE, p.PRECIO, p.STOCK, p.IMAGEN_URL
+            FROM   productos p
+            JOIN   categorias c ON p.categoria_id = c.categoria_id
+            WHERE  p.activo = 'S'
+            ORDER  BY c.nombre, p.nombre
+        `</span>;
+        <span class="kw">return await</span> db.<span class="fn">query</span>(consultaProductosActivos);
+    },
+
+    <span class="cmt">// Buscar producto por nombre (búsqueda parcial, insensible a mayúsculas)</span>
+    <span class="kw">async</span> <span class="fn">buscarPorNombre</span>(terminoDeBusqueda) {
+        <span class="kw">return await</span> db.<span class="fn">query</span>(<span class="str">`
+            SELECT p.PRODUCTO_ID, p.NOMBRE, p.PRECIO, p.STOCK, c.NOMBRE AS CATEGORIA
+            FROM   productos p JOIN categorias c ON p.categoria_id = c.categoria_id
+            WHERE  UPPER(p.nombre) LIKE UPPER('%' || :termino || '%') AND p.activo = 'S'
+            ORDER  BY p.nombre
+        `</span>, [terminoDeBusqueda]);
+    },
+
+    <span class="cmt">// Crear producto nuevo en la base de datos</span>
+    <span class="kw">async</span> <span class="fn">crear</span>(datosDelProducto) {
+        <span class="kw">return await</span> db.<span class="fn">execute</span>(<span class="str">`
+            INSERT INTO productos (categoria_id, nombre, descripcion, precio, stock, imagen_url)
+            VALUES (:categoria_id, :nombre, :descripcion, :precio, :stock, :imagen_url)
+        `</span>, {
+            categoria_id: datosDelProducto.categoria_id,
+            nombre:       datosDelProducto.nombre,
+            descripcion:  datosDelProducto.descripcion || <span class="kw">null</span>,
+            precio:       datosDelProducto.precio,
+            stock:        datosDelProducto.stock || <span class="num">0</span>,
+            imagen_url:   datosDelProducto.imagen_url || <span class="kw">null</span>
+        });
+    },
+
+    <span class="cmt">// Baja lógica del producto</span>
+    <span class="kw">async</span> <span class="fn">eliminar</span>(idDelProducto) {
+        <span class="kw">return await</span> db.<span class="fn">execute</span>(
+            <span class="str">"UPDATE productos SET activo = 'N' WHERE producto_id = :id"</span>,
+            [idDelProducto]
+        );
+    }
+};
+
+module.exports = ProductoModel;</pre>
+      </div>
+    </div>
+
+    <div class="subsec"><h3>models/pedidoModel.js — Transacciones manuales</h3>
+      <div class="code-wrap">
+        <div class="code-label">JavaScript — Crear pedido con transacción (rollback en caso de error)</div>
+        <pre><span class="kw">const</span> db       = <span class="fn">require</span>(<span class="str">'../db/db'</span>);
+<span class="kw">const</span> oracledb  = <span class="fn">require</span>(<span class="str">'oracledb'</span>);
+
+<span class="kw">const</span> PedidoModel = {
+
+    <span class="cmt">// Crear un pedido completo con varios items en una sola transacción</span>
+    <span class="kw">async</span> <span class="fn">crear</span>(idDeUsuario, listaDeItems, direccionDeEnvio) {
+        <span class="kw">let</span> conexionTransaccional;
+        <span class="kw">try</span> {
+            conexionTransaccional = <span class="kw">await</span> oracledb.<span class="fn">getConnection</span>();
+
+            <span class="cmt">// PASO 1: Insertar el encabezado del pedido</span>
+            <span class="kw">await</span> conexionTransaccional.<span class="fn">execute</span>(
+                <span class="str">`INSERT INTO pedidos (usuario_id, estado, direccion_envio)
+                 VALUES (:uid, 'PENDIENTE', :dir)`</span>,
+                { uid: idDeUsuario, dir: direccionDeEnvio },
+                { autoCommit: <span class="kw">false</span> }   <span class="cmt">// NO confirmar aún — parte de la transacción</span>
+            );
+
+            <span class="cmt">// PASO 2: Obtener el pedido_id generado automáticamente</span>
+            <span class="kw">const</span> resultadoId = <span class="kw">await</span> conexionTransaccional.<span class="fn">execute</span>(
+                <span class="str">`SELECT MAX(pedido_id) AS pid FROM pedidos WHERE usuario_id = :uid`</span>,
+                [idDeUsuario],
+                { outFormat: oracledb.OUT_FORMAT_OBJECT }
+            );
+            <span class="kw">const</span> idDelNuevoPedido = resultadoId.rows[<span class="num">0</span>].PID;
+
+            <span class="cmt">// PASO 3: Insertar cada item — el trigger actualiza el total automáticamente</span>
+            <span class="kw">for</span> (<span class="kw">const</span> itemDelCarrito <span class="kw">of</span> listaDeItems) {
+                <span class="kw">await</span> conexionTransaccional.<span class="fn">execute</span>(
+                    <span class="str">`INSERT INTO detalle_pedidos
+                         (pedido_id, producto_id, cantidad, precio_unitario)
+                     VALUES (:pid, :prod, :cant, :precio)`</span>,
+                    {
+                        pid:    idDelNuevoPedido,
+                        prod:   itemDelCarrito.producto_id,
+                        cant:   itemDelCarrito.cantidad,
+                        precio: itemDelCarrito.precio_unitario
+                    },
+                    { autoCommit: <span class="kw">false</span> }
+                );
+
+                <span class="cmt">// PASO 4: Descontar stock (trg_validar_stock lanza error si queda negativo)</span>
+                <span class="kw">await</span> conexionTransaccional.<span class="fn">execute</span>(
+                    <span class="str">`UPDATE productos SET stock = stock - :cant
+                     WHERE producto_id = :pid AND stock >= :cant`</span>,
+                    { cant: itemDelCarrito.cantidad, pid: itemDelCarrito.producto_id },
+                    { autoCommit: <span class="kw">false</span> }
+                );
+            }
+
+            <span class="cmt">// PASO 5: Confirmar toda la transacción si no hubo errores</span>
+            <span class="kw">await</span> conexionTransaccional.<span class="fn">commit</span>();
+            <span class="kw">return</span> { pedido_id: idDelNuevoPedido, items: listaDeItems.length };
+
+        } <span class="kw">catch</span> (errorDeLaTransaccion) {
+            <span class="cmt">// Si algo falló, deshacer todos los cambios</span>
+            <span class="kw">if</span> (conexionTransaccional) <span class="kw">await</span> conexionTransaccional.<span class="fn">rollback</span>();
+            <span class="kw">throw</span> errorDeLaTransaccion;
+        } <span class="kw">finally</span> {
+            <span class="kw">if</span> (conexionTransaccional) <span class="kw">await</span> conexionTransaccional.<span class="fn">close</span>();
+        }
+    }
+};
+
+module.exports = PedidoModel;</pre>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ SECCIÓN 6 -->
+<section id="s6">
+  <div class="sec-header"><div class="sec-num">6</div><h2>API REST con Express + Oracle XE</h2></div>
+  <div class="sec-body">
+
+    <div class="subsec"><h3>routes/usuarios.js</h3>
+      <div class="code-wrap">
+        <div class="code-label">JavaScript — Rutas CRUD de usuarios</div>
+        <pre><span class="kw">const</span> express      = <span class="fn">require</span>(<span class="str">'express'</span>);
+<span class="kw">const</span> enrutadorUsuarios = express.<span class="fn">Router</span>();
+<span class="kw">const</span> UsuarioModel = <span class="fn">require</span>(<span class="str">'../models/usuarioModel'</span>);
+
+<span class="cmt">// GET /api/usuarios — Listar todos</span>
+enrutadorUsuarios.<span class="fn">get</span>(<span class="str">'/'</span>, <span class="kw">async</span> (peticion, respuesta) => {
+    <span class="kw">try</span> {
+        <span class="kw">const</span> listaDeUsuarios = <span class="kw">await</span> UsuarioModel.<span class="fn">listarTodos</span>();
+        respuesta.<span class="fn">json</span>({ ok: <span class="kw">true</span>, data: listaDeUsuarios, total: listaDeUsuarios.length });
+    } <span class="kw">catch</span> (error) {
+        respuesta.<span class="fn">status</span>(<span class="num">500</span>).<span class="fn">json</span>({ ok: <span class="kw">false</span>, error: error.message });
+    }
+});
+
+<span class="cmt">// GET /api/usuarios/:id — Obtener por ID</span>
+enrutadorUsuarios.<span class="fn">get</span>(<span class="str">'/:id'</span>, <span class="kw">async</span> (peticion, respuesta) => {
+    <span class="kw">try</span> {
+        <span class="kw">const</span> usuarioEncontrado = <span class="kw">await</span> UsuarioModel.<span class="fn">buscarPorId</span>(peticion.params.id);
+        <span class="kw">if</span> (!usuarioEncontrado)
+            <span class="kw">return</span> respuesta.<span class="fn">status</span>(<span class="num">404</span>).<span class="fn">json</span>({ ok: <span class="kw">false</span>, error: <span class="str">'Usuario no encontrado'</span> });
+        respuesta.<span class="fn">json</span>({ ok: <span class="kw">true</span>, data: usuarioEncontrado });
+    } <span class="kw">catch</span> (error) {
+        respuesta.<span class="fn">status</span>(<span class="num">500</span>).<span class="fn">json</span>({ ok: <span class="kw">false</span>, error: error.message });
+    }
+});
+
+<span class="cmt">// POST /api/usuarios — Crear nuevo usuario</span>
+enrutadorUsuarios.<span class="fn">post</span>(<span class="str">'/'</span>, <span class="kw">async</span> (peticion, respuesta) => {
+    <span class="kw">try</span> {
+        <span class="kw">const</span> { nombre, email, username, password_hash } = peticion.body;
+        <span class="kw">if</span> (!nombre || !email || !username || !password_hash)
+            <span class="kw">return</span> respuesta.<span class="fn">status</span>(<span class="num">400</span>).<span class="fn">json</span>({ ok: <span class="kw">false</span>, error: <span class="str">'Faltan campos requeridos'</span> });
+
+        <span class="kw">const</span> resultadoCreacion = <span class="kw">await</span> UsuarioModel.<span class="fn">crear</span>(peticion.body);
+        respuesta.<span class="fn">status</span>(<span class="num">201</span>).<span class="fn">json</span>({ ok: <span class="kw">true</span>, mensaje: <span class="str">'Usuario creado'</span>, data: resultadoCreacion });
+    } <span class="kw">catch</span> (error) {
+        <span class="cmt">// ORA-00001: constraint única violada (email o username duplicado)</span>
+        <span class="kw">if</span> (error.message.<span class="fn">includes</span>(<span class="str">'ORA-00001'</span>))
+            <span class="kw">return</span> respuesta.<span class="fn">status</span>(<span class="num">409</span>).<span class="fn">json</span>({ ok: <span class="kw">false</span>, error: <span class="str">'Email o username ya existe'</span> });
+        respuesta.<span class="fn">status</span>(<span class="num">500</span>).<span class="fn">json</span>({ ok: <span class="kw">false</span>, error: error.message });
+    }
+});
+
+<span class="cmt">// PUT /api/usuarios/:id — Actualizar usuario</span>
+enrutadorUsuarios.<span class="fn">put</span>(<span class="str">'/:id'</span>, <span class="kw">async</span> (peticion, respuesta) => {
+    <span class="kw">try</span> {
+        <span class="kw">const</span> resultadoActualizacion = <span class="kw">await</span> UsuarioModel.<span class="fn">actualizar</span>(peticion.params.id, peticion.body);
+        <span class="kw">if</span> (resultadoActualizacion.filasAfectadas === <span class="num">0</span>)
+            <span class="kw">return</span> respuesta.<span class="fn">status</span>(<span class="num">404</span>).<span class="fn">json</span>({ ok: <span class="kw">false</span>, error: <span class="str">'Usuario no encontrado'</span> });
+        respuesta.<span class="fn">json</span>({ ok: <span class="kw">true</span>, mensaje: <span class="str">'Usuario actualizado'</span> });
+    } <span class="kw">catch</span> (error) {
+        respuesta.<span class="fn">status</span>(<span class="num">500</span>).<span class="fn">json</span>({ ok: <span class="kw">false</span>, error: error.message });
+    }
+});
+
+<span class="cmt">// DELETE /api/usuarios/:id — Baja lógica (activo = 'N')</span>
+enrutadorUsuarios.<span class="fn">delete</span>(<span class="str">'/:id'</span>, <span class="kw">async</span> (peticion, respuesta) => {
+    <span class="kw">try</span> {
+        <span class="kw">await</span> UsuarioModel.<span class="fn">eliminar</span>(peticion.params.id);
+        respuesta.<span class="fn">json</span>({ ok: <span class="kw">true</span>, mensaje: <span class="str">'Usuario desactivado'</span> });
+    } <span class="kw">catch</span> (error) {
+        respuesta.<span class="fn">status</span>(<span class="num">500</span>).<span class="fn">json</span>({ ok: <span class="kw">false</span>, error: error.message });
+    }
+});
+
+module.exports = enrutadorUsuarios;</pre>
+      </div>
+    </div>
+
+    <div class="subsec"><h3>server.js — Servidor principal</h3>
+      <div class="code-wrap">
+        <div class="code-label">JavaScript — Punto de entrada de la aplicación</div>
+        <pre><span class="fn">require</span>(<span class="str">'dotenv'</span>).<span class="fn">config</span>();  <span class="cmt">// Cargar variables de .env al inicio</span>
+
+<span class="kw">const</span> express  = <span class="fn">require</span>(<span class="str">'express'</span>);
+<span class="kw">const</span> cors     = <span class="fn">require</span>(<span class="str">'cors'</span>);
+<span class="kw">const</span> path     = <span class="fn">require</span>(<span class="str">'path'</span>);
+<span class="kw">const</span> { iniciarPool, cerrarPool } = <span class="fn">require</span>(<span class="str">'./db/pool'</span>);
+
+<span class="kw">const</span> aplicacion = <span class="fn">express</span>();
+<span class="kw">const</span> PUERTO     = process.env.PORT || <span class="num">3000</span>;
+
+<span class="cmt">// Middlewares globales</span>
+aplicacion.<span class="fn">use</span>(<span class="fn">cors</span>());                              <span class="cmt">// Habilitar CORS para el frontend</span>
+aplicacion.<span class="fn">use</span>(express.<span class="fn">json</span>());                      <span class="cmt">// Parsear JSON en peticiones</span>
+aplicacion.<span class="fn">use</span>(express.static(<span class="fn">path.join</span>(__dirname, <span class="str">'public'</span>)));  <span class="cmt">// Servir HTML/CSS/JS</span>
+
+<span class="cmt">// Rutas de la API REST</span>
+aplicacion.<span class="fn">use</span>(<span class="str">'/api/usuarios'</span>,  <span class="fn">require</span>(<span class="str">'./routes/usuarios'</span>));
+aplicacion.<span class="fn">use</span>(<span class="str">'/api/productos'</span>, <span class="fn">require</span>(<span class="str">'./routes/productos'</span>));
+aplicacion.<span class="fn">use</span>(<span class="str">'/api/pedidos'</span>,   <span class="fn">require</span>(<span class="str">'./routes/pedidos'</span>));
+
+<span class="cmt">// Middleware de manejo de errores (siempre al final)</span>
+aplicacion.<span class="fn">use</span>(<span class="fn">require</span>(<span class="str">'./middleware/errorHandler'</span>));
+
+<span class="cmt">// Función que inicia el pool Oracle XE ANTES de aceptar peticiones</span>
+<span class="kw">async function</span> <span class="fn">iniciarServidor</span>() {
+    <span class="kw">try</span> {
+        <span class="kw">await</span> <span class="fn">iniciarPool</span>();   <span class="cmt">// Primero el pool, luego el servidor HTTP</span>
+        aplicacion.<span class="fn">listen</span>(PUERTO, () => {
+            console.<span class="fn">log</span>(<span class="str">`[SERVIDOR] Activo en http://localhost:${PUERTO}`</span>);
+            console.<span class="fn">log</span>(<span class="str">`[API] Endpoints en http://localhost:${PUERTO}/api`</span>);
+            console.<span class="fn">log</span>(<span class="str">'[ORACLE] Pool conectado a XEPDB1 via modo Thin'</span>);
+        });
+    } <span class="kw">catch</span> (errorDeInicio) {
+        console.<span class="fn">error</span>(<span class="str">'Error al iniciar el servidor:'</span>, errorDeInicio.message);
+        process.<span class="fn">exit</span>(<span class="num">1</span>);
+    }
+}
+
+<span class="cmt">// Cierre limpio del pool al detener el servidor (Ctrl+C)</span>
+process.<span class="fn">on</span>(<span class="str">'SIGINT'</span>, <span class="kw">async</span> () => {
+    console.<span class="fn">log</span>(<span class="str">'\n[SERVIDOR] Cerrando servidor...'</span>);
+    <span class="kw">await</span> <span class="fn">cerrarPool</span>();
+    process.<span class="fn">exit</span>(<span class="num">0</span>);
+});
+
+<span class="fn">iniciarServidor</span>();</pre>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ SECCIÓN 7 -->
+<section id="s7">
+  <div class="sec-header"><div class="sec-num">7</div><h2>Integración con HTML5 — Frontend → Backend → Oracle XE</h2></div>
+  <div class="sec-body">
+
+    <div class="code-wrap">
+      <div class="code-label">public/index.html — Catálogo de productos</div>
+      <pre>&lt;!DOCTYPE html&gt;
+&lt;html lang=<span class="str">"es"</span>&gt;
+&lt;head&gt;
+    &lt;meta charset=<span class="str">"UTF-8"</span>&gt;
+    &lt;title&gt;Catálogo — Oracle XE + Node.js&lt;/title&gt;
+    &lt;style&gt;
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f2f8f8; padding: 20px; }
+        h1   { color: #0b6967; margin-bottom: 20px; }
+        .grilla { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px,1fr)); gap: 16px; }
+        .tarjeta { background: white; border-radius: 10px; padding: 16px;
+                   border: 1px solid #bdd8d8; box-shadow: 0 2px 6px rgba(11,105,103,0.1); }
+        .precio { font-size: 1.1rem; color: #0b6967; font-weight: bold; margin: 6px 0; }
+        .stock  { font-size: 0.82rem; color: #3d5e5e; }
+        .boton  { background: #0b6967; color: white; border: none;
+                  padding: 8px 16px; border-radius: 6px; cursor: pointer; margin-top: 10px; }
+        .boton:hover { background: #094f4d; }
+        input[type="text"] { width: 100%; padding: 10px; margin-bottom: 16px;
+                             border: 1.5px solid #bdd8d8; border-radius: 8px; font-size: 1rem; }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Catálogo de Productos&lt;/h1&gt;
+    &lt;input type=<span class="str">"text"</span> placeholder=<span class="str">"Buscar producto..."</span> oninput=<span class="str">"buscarConRetraso(this.value)"</span>&gt;
+    &lt;div class=<span class="str">"grilla"</span> id=<span class="str">"contenedorProductos"</span>&gt;&lt;/div&gt;
+    &lt;script src=<span class="str">"js/app.js"</span>&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-label">public/js/app.js — Lógica del frontend</div>
+      <pre><span class="kw">const</span> BASE_API = <span class="str">'/api'</span>;   <span class="cmt">// Prefijo de todos los endpoints</span>
+
+<span class="cmt">// Cargar y mostrar productos desde la API de Node.js</span>
+<span class="kw">async function</span> <span class="fn">cargarProductos</span>(terminoDeBusqueda = <span class="str">''</span>) {
+    <span class="kw">try</span> {
+        <span class="cmt">// Si hay texto de búsqueda, agrega el parámetro ?buscar=...</span>
+        <span class="kw">const</span> urlConsulta = terminoDeBusqueda
+            ? <span class="str">`${BASE_API}/productos?buscar=${</span><span class="fn">encodeURIComponent</span>(terminoDeBusqueda)<span class="str">}`</span>
+            : <span class="str">`${BASE_API}/productos`</span>;
+
+        <span class="cmt">// Llamada fetch — comunicación HTTP entre navegador y Node.js</span>
+        <span class="kw">const</span> respuestaHTTP = <span class="kw">await</span> <span class="fn">fetch</span>(urlConsulta);
+        <span class="kw">const</span> datosRecibidos = <span class="kw">await</span> respuestaHTTP.<span class="fn">json</span>();
+
+        <span class="kw">if</span> (!datosRecibidos.ok) <span class="kw">throw new</span> <span class="fn">Error</span>(datosRecibidos.error);
+        <span class="fn">renderizarProductos</span>(datosRecibidos.data);
+
+    } <span class="kw">catch</span> (errorDeRed) {
+        console.<span class="fn">error</span>(<span class="str">'Error al cargar productos:'</span>, errorDeRed.message);
+    }
+}
+
+<span class="cmt">// Renderizar las tarjetas de producto en el DOM</span>
+<span class="kw">function</span> <span class="fn">renderizarProductos</span>(listaDeProductos) {
+    <span class="kw">const</span> contenedor = document.<span class="fn">getElementById</span>(<span class="str">'contenedorProductos'</span>);
+    contenedor.innerHTML = listaDeProductos.length === <span class="num">0</span>
+        ? <span class="str">'&lt;p&gt;Sin resultados.&lt;/p&gt;'</span>
+        : listaDeProductos.<span class="fn">map</span>(producto => <span class="str">`
+            &lt;div class="tarjeta"&gt;
+                &lt;h3&gt;${producto.NOMBRE}&lt;/h3&gt;
+                &lt;small&gt;${producto.CATEGORIA}&lt;/small&gt;
+                &lt;p class="precio"&gt;${Number(producto.PRECIO).toLocaleString('es-PY')} Gs.&lt;/p&gt;
+                &lt;p class="stock"&gt;Stock: ${producto.STOCK}&lt;/p&gt;
+                &lt;button class="boton" onclick="agregarAlCarrito(${producto.PRODUCTO_ID},'${producto.NOMBRE}',${producto.PRECIO})"&gt;
+                    + Agregar
+                &lt;/button&gt;
+            &lt;/div&gt;`</span>).<span class="fn">join</span>(<span class="str">''</span>);
+}
+
+<span class="cmt">// Búsqueda con retraso (evita llamar la API en cada tecla)</span>
+<span class="kw">let</span> timerDeBusqueda;
+<span class="kw">function</span> <span class="fn">buscarConRetraso</span>(textoBuscado) {
+    <span class="fn">clearTimeout</span>(timerDeBusqueda);
+    timerDeBusqueda = <span class="fn">setTimeout</span>(() => <span class="fn">cargarProductos</span>(textoBuscado), <span class="num">400</span>);
+}
+
+<span class="cmt">// Carrito de compras en memoria</span>
+<span class="kw">let</span> carritoDeCompras = [];
+<span class="kw">function</span> <span class="fn">agregarAlCarrito</span>(idProducto, nombreProducto, precioUnitario) {
+    <span class="kw">const</span> itemExistente = carritoDeCompras.<span class="fn">find</span>(i => i.producto_id === idProducto);
+    itemExistente
+        ? itemExistente.cantidad++
+        : carritoDeCompras.<span class="fn">push</span>({ producto_id: idProducto, nombre: nombreProducto, precio_unitario: precioUnitario, cantidad: <span class="num">1</span> });
+    console.<span class="fn">log</span>(<span class="str">`Carrito: ${carritoDeCompras.reduce((suma, i) => suma + i.cantidad, 0)} items`</span>);
+}
+
+<span class="cmt">// Enviar el pedido al servidor Node.js que lo guarda en Oracle XE</span>
+<span class="kw">async function</span> <span class="fn">confirmarPedido</span>() {
+    <span class="kw">if</span> (!carritoDeCompras.length) <span class="kw">return</span>;
+    <span class="kw">try</span> {
+        <span class="kw">const</span> respuesta = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">`${BASE_API}/pedidos`</span>, {
+            method:  <span class="str">'POST'</span>,
+            headers: { <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span> },
+            body:    <span class="fn">JSON.stringify</span>({
+                usuario_id: <span class="num">2</span>,
+                items:      carritoDeCompras,
+                direccion:  <span class="str">'Asunción, Paraguay'</span>
+            })
+        });
+        <span class="kw">const</span> datos = <span class="kw">await</span> respuesta.<span class="fn">json</span>();
+        <span class="kw">if</span> (datos.ok) carritoDeCompras = [];
+        console.<span class="fn">log</span>(<span class="str">'Pedido creado:'</span>, datos);
+    } <span class="kw">catch</span> (error) {
+        console.<span class="fn">error</span>(<span class="str">'Error al confirmar pedido:'</span>, error.message);
+    }
+}
+
+<span class="cmt">// Cargar productos al abrir la página</span>
+document.<span class="fn">addEventListener</span>(<span class="str">'DOMContentLoaded'</span>, () => <span class="fn">cargarProductos</span>());</pre>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ SECCIÓN 8 -->
+<section id="s8">
+  <div class="sec-header"><div class="sec-num">8</div><h2>Manejo de Errores y Buenas Prácticas</h2></div>
+  <div class="sec-body">
+
+    <div class="code-wrap">
+      <div class="code-label">middleware/errorHandler.js — Interceptar errores Oracle XE</div>
+      <pre><span class="cmt">// Mapa de errores Oracle XE → respuesta HTTP adecuada</span>
+<span class="kw">const</span> mapaDeErroresOracle = {
+    <span class="str">'ORA-00001'</span>: { estado: <span class="num">409</span>, mensaje: <span class="str">'Registro duplicado (constraint única)'</span> },
+    <span class="str">'ORA-01400'</span>: { estado: <span class="num">400</span>, mensaje: <span class="str">'Campo obligatorio está nulo'</span> },
+    <span class="str">'ORA-02291'</span>: { estado: <span class="num">400</span>, mensaje: <span class="str">'FK inválida: registro padre no existe'</span> },
+    <span class="str">'ORA-02292'</span>: { estado: <span class="num">409</span>, mensaje: <span class="str">'No se puede eliminar: tiene registros relacionados'</span> },
+    <span class="str">'ORA-20001'</span>: { estado: <span class="num">400</span>, mensaje: <span class="str">'Stock insuficiente para el pedido'</span> },
+    <span class="str">'ORA-01017'</span>: { estado: <span class="num">401</span>, mensaje: <span class="str">'Credenciales Oracle incorrectas'</span> },
+    <span class="str">'ORA-12541'</span>: { estado: <span class="num">503</span>, mensaje: <span class="str">'Oracle XE no disponible (listener)'</span> }
+};
+
+<span class="kw">function</span> <span class="fn">manejarErrores</span>(error, peticion, respuesta, siguiente) {
+    <span class="cmt">// Registrar el error en consola con timestamp</span>
+    console.<span class="fn">error</span>(<span class="str">`[${new Date().toISOString()}] ${peticion.method} ${peticion.path} →`</span>, error.message);
+
+    <span class="cmt">// Buscar si el error corresponde a un código Oracle conocido</span>
+    <span class="kw">for</span> (<span class="kw">const</span> [codigoOracle, respuestaPreparada] <span class="kw">of</span> <span class="fn">Object.entries</span>(mapaDeErroresOracle)) {
+        <span class="kw">if</span> (error.message.<span class="fn">includes</span>(codigoOracle)) {
+            <span class="kw">return</span> respuesta.<span class="fn">status</span>(respuestaPreparada.estado).<span class="fn">json</span>({
+                ok:     <span class="kw">false</span>,
+                error:  respuestaPreparada.mensaje,
+                codigo: codigoOracle
+            });
+        }
+    }
+
+    <span class="cmt">// Error genérico no mapeado</span>
+    respuesta.<span class="fn">status</span>(<span class="num">500</span>).<span class="fn">json</span>({ ok: <span class="kw">false</span>, error: <span class="str">'Error interno del servidor'</span> });
+}
+
+module.exports = manejarErrores;</pre>
+    </div>
+
+    <div class="subsec"><h3>Errores frecuentes Node.js + Oracle XE</h3>
+      <table class="info-table">
+        <tr><th>Error</th><th>Causa</th><th>Solución</th></tr>
+        <tr><td>ORA-01017</td><td>Credenciales incorrectas</td><td>Verificar DB_USER y DB_PASSWORD en <code>.env</code></td></tr>
+        <tr><td>ORA-12514</td><td>XEPDB1 no está abierta</td><td><code>ALTER PLUGGABLE DATABASE XEPDB1 OPEN;</code></td></tr>
+        <tr><td>NJS-500 / DPI-1047</td><td><code>oracledb.thin = true</code> no está activo</td><td>Agregar <code>oracledb.thin = true</code> antes de <code>createPool()</code></td></tr>
+        <tr><td>NJS-003</td><td>Pool no iniciado antes de peticiones</td><td>Verificar que <code>iniciarPool()</code> se llama en <code>iniciarServidor()</code></td></tr>
+      </table>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ SECCIÓN 9 -->
+<section id="s9">
+  <div class="sec-header"><div class="sec-num">9</div><h2>Variables de Entorno (.env)</h2></div>
+  <div class="sec-body">
+
+    <div class="nota">Las credenciales de Oracle XE <strong>nunca</strong> deben ir directamente en el código fuente. Usar <code>.env</code> y agregarlo al <code>.gitignore</code>.</div>
+
+    <div class="code-wrap">
+      <div class="code-label">.env — Credenciales y configuración (NO subir a Git)</div>
+      <pre>PORT=<span class="num">3000</span>
+
+<span class="cmt"># Oracle XE 21c — PDB XEPDB1</span>
+DB_USER=admin_web
+DB_PASSWORD=AdminWeb2024#
+DB_CONNECT=localhost:<span class="num">1521</span>/XEPDB1
+
+<span class="cmt"># Pool de conexiones (límites sugeridos para XE)</span>
+DB_POOL_MIN=<span class="num">1</span>
+DB_POOL_MAX=<span class="num">5</span></pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-label">.gitignore — Excluir archivos sensibles del repositorio</div>
+      <pre>.env
+node_modules/
+*.log
+*.dmp</pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-label">.env.example — Plantilla pública sin contraseñas reales</div>
+      <pre>PORT=3000
+DB_USER=TU_USUARIO_ORACLE
+DB_PASSWORD=TU_CONTRASEÑA_ORACLE
+DB_CONNECT=localhost:<span class="num">1521</span>/XEPDB1
+DB_POOL_MIN=<span class="num">1</span>
+DB_POOL_MAX=<span class="num">5</span></pre>
+    </div>
+
+    <div class="tip">Compartir <code>.env.example</code> (sin contraseñas) en el repositorio para que compañeros de equipo sepan qué variables configurar.</div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ SECCIÓN 10 -->
+<section id="s10">
+  <div class="sec-header"><div class="sec-num">10</div><h2>Proyecto WEB Completo — Paso a Paso desde Cero</h2></div>
+  <div class="sec-body">
+
+    <ol class="steps">
+      <li><span><strong>Verificar Oracle XE</strong> antes de empezar:<br>
+        <code>Get-Service "OracleServiceXE", "OracleOraDB21Home1TNSListener"</code> → ambos deben estar en Running<br>
+        En SQLPlus: <code>SHOW PDBS;</code> — XEPDB1 debe aparecer en READ WRITE
+      </span></li>
+      <li><span><strong>Crear y configurar el proyecto Node.js:</strong><br>
+        <code>mkdir C:\proyectos\proyecto-web-oracle</code><br>
+        <code>cd C:\proyectos\proyecto-web-oracle</code><br>
+        <code>npm init -y</code><br>
+        <code>npm install oracledb express dotenv cors</code><br>
+        <code>npm install nodemon --save-dev</code>
+      </span></li>
+      <li><span><strong>Crear la estructura de carpetas:</strong><br>
+        <code>New-Item -ItemType Directory -Path "db","routes","models","middleware","public\js"</code>
+      </span></li>
+      <li><span><strong>Copiar el código de cada sección de esta guía</strong> en los archivos correspondientes (pool.js, db.js, modelos, rutas, server.js)</span></li>
+      <li><span><strong>Configurar el archivo .env</strong> con las credenciales de Oracle XE (ver sección 9)</span></li>
+      <li><span><strong>Preparar la base de datos en Oracle XE</strong> desde SQLPlus o DBeaver: CREATE TABLE (oracle.html §7), GRANT (oracle.html §9), Triggers (oracle.html §8), INSERT de prueba (oracle.html §10)</span></li>
+      <li><span><strong>Verificar la conexión</strong> antes de iniciar el servidor:<br>
+        <code>node test_conexion.js</code> — debe mostrar versión de Oracle y nombre de la PDB
+      </span></li>
+      <li><span><strong>Iniciar el servidor en modo desarrollo:</strong><br>
+        <code>npm run dev</code> — debe mostrar "Pool Oracle XE iniciado" y "Activo en http://localhost:3000"
+      </span></li>
+      <li><span><strong>Abrir en el navegador:</strong> <code>http://localhost:3000</code></span></li>
+    </ol>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ SECCIÓN 11 -->
+<section id="s11">
+  <div class="sec-header"><div class="sec-num">11</div><h2>Probar la API desde PowerShell y DBeaver</h2></div>
+  <div class="sec-body">
+
+    <div class="subsec"><h3>Pruebas desde PowerShell (Invoke-RestMethod)</h3>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell — Probar endpoints GET</div>
+        <pre><span class="cmt"># Listar todos los productos:</span>
+<span class="ps">Invoke-RestMethod</span> -Uri <span class="str">"http://localhost:3000/api/productos"</span> -Method GET
+
+<span class="cmt"># Buscar producto por nombre:</span>
+<span class="ps">Invoke-RestMethod</span> -Uri <span class="str">"http://localhost:3000/api/productos?buscar=laptop"</span> -Method GET
+
+<span class="cmt"># Listar todos los usuarios:</span>
+<span class="ps">Invoke-RestMethod</span> -Uri <span class="str">"http://localhost:3000/api/usuarios"</span> -Method GET
+
+<span class="cmt"># Ver pedidos de un usuario:</span>
+<span class="ps">Invoke-RestMethod</span> -Uri <span class="str">"http://localhost:3000/api/pedidos?usuario_id=2"</span> -Method GET</pre>
+      </div>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell — Crear usuario (POST)</div>
+        <pre>$datosDelNuevoUsuario = @{
+    rol_id        = <span class="num">3</span>
+    nombre        = <span class="str">"María"</span>
+    apellido      = <span class="str">"González"</span>
+    email         = <span class="str">"maria.gonzalez@test.com"</span>
+    username      = <span class="str">"mgonzalez"</span>
+    password_hash = <span class="str">"5e884898da28047151d0e56f8dc62927..."</span>
+    telefono      = <span class="str">"0981555444"</span>
+} | <span class="ps">ConvertTo-Json</span>
+
+<span class="ps">Invoke-RestMethod</span> -Uri <span class="str">"http://localhost:3000/api/usuarios"</span> `
+    -Method POST `
+    -ContentType <span class="str">"application/json"</span> `
+    -Body $datosDelNuevoUsuario</pre>
+      </div>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell — Crear pedido con múltiples items (POST)</div>
+        <pre>$datosDePedido = @{
+    usuario_id = <span class="num">2</span>
+    direccion  = <span class="str">"Av. Mariscal López 1234, Asunción"</span>
+    items = @(
+        @{ producto_id = <span class="num">1</span>; cantidad = <span class="num">1</span>; precio_unitario = <span class="num">2500000</span> }
+        @{ producto_id = <span class="num">2</span>; cantidad = <span class="num">2</span>; precio_unitario = <span class="num">85000</span>   }
+    )
+} | <span class="ps">ConvertTo-Json</span> -Depth <span class="num">3</span>
+
+<span class="ps">Invoke-RestMethod</span> -Uri <span class="str">"http://localhost:3000/api/pedidos"</span> `
+    -Method POST `
+    -ContentType <span class="str">"application/json"</span> `
+    -Body $datosDePedido</pre>
+      </div>
+    </div>
+
+    <div class="subsec"><h3>Verificar datos en Oracle XE desde DBeaver</h3>
+      <div class="code-wrap">
+        <div class="code-label">SQL — Verificar datos guardados por la API</div>
+        <pre><span class="cmt">-- Ver pedidos creados desde la API con el total calculado por el trigger:</span>
+<span class="kw">SELECT</span> p.pedido_id,
+       u.nombre || <span class="str">' '</span> || u.apellido <span class="kw">AS</span> cliente,
+       p.estado,
+       <span class="fn">TO_CHAR</span>(p.total, <span class="str">'FM999,999,990 Gs.'</span>) <span class="kw">AS</span> total,
+       <span class="fn">TO_CHAR</span>(p.fecha_pedido, <span class="str">'DD/MM/YYYY HH24:MI:SS'</span>) <span class="kw">AS</span> fecha
+<span class="kw">FROM</span>   pedidos p
+<span class="kw">JOIN</span>   usuarios u <span class="kw">ON</span> p.usuario_id = u.usuario_id
+<span class="kw">ORDER BY</span> p.fecha_pedido <span class="kw">DESC</span>;
+
+<span class="cmt">-- Verificar que el trigger actualizó los totales correctamente:</span>
+<span class="kw">SELECT</span> ped.pedido_id,
+       ped.total                          <span class="kw">AS</span> total_calculado_por_trigger,
+       <span class="fn">SUM</span>(dp.cantidad * dp.precio_unitario) <span class="kw">AS</span> total_verificado_manual
+<span class="kw">FROM</span>   pedidos ped
+<span class="kw">JOIN</span>   detalle_pedidos dp <span class="kw">ON</span> ped.pedido_id = dp.pedido_id
+<span class="kw">GROUP BY</span> ped.pedido_id, ped.total;
+
+<span class="cmt">-- Ver logs generados automáticamente por los triggers:</span>
+<span class="kw">SELECT</span> l.log_id, u.username, l.accion, l.descripcion,
+       <span class="fn">TO_CHAR</span>(l.fecha_accion, <span class="str">'DD/MM/YYYY HH24:MI:SS'</span>) <span class="kw">AS</span> fecha
+<span class="kw">FROM</span>   logs_acceso l
+<span class="kw">LEFT JOIN</span> usuarios u <span class="kw">ON</span> l.usuario_id = u.usuario_id
+<span class="kw">ORDER BY</span> l.fecha_accion <span class="kw">DESC</span>;</pre>
+      </div>
+    </div>
+
+    <div class="subsec"><h3>Resumen de endpoints de la API</h3>
+      <table class="endpoint-table">
+        <tr><th>Método</th><th>Ruta</th><th>Descripción</th></tr>
+        <tr><td><span class="method get">GET</span></td><td>/api/usuarios</td><td>Listar todos los usuarios</td></tr>
+        <tr><td><span class="method get">GET</span></td><td>/api/usuarios/:id</td><td>Obtener usuario por ID</td></tr>
+        <tr><td><span class="method post">POST</span></td><td>/api/usuarios</td><td>Crear nuevo usuario</td></tr>
+        <tr><td><span class="method put">PUT</span></td><td>/api/usuarios/:id</td><td>Actualizar datos del usuario</td></tr>
+        <tr><td><span class="method delete">DELETE</span></td><td>/api/usuarios/:id</td><td>Baja lógica (activo = 'N')</td></tr>
+        <tr><td><span class="method get">GET</span></td><td>/api/productos</td><td>Listar productos activos</td></tr>
+        <tr><td><span class="method get">GET</span></td><td>/api/productos?buscar=xyz</td><td>Buscar productos por nombre</td></tr>
+        <tr><td><span class="method post">POST</span></td><td>/api/productos</td><td>Crear producto nuevo</td></tr>
+        <tr><td><span class="method put">PUT</span></td><td>/api/productos/:id</td><td>Actualizar producto</td></tr>
+        <tr><td><span class="method delete">DELETE</span></td><td>/api/productos/:id</td><td>Baja lógica del producto</td></tr>
+        <tr><td><span class="method get">GET</span></td><td>/api/pedidos?usuario_id=N</td><td>Pedidos de un usuario</td></tr>
+        <tr><td><span class="method get">GET</span></td><td>/api/pedidos/:id/detalle</td><td>Líneas de detalle del pedido</td></tr>
+        <tr><td><span class="method post">POST</span></td><td>/api/pedidos</td><td>Crear pedido con items (transacción)</td></tr>
+        <tr><td><span class="method patch">PATCH</span></td><td>/api/pedidos/:id/estado</td><td>Cambiar estado del pedido</td></tr>
+      </table>
+    </div>
+
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <strong>Oracle Express Edition 21c + Node.js — Guía de Integración</strong><br>
+  Complemento Unidades 10, 11 y 12 — Programación 2 (PR2)<br>
+  Universidad Columbia del Paraguay · 2025
+</footer>
+
+</body>
+</html>

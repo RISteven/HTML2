@@ -2,55 +2,92 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Guía Estudiante — Node.js + Oracle XE</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guía del Estudiante — Node.js + Oracle XE</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --blue:   #0d6efd;
-      --green:  #198754;
-      --orange: #fd7e14;
-      --red:    #dc3545;
-      --purple: #6f42c1;
-      --teal:   #0dcaf0;
-      --gray:   #6c757d;
-      --dark:   #1a1a2e;
-      --bg:     #f0f2f5;
+      /* Colores institucionales principales */
+      --color-primario:         #0b6967;  /* Teal principal — identidad Columbia */
+      --color-primario-oscuro:  #094f4d;  /* Para headers y footers */
+      --color-primario-claro:   #0e8a87;  /* Para degradados y acentos secundarios */
+      --color-acento:           #c47a28;  /* Ámbar — color complementario */
+      --color-acento-claro:     #e8a84e;  /* Ámbar suave para fondos de acento */
+
+      /* Fondos de página y superficie */
+      --color-fondo:            #f2f8f8;  /* Fondo general de la página */
+      --color-superficie:       #ffffff;  /* Tarjetas y paneles blancos */
+
+      /* Bloques de código */
+      --color-codigo-fondo:     #0a2424;  /* Fondo oscuro para <pre> y bloques de código */
+      --color-codigo-resalte:   #133535;  /* Resalte dentro del código */
+
+      /* Texto en distintos niveles de jerarquía */
+      --color-texto:            #172828;  /* Texto principal */
+      --color-texto-medio:      #3d5e5e;  /* Párrafos y descripciones */
+      --color-texto-suave:      #6e8f8f;  /* Texto secundario / metadatos */
+      --color-borde:            #bdd8d8;  /* Bordes y separadores */
+
+      /* Estados de interfaz */
+      --color-exito:            #1a6b3c;  /* Verde para éxito / check */
+      --color-fondo-exito:      #d4ede0;  /* Fondo verde suave */
+      --color-error:            #842029;  /* Rojo para errores */
+      --color-fondo-error:      #f8d7da;  /* Fondo rojo suave */
+      --color-advertencia:      #664d03;  /* Amarillo-café para advertencias */
+      --color-fondo-advertencia:#fff3cd;  /* Fondo amarillo suave */
     }
 
+    /* ── Base del documento ── */
     body {
       font-family: 'Segoe UI', system-ui, sans-serif;
-      background: var(--bg);
-      color: #222;
-      padding: 30px 16px 60px;
+      background: var(--color-fondo);
+      color: var(--color-texto);
+      padding: 0 0 60px;
     }
 
-    /* ── PAGE HEADER ── */
-    .page-header {
+    /* ══ BANNER INSTITUCIONAL ══
+       Header tipo universidad con degradado teal Columbia */
+    .site-header {
+      background: linear-gradient(135deg, var(--color-primario-oscuro) 0%, var(--color-primario) 60%, var(--color-primario-claro) 100%);
+      color: #fff;
+      padding: 28px 20px 24px;
       text-align: center;
-      margin-bottom: 36px;
+      margin-bottom: 0;
+      box-shadow: 0 4px 12px rgba(9, 79, 77, 0.35);
     }
-    .page-header h1 {
-      font-size: 1.7rem;
-      color: var(--dark);
+    .site-header .institución {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0.85;
       margin-bottom: 6px;
     }
-    .page-header p {
-      color: #555;
-      font-size: 0.95rem;
+    .site-header h1 {
+      font-size: 1.55rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+      letter-spacing: 0.2px;
+    }
+    .site-header p {
+      font-size: 0.9rem;
+      opacity: 0.85;
     }
 
-    /* ── LAYOUT ── */
-    .container { max-width: 860px; margin: 0 auto; }
+    /* ── LAYOUT — contenedor centrado ── */
+    .container { max-width: 860px; margin: 0 auto; padding: 30px 16px 0; }
 
-    /* ── SECTION CARD ── */
+    /* ── TARJETA DE SECCIÓN ── */
     .card {
-      background: #fff;
+      background: var(--color-superficie);
       border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,.09);
+      box-shadow: 0 2px 10px rgba(0,0,0,.08);
       margin-bottom: 24px;
       overflow: hidden;
     }
+
+    /* Cabecera de cada tarjeta — siempre texto blanco sobre fondo de color */
     .card-header {
       display: flex;
       align-items: center;
@@ -60,6 +97,8 @@
       font-size: 1rem;
       color: #fff;
     }
+
+    /* Número o letra de sección dentro del header */
     .card-header .num {
       background: rgba(255,255,255,.28);
       width: 30px; height: 30px;
@@ -69,16 +108,18 @@
     }
     .card-body { padding: 18px 20px; }
 
-    .bg-blue   { background: var(--blue);   }
-    .bg-green  { background: var(--green);  }
-    .bg-orange { background: var(--orange); }
-    .bg-red    { background: var(--red);    }
-    .bg-purple { background: var(--purple); }
-    .bg-teal   { background: var(--teal); color: #0a4d5e !important; }
-    .bg-gray   { background: var(--gray);   }
-    .bg-dark   { background: var(--dark);   }
+    /* ── VARIANTES DE COLOR PARA CABECERAS ──
+       Usando la paleta Columbia en lugar de colores Bootstrap genéricos */
+    .bg-primario        { background: var(--color-primario); }         /* Teal principal */
+    .bg-primario-oscuro { background: var(--color-primario-oscuro); }  /* Teal oscuro — para secciones clave */
+    .bg-primario-claro  { background: var(--color-primario-claro); }   /* Teal claro */
+    .bg-acento          { background: var(--color-acento); }           /* Ámbar — Oracle / configuración */
+    .bg-acento-claro    { background: var(--color-acento-claro); color: var(--color-primario-oscuro) !important; } /* Ámbar suave */
+    .bg-error           { background: var(--color-error); }            /* Rojo — errores */
+    .bg-exito           { background: var(--color-exito); }            /* Verde — éxito / checklist */
+    .bg-texto-suave     { background: var(--color-texto-suave); }      /* Gris-teal — secciones neutras */
 
-    /* ── ARCHITECTURE DIAGRAM ── */
+    /* ── DIAGRAMA DE ARQUITECTURA ── */
     .arch {
       display: flex;
       align-items: center;
@@ -93,15 +134,17 @@
       padding: 14px 18px;
       min-width: 140px;
     }
-    .arch-box .icon { font-size: 2rem; margin-bottom: 4px; }
+    .arch-box .icon  { font-size: 2rem; margin-bottom: 4px; }
     .arch-box .label { font-weight: 700; font-size: 0.9rem; }
-    .arch-box .sub { font-size: 0.75rem; color: #666; margin-top: 3px; }
+    .arch-box .sub   { font-size: 0.75rem; color: var(--color-texto-suave); margin-top: 3px; }
+
+    /* Conectores de flecha entre cajas del diagrama */
     .arch-arrow {
       display: flex;
       flex-direction: column;
       align-items: center;
       font-size: 0.7rem;
-      color: #666;
+      color: var(--color-texto-suave);
       padding: 0 6px;
       gap: 2px;
     }
@@ -114,14 +157,14 @@
     .arch-arrow .dash {
       width: 40px;
       height: 2px;
-      background: #adb5bd;
+      background: var(--color-borde);
       position: relative;
     }
     .arch-arrow .dash.right::after {
       content: '';
       position: absolute;
       right: -1px; top: -4px;
-      border-left: 8px solid #adb5bd;
+      border-left: 8px solid var(--color-borde);
       border-top: 5px solid transparent;
       border-bottom: 5px solid transparent;
     }
@@ -129,14 +172,17 @@
       content: '';
       position: absolute;
       left: -1px; top: -4px;
-      border-right: 8px solid #adb5bd;
+      border-right: 8px solid var(--color-borde);
       border-top: 5px solid transparent;
       border-bottom: 5px solid transparent;
     }
-    .box-browser { background: #e7f1ff; border: 2px solid #9ec5fe; }
-    .box-node    { background: #d1e7dd; border: 2px solid #a3cfbb; }
-    .box-oracle  { background: #fff3cd; border: 2px solid #ffda6a; }
 
+    /* Cajas del diagrama — teal y ámbar en lugar de azul/verde/amarillo genérico */
+    .box-browser { background: #d6eeed; border: 2px solid var(--color-primario-claro); }
+    .box-node    { background: #d4ede0; border: 2px solid #6ab89a; }
+    .box-oracle  { background: #fdefd8; border: 2px solid var(--color-acento-claro); }
+
+    /* Pasos numerados dentro del diagrama de flujo */
     .flow-steps {
       display: flex;
       flex-direction: column;
@@ -148,10 +194,10 @@
       align-items: flex-start;
       gap: 10px;
       font-size: 0.85rem;
-      color: #444;
+      color: var(--color-texto-medio);
     }
     .flow-step .step-n {
-      background: var(--blue);
+      background: var(--color-primario);
       color: #fff;
       width: 22px; height: 22px;
       border-radius: 50%;
@@ -160,21 +206,22 @@
       margin-top: 1px;
     }
 
-    /* ── FOLDER TREE ── */
+    /* ── ÁRBOL DE CARPETAS (monospace) ── */
     .tree {
       font-family: 'Consolas', 'Courier New', monospace;
       font-size: 0.85rem;
       line-height: 1.9;
-      background: #f8f9fa;
+      background: var(--color-fondo);
       border-radius: 8px;
       padding: 14px 16px;
     }
-    .tree .folder { color: #0d6efd; font-weight: 700; }
-    .tree .file   { color: #333; }
-    .tree .desc   { color: #888; font-size: 0.78rem; }
-    .tree .indent { color: #adb5bd; }
+    .tree .folder { color: var(--color-primario); font-weight: 700; }  /* Nombres de carpeta en teal */
+    .tree .file   { color: var(--color-texto); }
+    .tree .desc   { color: var(--color-texto-suave); font-size: 0.78rem; }
+    .tree .indent { color: var(--color-borde); }
 
-    /* ── FOLDER BADGES (carpetas.txt) ── */
+    /* ── GRILLA DE TARJETAS DE CARPETA ──
+       Muestra js/, routes/, public/, etc. con colores teal y ámbar */
     .folder-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -192,15 +239,17 @@
       font-size: 0.95rem;
       margin-bottom: 4px;
     }
-    .folder-card .fc-desc { font-size: 0.8rem; color: #444; }
-    .fc-js     { background: #d1e7dd; border-color: #198754; }
-    .fc-routes { background: #cfe2ff; border-color: #0d6efd; }
-    .fc-public { background: #fff3cd; border-color: #fd7e14; }
-    .fc-docs   { background: #f8d7da; border-color: #dc3545; }
-    .fc-img    { background: #e2d9f3; border-color: #6f42c1; }
-    .fc-nm     { background: #f0f0f0; border-color: #adb5bd; }
+    .folder-card .fc-desc { font-size: 0.8rem; color: var(--color-texto-medio); }
 
-    /* ── STEPS ── */
+    /* Cada carpeta con variaciones de teal y ámbar Columbia */
+    .fc-js     { background: #d6eeed; border-color: var(--color-primario); }          /* js/ — teal principal */
+    .fc-routes { background: #c8e8e7; border-color: var(--color-primario-claro); }    /* routes/ — teal claro */
+    .fc-public { background: #fdefd8; border-color: var(--color-acento); }            /* public/ — ámbar */
+    .fc-docs   { background: #fde8d8; border-color: #c46428; }                        /* DOCs/ — ámbar oscuro */
+    .fc-img    { background: #e3f0ef; border-color: var(--color-primario-oscuro); }   /* img/ — teal oscuro */
+    .fc-nm     { background: #edf4f4; border-color: var(--color-borde); }             /* node_modules/ — neutro */
+
+    /* ── PASOS NUMERADOS (instalación) ── */
     .steps { display: flex; flex-direction: column; gap: 10px; }
     .step {
       display: flex;
@@ -208,7 +257,7 @@
       align-items: flex-start;
     }
     .step-badge {
-      background: var(--blue);
+      background: var(--color-primario);
       color: #fff;
       min-width: 28px; height: 28px;
       border-radius: 50%;
@@ -217,30 +266,34 @@
       margin-top: 2px;
     }
     .step-content { flex: 1; }
-    .step-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; }
-    .step-detail { font-size: 0.83rem; color: #555; line-height: 1.5; }
+    .step-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; color: var(--color-texto); }
+    .step-detail { font-size: 0.83rem; color: var(--color-texto-medio); line-height: 1.5; }
+
+    /* Caja de advertencia / nota informativa */
     .note {
-      background: #fff3cd;
-      border-left: 4px solid #ffc107;
+      background: var(--color-fondo-advertencia);
+      border-left: 4px solid var(--color-acento);
       border-radius: 6px;
       padding: 8px 12px;
       font-size: 0.82rem;
-      color: #664d03;
+      color: var(--color-advertencia);
       margin-top: 10px;
     }
     .note strong { color: #533c00; }
 
-    /* ── CODE ── */
+    /* ── CÓDIGO EN LÍNEA ── */
     code {
-      background: #e9ecef;
+      background: #e3eded;
       border-radius: 4px;
       padding: 1px 6px;
       font-family: 'Consolas', monospace;
       font-size: 0.83rem;
-      color: #c7254e;
+      color: var(--color-primario-oscuro);
     }
+
+    /* Bloque de código multilinea — fondo oscuro institucional */
     pre {
-      background: #1e1e2e;
+      background: var(--color-codigo-fondo);
       color: #cdd6f4;
       border-radius: 8px;
       padding: 12px 14px;
@@ -250,19 +303,20 @@
       line-height: 1.6;
       margin: 8px 0;
     }
-    pre .kw  { color: #cba6f7; }
-    pre .str { color: #a6e3a1; }
-    pre .cm  { color: #6c7086; font-style: italic; }
-    pre .fn  { color: #89b4fa; }
+    /* Resaltado de sintaxis dentro de <pre> */
+    pre .kw  { color: #cba6f7; }   /* palabras clave JS/SQL */
+    pre .str { color: #a6e3a1; }   /* strings */
+    pre .cm  { color: #6c7086; font-style: italic; }  /* comentarios */
+    pre .fn  { color: #89b4fa; }   /* funciones */
 
-    /* ── TABLE ── */
+    /* ── TABLA DE RUTAS HTTP ── */
     .routes-table {
       width: 100%;
       border-collapse: collapse;
       font-size: 0.85rem;
     }
     .routes-table th {
-      background: var(--dark);
+      background: var(--color-primario-oscuro);
       color: #fff;
       padding: 9px 12px;
       text-align: left;
@@ -271,11 +325,13 @@
     }
     .routes-table td {
       padding: 9px 12px;
-      border-bottom: 1px solid #e9ecef;
+      border-bottom: 1px solid var(--color-borde);
       vertical-align: middle;
     }
     .routes-table tr:last-child td { border-bottom: none; }
-    .routes-table tr:nth-child(even) td { background: #f8f9fa; }
+    .routes-table tr:nth-child(even) td { background: var(--color-fondo); }
+
+    /* Badges de método HTTP — colores semánticos Columbia */
     .method {
       display: inline-block;
       padding: 2px 8px;
@@ -284,12 +340,12 @@
       font-size: 0.75rem;
       font-family: monospace;
     }
-    .m-get    { background: #d1e7dd; color: #0a3622; }
-    .m-post   { background: #cfe2ff; color: #084298; }
-    .m-put    { background: #fff3cd; color: #664d03; }
-    .m-delete { background: #f8d7da; color: #842029; }
+    .m-get    { background: #d6eeed; color: var(--color-primario-oscuro); }   /* GET → teal */
+    .m-post   { background: #fdefd8; color: #7a4a10; }                        /* POST → ámbar */
+    .m-put    { background: #c8e8e7; color: var(--color-primario-oscuro); }   /* PUT → teal claro */
+    .m-delete { background: var(--color-fondo-error); color: var(--color-error); } /* DELETE → rojo suave */
 
-    /* ── PACKAGES ── */
+    /* ── TARJETAS DE PAQUETES NPM ── */
     .pkg-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -301,13 +357,13 @@
       padding: 12px 14px;
       border: 1px solid;
     }
-    .pkg-name { font-weight: 700; font-family: monospace; font-size: 0.9rem; margin-bottom: 4px; }
-    .pkg-desc { font-size: 0.78rem; color: #555; }
-    .pkg-express { background: #d1e7dd; border-color: #a3cfbb; }
-    .pkg-bp      { background: #cfe2ff; border-color: #9ec5fe; }
-    .pkg-oracle  { background: #fff3cd; border-color: #ffda6a; }
+    .pkg-name { font-weight: 700; font-family: monospace; font-size: 0.9rem; margin-bottom: 4px; color: var(--color-texto); }
+    .pkg-desc { font-size: 0.78rem; color: var(--color-texto-medio); }
+    .pkg-express { background: #d6eeed; border-color: var(--color-primario); }         /* express → teal */
+    .pkg-bp      { background: #c8e8e7; border-color: var(--color-primario-claro); }   /* body-parser → teal claro */
+    .pkg-oracle  { background: #fdefd8; border-color: var(--color-acento-claro); }     /* oracledb → ámbar */
 
-    /* ── ERRORS ── */
+    /* ── LISTA DE ERRORES FRECUENTES ── */
     .error-list { display: flex; flex-direction: column; gap: 10px; }
     .error-item {
       border-radius: 8px;
@@ -315,12 +371,12 @@
       border: 1px solid #f5c2c7;
     }
     .error-head {
-      background: #f8d7da;
+      background: var(--color-fondo-error);
       padding: 8px 12px;
       font-family: monospace;
       font-size: 0.82rem;
       font-weight: 700;
-      color: #842029;
+      color: var(--color-error);
     }
     .error-body {
       background: #fff;
@@ -329,36 +385,37 @@
       display: flex;
       gap: 20px;
     }
-    .error-body span { flex: 1; color: #555; }
-    .error-body span strong { color: #333; display: block; margin-bottom: 2px; }
+    .error-body span { flex: 1; color: var(--color-texto-medio); }
+    .error-body span strong { color: var(--color-texto); display: block; margin-bottom: 2px; }
 
-    /* ── CHECKLIST ── */
+    /* ── CHECKLIST DE VERIFICACIÓN FINAL ── */
     .checklist { display: flex; flex-direction: column; gap: 8px; }
     .check-item {
       display: flex;
       align-items: flex-start;
       gap: 10px;
       padding: 9px 12px;
-      background: #f8f9fa;
+      background: var(--color-fondo);
       border-radius: 8px;
-      border-left: 4px solid #198754;
+      border-left: 4px solid var(--color-exito);
       font-size: 0.86rem;
+      color: var(--color-texto);
     }
     .check-box {
       width: 20px; height: 20px;
-      border: 2px solid #198754;
+      border: 2px solid var(--color-exito);
       border-radius: 4px;
       flex-shrink: 0;
       margin-top: 1px;
     }
 
-    /* ── SECTION DIVIDER LABEL ── */
+    /* ── ETIQUETA DE SECCIÓN DIVISORA ── */
     .section-label {
       font-size: 0.72rem;
       font-weight: 700;
       letter-spacing: 1px;
       text-transform: uppercase;
-      color: #888;
+      color: var(--color-texto-suave);
       margin: 28px 0 10px;
     }
 
@@ -371,20 +428,20 @@
 </head>
 <body>
 
+<!-- ══ BANNER INSTITUCIONAL ══ -->
+<header class="site-header">
+  <div class="institución">Universidad Columbia del Paraguay — Programación 2</div>
+  <h1>Guía del Estudiante — Aplicación Web con Node.js y Oracle XE 21c</h1>
+  <p>Para estudiantes que inician en programación web</p>
+</header>
+
 <div class="container">
-
-  <!-- PAGE HEADER -->
-  <div class="page-header">
-    <h1>Guía Completa — Aplicación Web con Node.js y Oracle XE 21c</h1>
-    <p>Para estudiantes que inician en programación web</p>
-  </div>
-
 
   <!-- ── ARQUITECTURA ── -->
   <p class="section-label">Conceptos base</p>
 
   <div class="card">
-    <div class="card-header bg-dark">
+    <div class="card-header bg-primario-oscuro">
       <div class="num">A</div>
       Arquitectura de la Aplicación
     </div>
@@ -433,29 +490,29 @@
   <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px;">
 
     <div class="card" style="margin-bottom:0">
-      <div class="card-header bg-green">
+      <div class="card-header bg-primario">
         <div class="num">N</div>
         ¿Qué es Node.js?
       </div>
       <div class="card-body">
-        <p style="font-size:.85rem;color:#444;margin-bottom:10px">Entorno que permite ejecutar JavaScript fuera del navegador, en el servidor. Cumple el rol de <strong>SERVIDOR</strong>.</p>
+        <p style="font-size:.85rem;color:var(--color-texto-medio);margin-bottom:10px">Entorno que permite ejecutar JavaScript fuera del navegador, en el servidor. Cumple el rol de <strong>SERVIDOR</strong>.</p>
         <div style="display:flex;flex-direction:column;gap:5px">
-          <div style="font-size:.82rem;display:flex;gap:6px"><span style="color:green;font-weight:700">✔</span> Usa JavaScript, el mismo lenguaje del navegador.</div>
-          <div style="font-size:.82rem;display:flex;gap:6px"><span style="color:green;font-weight:700">✔</span> Liviano y rápido para muchas peticiones.</div>
-          <div style="font-size:.82rem;display:flex;gap:6px"><span style="color:green;font-weight:700">✔</span> Ecosistema enorme de librerías (npm).</div>
-          <div style="font-size:.82rem;display:flex;gap:6px"><span style="color:green;font-weight:700">✔</span> Express crea un servidor con pocas líneas.</div>
+          <div style="font-size:.82rem;display:flex;gap:6px"><span style="color:var(--color-exito);font-weight:700">✔</span> Usa JavaScript, el mismo lenguaje del navegador.</div>
+          <div style="font-size:.82rem;display:flex;gap:6px"><span style="color:var(--color-exito);font-weight:700">✔</span> Liviano y rápido para muchas peticiones.</div>
+          <div style="font-size:.82rem;display:flex;gap:6px"><span style="color:var(--color-exito);font-weight:700">✔</span> Ecosistema enorme de librerías (npm).</div>
+          <div style="font-size:.82rem;display:flex;gap:6px"><span style="color:var(--color-exito);font-weight:700">✔</span> Express crea un servidor con pocas líneas.</div>
         </div>
       </div>
     </div>
 
     <div class="card" style="margin-bottom:0">
-      <div class="card-header bg-orange">
+      <div class="card-header bg-acento">
         <div class="num">O</div>
         ¿Qué es Oracle XE?
       </div>
       <div class="card-body">
-        <p style="font-size:.85rem;color:#444;margin-bottom:10px">Versión gratuita de Oracle Database. Motor relacional que cumple el rol de <strong>ALMACÉN DE DATOS</strong>.</p>
-        <div style="font-size:.82rem;background:#fff3cd;border-radius:6px;padding:10px 12px">
+        <p style="font-size:.85rem;color:var(--color-texto-medio);margin-bottom:10px">Versión gratuita de Oracle Database. Motor relacional que cumple el rol de <strong>ALMACÉN DE DATOS</strong>.</p>
+        <div style="font-size:.82rem;background:var(--color-fondo-advertencia);border-radius:6px;padding:10px 12px;color:var(--color-advertencia)">
           <strong>XEPDB1</strong> es el nombre de la base de datos (PDB = Pluggable DataBase) que viene creada por defecto en Oracle XE 21c.
         </div>
       </div>
@@ -468,7 +525,7 @@
   <p class="section-label">Estructura del proyecto</p>
 
   <div class="card">
-    <div class="card-header bg-purple">
+    <div class="card-header bg-primario-claro">
       <div class="num">📁</div>
       Estructura de Carpetas
     </div>
@@ -533,7 +590,7 @@
   <p class="section-label">Instalación</p>
 
   <div class="card">
-    <div class="card-header bg-orange">
+    <div class="card-header bg-acento">
       <div class="num">4</div>
       Instalación de Oracle XE 21c
     </div>
@@ -574,7 +631,7 @@
   </div>
 
   <div class="card">
-    <div class="card-header bg-green">
+    <div class="card-header bg-primario">
       <div class="num">5</div>
       Instalación de Node.js
     </div>
@@ -608,7 +665,7 @@
   </div>
 
   <div class="card">
-    <div class="card-header bg-blue">
+    <div class="card-header bg-primario-claro">
       <div class="num">6</div>
       Creación del Proyecto Node
     </div>
@@ -646,7 +703,7 @@
   <p class="section-label">Configuración</p>
 
   <div class="card">
-    <div class="card-header bg-teal">
+    <div class="card-header bg-primario">
       <div class="num">7</div>
       Instalación de Dependencias (paquetes)
     </div>
@@ -671,7 +728,7 @@
   </div>
 
   <div class="card">
-    <div class="card-header bg-orange">
+    <div class="card-header bg-acento">
       <div class="num">8</div>
       Configuración de Conexión a Oracle (db.js)
     </div>
@@ -685,7 +742,7 @@
 };
 
 module.exports = configuracion;</pre>
-      <div style="margin-top:12px;font-size:.84rem;color:#444">
+      <div style="margin-top:12px;font-size:.84rem;color:var(--color-texto-medio)">
         <strong>connectString:</strong><br>
         · <code>localhost</code> → la base de datos está en la misma computadora.<br>
         · <code>XEPDB1</code> → nombre de la PDB de Oracle XE 21c.
@@ -696,7 +753,7 @@ module.exports = configuracion;</pre>
 
   <!-- ── TABLA USUARIOS ── -->
   <div class="card">
-    <div class="card-header bg-gray">
+    <div class="card-header bg-texto-suave">
       <div class="num">10</div>
       Tabla de Usuarios en Oracle
     </div>
@@ -711,7 +768,7 @@ module.exports = configuracion;</pre>
     estado         VARCHAR2(20)    <span class="kw">DEFAULT</span> <span class="str">'ACTIVO'</span>
 );</pre>
       <div style="margin-top:12px">
-        <div style="font-size:.8rem;font-weight:700;color:#555;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Insertar usuario de prueba</div>
+        <div style="font-size:.8rem;font-weight:700;color:var(--color-texto-suave);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Insertar usuario de prueba</div>
         <pre><span class="kw">INSERT INTO</span> usuarios (nombre, apellido, email, passw)
 <span class="kw">VALUES</span> (<span class="str">'Richard'</span>, <span class="str">'Paredes'</span>, <span class="str">'richard@email.com'</span>, <span class="str">'1234'</span>);
 
@@ -723,7 +780,7 @@ module.exports = configuracion;</pre>
 
   <!-- ── EJECUCIÓN ── -->
   <div class="card">
-    <div class="card-header bg-blue">
+    <div class="card-header bg-primario-oscuro">
       <div class="num">11</div>
       Ejecución del Servidor
     </div>
@@ -753,7 +810,7 @@ module.exports = configuracion;</pre>
   <p class="section-label">Referencia rápida</p>
 
   <div class="card">
-    <div class="card-header bg-dark">
+    <div class="card-header bg-primario-oscuro">
       <div class="num">13</div>
       Resumen de Rutas y Operaciones
     </div>
@@ -800,11 +857,12 @@ module.exports = configuracion;</pre>
           </tr>
         </tbody>
       </table>
+      <!-- Leyenda de métodos HTTP con colores Columbia -->
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-top:14px;font-size:.8rem">
-        <div style="background:#d1e7dd;border-radius:6px;padding:8px 10px"><span class="method m-get">GET</span><br><span style="color:#555;margin-top:4px;display:block">Solo pide datos (no modifica).</span></div>
-        <div style="background:#cfe2ff;border-radius:6px;padding:8px 10px"><span class="method m-post">POST</span><br><span style="color:#555;margin-top:4px;display:block">Crea un recurso nuevo.</span></div>
-        <div style="background:#fff3cd;border-radius:6px;padding:8px 10px"><span class="method m-put">PUT</span><br><span style="color:#555;margin-top:4px;display:block">Actualiza un recurso existente.</span></div>
-        <div style="background:#f8d7da;border-radius:6px;padding:8px 10px"><span class="method m-delete">DELETE</span><br><span style="color:#555;margin-top:4px;display:block">Elimina un recurso existente.</span></div>
+        <div style="background:#d6eeed;border-radius:6px;padding:8px 10px"><span class="method m-get">GET</span><br><span style="color:var(--color-texto-medio);margin-top:4px;display:block">Solo pide datos (no modifica).</span></div>
+        <div style="background:#fdefd8;border-radius:6px;padding:8px 10px"><span class="method m-post">POST</span><br><span style="color:var(--color-texto-medio);margin-top:4px;display:block">Crea un recurso nuevo.</span></div>
+        <div style="background:#c8e8e7;border-radius:6px;padding:8px 10px"><span class="method m-put">PUT</span><br><span style="color:var(--color-texto-medio);margin-top:4px;display:block">Actualiza un recurso existente.</span></div>
+        <div style="background:var(--color-fondo-error);border-radius:6px;padding:8px 10px"><span class="method m-delete">DELETE</span><br><span style="color:var(--color-texto-medio);margin-top:4px;display:block">Elimina un recurso existente.</span></div>
       </div>
     </div>
   </div>
@@ -812,7 +870,7 @@ module.exports = configuracion;</pre>
 
   <!-- ── ERRORES ── -->
   <div class="card">
-    <div class="card-header bg-red">
+    <div class="card-header bg-error">
       <div class="num">14</div>
       Errores Frecuentes y Soluciones
     </div>
@@ -874,7 +932,7 @@ module.exports = configuracion;</pre>
 
   <!-- ── CHECKLIST FINAL ── -->
   <div class="card">
-    <div class="card-header bg-green">
+    <div class="card-header bg-exito">
       <div class="num">✓</div>
       Checklist Final — Antes de ejecutar la aplicación
     </div>
@@ -890,7 +948,7 @@ module.exports = configuracion;</pre>
         <div class="check-item"><div class="check-box"></div>Terminal abierta en la carpeta <code>js\</code> con <code>node server.js</code> ejecutado.</div>
         <div class="check-item"><div class="check-box"></div>Navegador abierto en <code>http://localhost:3000/login.html</code>.</div>
       </div>
-      <div style="margin-top:14px;text-align:center;font-size:.85rem;color:#555;font-style:italic">
+      <div style="margin-top:14px;text-align:center;font-size:.85rem;color:var(--color-texto-suave);font-style:italic">
         Si todos los puntos están marcados, la aplicación debe funcionar correctamente.
       </div>
     </div>

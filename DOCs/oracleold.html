@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oracle XE 21c — Guía Completa | Universidad Columbia del Paraguay</title>
+<style>
+
+
+  :root {
+    --col-p:      #0b6967;
+    --col-pd:     #094f4d;
+    --col-pl:     #0e8a87;
+    --col-acc:    #c47a28;
+    --col-accl:   #e8a84e;
+    --col-bg:     #f2f8f8;
+    --col-surf:   #ffffff;
+    --col-code:   #0a2424;
+    --col-codehl: #133535;
+    --col-txt:    #172828;
+    --col-mid:    #3d5e5e;
+    --col-soft:   #6e8f8f;
+    --col-bdr:    #bdd8d8;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--col-bg);
+    color: var(--col-txt);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(135deg, var(--col-pd) 0%, var(--col-p) 60%, var(--col-pl) 100%);
+    color: #fff;
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 3px 12px rgba(9,79,77,0.4);
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 32px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+  }
+  .header-badge {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .header-title { flex: 1; }
+  .header-title h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+  .header-title p {
+    font-size: 0.78rem;
+    opacity: 0.78;
+    margin-top: 2px;
+  }
+  .header-meta {
+    font-size: 0.72rem;
+    opacity: 0.65;
+    text-align: right;
+    line-height: 1.5;
+  }
+
+  /* ── NAV PILLS ── */
+  .nav-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 8px 32px;
+    background: var(--col-pd);
+    overflow-x: auto;
+  }
+  .nav-bar a {
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.15);
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .nav-bar a:hover {
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    border-color: rgba(255,255,255,0.4);
+  }
+
+  /* ── MAIN LAYOUT ── */
+  main {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 28px 24px 60px;
+  }
+
+  /* ── SECTION ── */
+  section {
+    background: var(--col-surf);
+    border-radius: 12px;
+    margin-bottom: 24px;
+    border: 1px solid var(--col-bdr);
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(11,105,103,0.07);
+  }
+
+  .sec-header {
+    background: linear-gradient(90deg, var(--col-p) 0%, var(--col-pl) 100%);
+    color: #fff;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .sec-num {
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+  }
+  .sec-header h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+  }
+  .sec-body { padding: 22px 24px; }
+
+  /* ── SUBSECCIÓN ── */
+  .subsec {
+    border-left: 3px solid var(--col-p);
+    margin: 18px 0;
+    padding-left: 16px;
+  }
+  .subsec h3 {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--col-p);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .subsec h3::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: var(--col-acc);
+    border-radius: 50%;
+  }
+
+  /* ── BLOQUE DE CÓDIGO ── */
+  .code-wrap {
+    background: var(--col-code);
+    border-radius: 8px;
+    margin: 12px 0;
+    overflow: hidden;
+    border: 1px solid #1a4040;
+  }
+  .code-label {
+    background: var(--col-codehl);
+    color: var(--col-accl);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-bottom: 1px solid #1a4040;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .code-label::before {
+    content: '●';
+    color: var(--col-acc);
+    font-size: 0.7rem;
+  }
+  pre {
+    padding: 16px;
+    overflow-x: auto;
+    font-family: 'Cascadia Code', 'Consolas', 'Fira Code', monospace;
+    font-size: 0.82rem;
+    line-height: 1.6;
+    color: #d4efef;
+    tab-size: 4;
+  }
+  /* Colores sintácticos mínimos */
+  .kw   { color: #7dd8d6; font-weight: 600; } /* keywords SQL */
+  .str  { color: #a8d8a8; }                    /* strings */
+  .cmt  { color: #5a8888; font-style: italic; } /* comentarios */
+  .num  { color: var(--col-accl); }             /* números */
+  .fn   { color: #9ecfcf; }                     /* funciones */
+  .ps   { color: #b8d4d4; }                     /* PowerShell cmdlets */
+
+  /* ── COMANDO INLINE ── */
+  code {
+    background: rgba(11,105,103,0.12);
+    color: var(--col-pd);
+    border: 1px solid var(--col-bdr);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: 0.82em;
+  }
+
+  /* ── TABLA DE INFO ── */
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    margin: 12px 0;
+  }
+  .info-table th {
+    background: var(--col-p);
+    color: #fff;
+    padding: 8px 14px;
+    text-align: left;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+  }
+  .info-table td {
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--col-bdr);
+    vertical-align: top;
+  }
+  .info-table tr:nth-child(even) td { background: #f5fbfb; }
+  .info-table tr:last-child td { border-bottom: none; }
+  .info-table td:first-child { font-weight: 600; color: var(--col-p); font-family: monospace; }
+
+  /* ── NOTA / AVISO ── */
+  .nota {
+    background: rgba(196,122,40,0.08);
+    border: 1px solid rgba(196,122,40,0.3);
+    border-left: 4px solid var(--col-acc);
+    border-radius: 6px;
+    padding: 11px 16px;
+    margin: 12px 0;
+    font-size: 0.85rem;
+    color: #5a3a0a;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .nota::before { content: '⚠'; font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+
+  .tip {
+    background: rgba(11,105,103,0.07);
+    border: 1px solid rgba(11,105,103,0.25);
+    border-left: 4px solid var(--col-p);
+    border-radius: 6px;
+    padding: 11px 16px;
+    margin: 12px 0;
+    font-size: 0.85rem;
+    color: var(--col-pd);
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .tip::before { content: '💡'; font-size: 0.9rem; flex-shrink: 0; margin-top: 1px; }
+
+  /* ── PÁRRAFO TEXTO ── */
+  p { color: var(--col-mid); margin-bottom: 10px; font-size: 0.9rem; }
+  ul, ol { padding-left: 20px; margin-bottom: 10px; }
+  li { color: var(--col-mid); font-size: 0.9rem; margin-bottom: 4px; }
+  li strong { color: var(--col-txt); }
+
+  /* ── COMPARATIVA ── */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 12px 0;
+  }
+  .compare-col { border-radius: 8px; overflow: hidden; border: 1px solid var(--col-bdr); }
+  .compare-col .col-head {
+    background: var(--col-p);
+    color: #fff;
+    padding: 8px 14px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .compare-col:last-child .col-head { background: var(--col-acc); }
+  .compare-col ul { padding: 12px 12px 12px 28px; background: #f5fbfb; }
+  .compare-col ul li { font-size: 0.83rem; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--col-pd);
+    color: rgba(255,255,255,0.7);
+    text-align: center;
+    padding: 20px;
+    font-size: 0.78rem;
+    line-height: 1.8;
+  }
+  footer strong { color: #fff; }
+
+  /* ── STEP LIST ── */
+  .steps { counter-reset: step; list-style: none; padding: 0; margin: 12px 0; }
+  .steps li {
+    counter-increment: step;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+  .steps li::before {
+    content: counter(step);
+    background: var(--col-p);
+    color: #fff;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 800;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .steps li span { color: var(--col-mid); font-size: 0.88rem; }
+
+  @media (max-width: 680px) {
+    .header-top { padding: 12px 16px; flex-wrap: wrap; }
+    .nav-bar { padding: 8px 16px; }
+    main { padding: 16px 12px 40px; }
+    .sec-body { padding: 16px; }
+    .compare-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="header-badge">PR2 · BD</div>
+    <div class="header-title">
+      <h1>Oracle Database Express Edition 21c</h1>
+      <p>Guía completa: PowerShell + SQLPlus + DBeaver — Proyecto WEB</p>
+    </div>
+    <div class="header-meta">
+      Universidad Columbia del Paraguay<br>
+      Prof. Richard Steven<br>
+      Programación 2 · 2025
+    </div>
+  </div>
+  <nav class="nav-bar">
+    <a href="#s1">1. Oracle XE 21c</a>
+    <a href="#s2">2. Verificación</a>
+    <a href="#s3">3. Conexión CLI + DBeaver</a>
+    <a href="#s4">4. PDB XEPDB1</a>
+    <a href="#s5">5. Usuarios</a>
+    <a href="#s6">6. Esquemas</a>
+    <a href="#s7">7. Tablas</a>
+    <a href="#s8">8. Triggers</a>
+    <a href="#s9">9. Permisos</a>
+    <a href="#s10">10. Datos prueba</a>
+    <a href="#s11">11. Consultas</a>
+    <a href="#s12">12. Validación</a>
+    <a href="#s13">13. Administración</a>
+    <a href="#s14">14. Troubleshooting</a>
+  </nav>
+</header>
+
+<main>
+
+<!-- ══════════════════════════════════════════════════════════ SECCIÓN 1 -->
+<section id="s1">
+  <div class="sec-header"><div class="sec-num">1</div><h2>Oracle XE 21c — Características y Requisitos</h2></div>
+  <div class="sec-body">
+    <p>Oracle <strong>Express Edition 21c (XE)</strong> es la versión gratuita de Oracle Database. Es ideal para aprendizaje, desarrollo y proyectos académicos.</p>
+
+    <table class="info-table">
+      <tr><th>Recurso</th><th>Límite en XE</th><th>Impacto en clase</th></tr>
+      <tr><td>CPUs</td><td>2 CPUs máximo</td><td>Suficiente para desarrollo</td></tr>
+      <tr><td>RAM (BD)</td><td>2 GB para la base</td><td>Límite el poolMax de Node.js</td></tr>
+      <tr><td>Disco</td><td>12 GB datos usuario</td><td>Más que suficiente para proyectos</td></tr>
+      <tr><td>PDBs</td><td>1 Pluggable Database</td><td>Usamos XEPDB1 (pre-creada)</td></tr>
+    </table>
+
+    <div class="subsec">
+      <h3>Rutas y servicios en Windows</h3>
+      <table class="info-table">
+        <tr><th>Elemento</th><th>Ruta / Nombre</th></tr>
+        <tr><td>ORACLE_HOME</td><td>C:\app\&lt;usuario&gt;\product\21c\dbhomeXE</td></tr>
+        <tr><td>Datos</td><td>C:\app\&lt;usuario&gt;\oradata\XE\</td></tr>
+        <tr><td>Alert Log</td><td>C:\app\&lt;usuario&gt;\diag\rdbms\xe\XE\trace\alert_XE.log</td></tr>
+        <tr><td>Data Pump</td><td>C:\app\&lt;usuario&gt;\admin\XE\dpdump\</td></tr>
+        <tr><td>Servicio BD</td><td>OracleServiceXE</td></tr>
+        <tr><td>Listener</td><td>OracleOraDB21Home1TNSListener</td></tr>
+        <tr><td>CDB (raíz)</td><td>XE</td></tr>
+        <tr><td>PDB proyecto</td><td>XEPDB1</td></tr>
+      </table>
+    </div>
+
+    <div class="tip">La PDB <strong>XEPDB1</strong> se crea automáticamente al instalar Oracle XE. No es necesario crearla manualmente. Solo hay que abrirla y usarla.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ SECCIÓN 2 -->
+<section id="s2">
+  <div class="sec-header"><div class="sec-num">2</div><h2>Verificación del Entorno Oracle XE desde PowerShell</h2></div>
+  <div class="sec-body">
+
+    <div class="subsec"><h3>Verificar servicios</h3>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell</div>
+        <pre><span class="cmt"># Ver todos los servicios Oracle instalados</span>
+<span class="ps">Get-Service</span> -Name <span class="str">"Oracle*"</span> | <span class="ps">Select-Object</span> Name, Status, StartType
+
+<span class="cmt"># Los dos servicios principales de Oracle XE 21c:</span>
+<span class="cmt"># OracleServiceXE                   ← Motor de base de datos</span>
+<span class="cmt"># OracleOraDB21Home1TNSListener     ← Listener (acepta conexiones)</span></pre>
+      </div>
+    </div>
+
+    <div class="subsec"><h3>Iniciar / Detener Oracle XE</h3>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell</div>
+        <pre><span class="ps">Start-Service</span>   -Name <span class="str">"OracleServiceXE"</span>
+<span class="ps">Stop-Service</span>    -Name <span class="str">"OracleServiceXE"</span>
+<span class="ps">Restart-Service</span> -Name <span class="str">"OracleServiceXE"</span>
+
+<span class="ps">Start-Service</span>   -Name <span class="str">"OracleOraDB21Home1TNSListener"</span></pre>
+      </div>
+    </div>
+
+    <div class="subsec"><h3>Variables de entorno</h3>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell — Configurar variables (sesión actual)</div>
+        <pre><span class="ps">$env:ORACLE_HOME</span> = <span class="str">"C:\app\$env:USERNAME\product\21c\dbhomeXE"</span>
+<span class="ps">$env:ORACLE_SID</span>  = <span class="str">"XE"</span>
+<span class="ps">$env:PATH</span>        = <span class="str">"$env:ORACLE_HOME\bin;$env:PATH"</span>
+<span class="ps">$env:NLS_LANG</span>    = <span class="str">"SPANISH_SPAIN.AL32UTF8"</span>
+
+<span class="cmt"># Verificar que sqlplus esté disponible:</span>
+where.exe sqlplus
+sqlplus -version
+
+<span class="cmt"># Verificar listener:</span>
+lsnrctl status
+tnsping XEPDB1</pre>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ SECCIÓN 3 -->
+<section id="s3">
+  <div class="sec-header"><div class="sec-num">3</div><h2>Conexión a Oracle XE — SQLPlus (CLI) y DBeaver (GUI)</h2></div>
+  <div class="sec-body">
+
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="col-head">✅ SQLPlus — Usar cuando...</div>
+        <ul>
+          <li>Scripts de despliegue y migración</li>
+          <li>Automatización y backups (expdp)</li>
+          <li>Examen práctico sin interfaz gráfica</li>
+          <li>Servidor sin entorno visual</li>
+          <li>Comandos de administración del sistema</li>
+        </ul>
+      </div>
+      <div class="compare-col">
+        <div class="col-head">✅ DBeaver — Usar cuando...</div>
+        <ul>
+          <li>Explorar visualmente tablas y datos</li>
+          <li>Editar Triggers y Procedures</li>
+          <li>Ver diagrama ER de relaciones</li>
+          <li>Comparar datos en grilla editable</li>
+          <li>Exportar resultados a CSV/Excel</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="subsec"><h3>Parte A — Conexión con SQLPlus</h3>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell / CMD</div>
+        <pre><span class="cmt">-- Como SYSDBA (administrador total):</span>
+sqlplus / <span class="kw">as</span> sysdba
+sqlplus sys/Oracle21c#@localhost:<span class="num">1521</span>/XE <span class="kw">as</span> sysdba
+
+<span class="cmt">-- Conexión directa a XEPDB1 (la PDB del proyecto):</span>
+sqlplus sys/Oracle21c#@localhost:<span class="num">1521</span>/XEPDB1 <span class="kw">as</span> sysdba
+sqlplus admin_web/AdminWeb2024#@localhost:<span class="num">1521</span>/XEPDB1
+
+<span class="cmt">-- Ejecutar script SQL sin abrir sesión interactiva:</span>
+sqlplus -s admin_web/AdminWeb2024#@localhost:<span class="num">1521</span>/XEPDB1 @<span class="str">"C:\scripts\tablas.sql"</span></pre>
+      </div>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell — Función reutilizable</div>
+        <pre><span class="kw">function</span> Invoke-OracleXE {
+    <span class="kw">param</span>(
+        [string]$Usuario  = <span class="str">"admin_web"</span>,
+        [string]$Password = <span class="str">"AdminWeb2024#"</span>,
+        [string]$Servicio = <span class="str">"XEPDB1"</span>,
+        [string]$SQL
+    )
+    $conn = <span class="str">"$Usuario/$Password@localhost:1521/$Servicio"</span>
+    $input = <span class="str">"SET FEEDBACK OFF`n$SQL`nEXIT;"</span>
+    <span class="kw">return</span> ($input | sqlplus -s $conn)
+}
+
+<span class="cmt"># Uso:</span>
+Invoke-OracleXE -SQL <span class="str">"SELECT table_name FROM user_tables ORDER BY 1;"</span></pre>
+      </div>
+    </div>
+
+    <div class="subsec"><h3>Parte B — Conexión con DBeaver</h3>
+      <ol class="steps">
+        <li><span>Instalar <strong>DBeaver Community</strong> (gratuito) desde <code>dbeaver.io/download</code></span></li>
+        <li><span>Abrir DBeaver → <strong>File → New → Database Connection</strong> (Ctrl+Shift+N)</span></li>
+        <li><span>Seleccionar <strong>Oracle</strong> → Next. DBeaver descarga el driver JDBC automáticamente.</span></li>
+        <li><span>Completar los campos: Host: <code>localhost</code> | Port: <code>1521</code> | Database: <code>XEPDB1</code> | Username: <code>admin_web</code> | Password: <code>AdminWeb2024#</code></span></li>
+        <li><span>Hacer clic en <strong>Test Connection</strong> → debe mostrar "Connected" → <strong>Finish</strong></span></li>
+      </ol>
+      <div class="tip">Para conectarse como SYSDBA en DBeaver: usar Username <code>sys</code>, Password <code>Oracle21c#</code>, y en <strong>Role</strong> seleccionar <strong>SYSDBA</strong>.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ SECCIÓN 4 -->
+<section id="s4">
+  <div class="sec-header"><div class="sec-num">4</div><h2>La PDB XEPDB1 — Base de Datos del Proyecto</h2></div>
+  <div class="sec-body">
+    <p>En Oracle XE 21c la instalación crea automáticamente la arquitectura Multitenant: el <strong>CDB</strong> (contenedor raíz <code>XE</code>) y la <strong>PDB</strong> (<code>XEPDB1</code>) donde se trabajan todos los objetos del proyecto.</p>
+
+    <div class="code-wrap">
+      <div class="code-label">SQLPlus — Verificar y abrir XEPDB1</div>
+      <pre><span class="cmt">-- Conectarse como SYSDBA al CDB:</span>
+sqlplus sys/Oracle21c#@localhost:<span class="num">1521</span>/XE <span class="kw">as</span> sysdba
+
+<span class="cmt">-- Ver estado de las PDBs:</span>
+<span class="kw">SELECT</span> con_id, name, open_mode <span class="kw">FROM</span> v$pdbs;
+
+<span class="cmt">-- Si XEPDB1 aparece en MOUNTED, abrirla:</span>
+<span class="kw">ALTER</span> PLUGGABLE DATABASE XEPDB1 <span class="kw">OPEN</span>;
+
+<span class="cmt">-- Guardar estado para que abra automáticamente al reiniciar Oracle:</span>
+<span class="kw">ALTER</span> PLUGGABLE DATABASE XEPDB1 <span class="kw">SAVE STATE</span>;
+
+<span class="cmt">-- Verificar el contenedor activo:</span>
+<span class="kw">SHOW</span> CON_NAME;   <span class="cmt">-- Debe mostrar: XEPDB1</span></pre>
+    </div>
+
+    <div class="nota">Si Oracle XE se reinicia y XEPDB1 no abre, ejecutar <code>ALTER PLUGGABLE DATABASE XEPDB1 SAVE STATE</code> para persistir el estado de apertura.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ SECCIÓN 5 -->
+<section id="s5">
+  <div class="sec-header"><div class="sec-num">5</div><h2>Creación de Usuarios</h2></div>
+  <div class="sec-body">
+    <div class="nota">Los usuarios en Oracle XE 21c deben crearse <strong>conectados a XEPDB1</strong>, no en el CDB raíz. En XEPDB1 no se usa el prefijo C##.</div>
+
+    <div class="code-wrap">
+      <div class="code-label">SQLPlus — Conectarse a XEPDB1 como SYSDBA</div>
+      <pre>sqlplus sys/Oracle21c#@localhost:<span class="num">1521</span>/XEPDB1 <span class="kw">as</span> sysdba
+<span class="kw">SHOW</span> CON_NAME;   <span class="cmt">-- Verificar: debe decir XEPDB1</span></pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-label">SQL — Crear usuarios del proyecto</div>
+      <pre><span class="cmt">-- Administrador del proyecto:</span>
+<span class="kw">CREATE USER</span> admin_web
+  <span class="kw">IDENTIFIED BY</span> <span class="str">AdminWeb2024#</span>
+  <span class="kw">DEFAULT TABLESPACE</span> users
+  <span class="kw">TEMPORARY TABLESPACE</span> temp
+  <span class="kw">QUOTA UNLIMITED ON</span> users;
+
+<span class="cmt">-- Desarrollador:</span>
+<span class="kw">CREATE USER</span> dev_web
+  <span class="kw">IDENTIFIED BY</span> <span class="str">DevWeb2024#</span>
+  <span class="kw">DEFAULT TABLESPACE</span> users
+  <span class="kw">TEMPORARY TABLESPACE</span> temp
+  <span class="kw">QUOTA</span> <span class="num">500</span>M <span class="kw">ON</span> users;
+
+<span class="cmt">-- Usuario para Node.js (app):</span>
+<span class="kw">CREATE USER</span> app_web
+  <span class="kw">IDENTIFIED BY</span> <span class="str">AppWeb2024#</span>
+  <span class="kw">DEFAULT TABLESPACE</span> users
+  <span class="kw">TEMPORARY TABLESPACE</span> temp
+  <span class="kw">QUOTA</span> <span class="num">200</span>M <span class="kw">ON</span> users;
+
+<span class="cmt">-- Solo lectura (reportes):</span>
+<span class="kw">CREATE USER</span> reporte_web
+  <span class="kw">IDENTIFIED BY</span> <span class="str">Reporte2024#</span>
+  <span class="kw">DEFAULT TABLESPACE</span> users
+  <span class="kw">TEMPORARY TABLESPACE</span> temp
+  <span class="kw">QUOTA</span> <span class="num">0</span> <span class="kw">ON</span> users;
+
+<span class="cmt">-- Verificar usuarios creados:</span>
+<span class="kw">SELECT</span> username, account_status, default_tablespace,
+       <span class="fn">TO_CHAR</span>(created, <span class="str">'DD/MM/YYYY'</span>) <span class="kw">AS</span> creado
+<span class="kw">FROM</span>   dba_users
+<span class="kw">WHERE</span>  username <span class="kw">IN</span> (<span class="str">'ADMIN_WEB'</span>,<span class="str">'DEV_WEB'</span>,<span class="str">'APP_WEB'</span>,<span class="str">'REPORTE_WEB'</span>)
+<span class="kw">ORDER BY</span> created;
+
+<span class="cmt">-- Otras operaciones:</span>
+<span class="kw">ALTER USER</span> dev_web <span class="kw">IDENTIFIED BY</span> <span class="str">NuevaPass2024#</span>;  <span class="cmt">-- Cambiar contraseña</span>
+<span class="kw">ALTER USER</span> dev_web <span class="kw">ACCOUNT UNLOCK</span>;                  <span class="cmt">-- Desbloquear</span>
+<span class="kw">DROP USER</span>  dev_web <span class="kw">CASCADE</span>;                          <span class="cmt">-- Eliminar con objetos</span></pre>
+    </div>
+    <div class="tip">En <strong>DBeaver</strong>: conexión SYSDBA → XEPDB1 → Security → Users → click derecho → Create New User.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ SECCIÓN 6 -->
+<section id="s6">
+  <div class="sec-header"><div class="sec-num">6</div><h2>Creación de Esquemas</h2></div>
+  <div class="sec-body">
+    <p>En Oracle el <strong>esquema = usuario</strong>. Al crear un usuario se crea automáticamente un esquema vacío con el mismo nombre. Las tablas que se crean bajo ese usuario forman su esquema.</p>
+
+    <div class="code-wrap">
+      <div class="code-label">SQL — Trabajar con esquemas</div>
+      <pre><span class="cmt">-- Conectarse al esquema principal:</span>
+sqlplus admin_web/AdminWeb2024#@localhost:<span class="num">1521</span>/XEPDB1
+
+<span class="cmt">-- Ver en qué esquema/contenedor estamos:</span>
+<span class="kw">SHOW USER</span>;
+<span class="kw">SELECT</span> <span class="fn">SYS_CONTEXT</span>(<span class="str">'USERENV'</span>,<span class="str">'CURRENT_USER'</span>)   <span class="kw">AS</span> usuario,
+       <span class="fn">SYS_CONTEXT</span>(<span class="str">'USERENV'</span>,<span class="str">'CURRENT_SCHEMA'</span>) <span class="kw">AS</span> esquema,
+       <span class="fn">SYS_CONTEXT</span>(<span class="str">'USERENV'</span>,<span class="str">'CON_NAME'</span>)        <span class="kw">AS</span> contenedor
+<span class="kw">FROM</span>   dual;
+
+<span class="cmt">-- Ver todos los objetos del esquema:</span>
+<span class="kw">SELECT</span> object_type, object_name, status
+<span class="kw">FROM</span>   user_objects
+<span class="kw">ORDER BY</span> object_type, object_name;
+
+<span class="cmt">-- Cambiar de esquema sin cerrar sesión:</span>
+<span class="kw">ALTER SESSION SET CURRENT_SCHEMA</span> = admin_web;
+
+<span class="cmt">-- Crear sinónimo público (acceso entre esquemas):</span>
+<span class="kw">CREATE PUBLIC SYNONYM</span> productos <span class="kw">FOR</span> admin_web.productos;</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ SECCIÓN 7 -->
+<section id="s7">
+  <div class="sec-header"><div class="sec-num">7</div><h2>Creación de Tablas del Proyecto WEB</h2></div>
+  <div class="sec-body">
+    <div class="tip">Conectarse como <code>admin_web</code> a <code>XEPDB1</code> antes de ejecutar los CREATE TABLE. En DBeaver: SQL Editor sobre la conexión admin_web.</div>
+
+    <div class="code-wrap">
+      <div class="code-label">SQL — Tabla ROLES</div>
+      <pre><span class="kw">CREATE TABLE</span> roles (
+    rol_id        NUMBER        <span class="kw">GENERATED ALWAYS AS IDENTITY PRIMARY KEY</span>,
+    nombre        <span class="kw">VARCHAR2</span>(<span class="num">50</span>)  <span class="kw">NOT NULL</span>,
+    descripcion   <span class="kw">VARCHAR2</span>(<span class="num">200</span>),
+    activo        <span class="kw">CHAR</span>(<span class="num">1</span>)       <span class="kw">DEFAULT</span> <span class="str">'S'</span> <span class="kw">NOT NULL</span>,
+    fecha_creacion <span class="kw">DATE</span>         <span class="kw">DEFAULT SYSDATE NOT NULL</span>,
+    <span class="kw">CONSTRAINT</span> roles_activo_ck  <span class="kw">CHECK</span> (activo <span class="kw">IN</span> (<span class="str">'S'</span>,<span class="str">'N'</span>)),
+    <span class="kw">CONSTRAINT</span> roles_nombre_uq  <span class="kw">UNIQUE</span> (nombre)
+);</pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-label">SQL — Tabla USUARIOS</div>
+      <pre><span class="kw">CREATE TABLE</span> usuarios (
+    usuario_id     NUMBER        <span class="kw">GENERATED ALWAYS AS IDENTITY PRIMARY KEY</span>,
+    rol_id         NUMBER        <span class="kw">NOT NULL</span>,
+    nombre         <span class="kw">VARCHAR2</span>(<span class="num">100</span>) <span class="kw">NOT NULL</span>,
+    apellido       <span class="kw">VARCHAR2</span>(<span class="num">100</span>) <span class="kw">NOT NULL</span>,
+    email          <span class="kw">VARCHAR2</span>(<span class="num">150</span>) <span class="kw">NOT NULL</span>,
+    username       <span class="kw">VARCHAR2</span>(<span class="num">50</span>)  <span class="kw">NOT NULL</span>,
+    password_hash  <span class="kw">VARCHAR2</span>(<span class="num">256</span>) <span class="kw">NOT NULL</span>,
+    telefono       <span class="kw">VARCHAR2</span>(<span class="num">20</span>),
+    activo         <span class="kw">CHAR</span>(<span class="num">1</span>)       <span class="kw">DEFAULT</span> <span class="str">'S'</span> <span class="kw">NOT NULL</span>,
+    fecha_registro <span class="kw">DATE</span>          <span class="kw">DEFAULT SYSDATE NOT NULL</span>,
+    ultimo_acceso  <span class="kw">TIMESTAMP</span>,
+    <span class="kw">CONSTRAINT</span> usuarios_email_uq    <span class="kw">UNIQUE</span> (email),
+    <span class="kw">CONSTRAINT</span> usuarios_username_uq <span class="kw">UNIQUE</span> (username),
+    <span class="kw">CONSTRAINT</span> usuarios_activo_ck   <span class="kw">CHECK</span> (activo <span class="kw">IN</span> (<span class="str">'S'</span>,<span class="str">'N'</span>)),
+    <span class="kw">CONSTRAINT</span> usuarios_rol_fk      <span class="kw">FOREIGN KEY</span> (rol_id) <span class="kw">REFERENCES</span> roles(rol_id)
+);</pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-label">SQL — Tablas CATEGORIAS, PRODUCTOS, PEDIDOS, DETALLE, SESIONES, LOGS</div>
+      <pre><span class="kw">CREATE TABLE</span> categorias (
+    categoria_id  NUMBER        <span class="kw">GENERATED ALWAYS AS IDENTITY PRIMARY KEY</span>,
+    nombre        <span class="kw">VARCHAR2</span>(<span class="num">100</span>) <span class="kw">NOT NULL</span>,
+    descripcion   <span class="kw">VARCHAR2</span>(<span class="num">300</span>),
+    imagen_url    <span class="kw">VARCHAR2</span>(<span class="num">500</span>),
+    activo        <span class="kw">CHAR</span>(<span class="num">1</span>)       <span class="kw">DEFAULT</span> <span class="str">'S'</span> <span class="kw">NOT NULL</span>,
+    fecha_creacion <span class="kw">DATE</span>         <span class="kw">DEFAULT SYSDATE NOT NULL</span>,
+    <span class="kw">CONSTRAINT</span> categorias_nombre_uq <span class="kw">UNIQUE</span> (nombre),
+    <span class="kw">CONSTRAINT</span> categorias_activo_ck <span class="kw">CHECK</span> (activo <span class="kw">IN</span> (<span class="str">'S'</span>,<span class="str">'N'</span>))
+);
+
+<span class="kw">CREATE TABLE</span> productos (
+    producto_id         NUMBER        <span class="kw">GENERATED ALWAYS AS IDENTITY PRIMARY KEY</span>,
+    categoria_id        NUMBER        <span class="kw">NOT NULL</span>,
+    nombre              <span class="kw">VARCHAR2</span>(<span class="num">200</span>) <span class="kw">NOT NULL</span>,
+    descripcion         <span class="kw">CLOB</span>,
+    precio              NUMBER(<span class="num">10</span>,<span class="num">2</span>)  <span class="kw">NOT NULL</span>,
+    stock               NUMBER(<span class="num">6</span>)     <span class="kw">DEFAULT</span> <span class="num">0</span> <span class="kw">NOT NULL</span>,
+    imagen_url          <span class="kw">VARCHAR2</span>(<span class="num">500</span>),
+    activo              <span class="kw">CHAR</span>(<span class="num">1</span>)       <span class="kw">DEFAULT</span> <span class="str">'S'</span> <span class="kw">NOT NULL</span>,
+    fecha_creacion      <span class="kw">DATE</span>          <span class="kw">DEFAULT SYSDATE NOT NULL</span>,
+    fecha_actualizacion <span class="kw">DATE</span>          <span class="kw">DEFAULT SYSDATE</span>,
+    <span class="kw">CONSTRAINT</span> productos_precio_ck <span class="kw">CHECK</span> (precio &gt;= <span class="num">0</span>),
+    <span class="kw">CONSTRAINT</span> productos_stock_ck  <span class="kw">CHECK</span> (stock  &gt;= <span class="num">0</span>),
+    <span class="kw">CONSTRAINT</span> productos_activo_ck <span class="kw">CHECK</span> (activo <span class="kw">IN</span> (<span class="str">'S'</span>,<span class="str">'N'</span>)),
+    <span class="kw">CONSTRAINT</span> productos_cat_fk    <span class="kw">FOREIGN KEY</span> (categoria_id) <span class="kw">REFERENCES</span> categorias(categoria_id)
+);
+
+<span class="kw">CREATE TABLE</span> pedidos (
+    pedido_id       NUMBER        <span class="kw">GENERATED ALWAYS AS IDENTITY PRIMARY KEY</span>,
+    usuario_id      NUMBER        <span class="kw">NOT NULL</span>,
+    estado          <span class="kw">VARCHAR2</span>(<span class="num">20</span>)  <span class="kw">DEFAULT</span> <span class="str">'PENDIENTE'</span> <span class="kw">NOT NULL</span>,
+    total           NUMBER(<span class="num">12</span>,<span class="num">2</span>)  <span class="kw">DEFAULT</span> <span class="num">0</span> <span class="kw">NOT NULL</span>,
+    direccion_envio <span class="kw">VARCHAR2</span>(<span class="num">400</span>),
+    notas           <span class="kw">VARCHAR2</span>(<span class="num">500</span>),
+    fecha_pedido    <span class="kw">DATE</span>          <span class="kw">DEFAULT SYSDATE NOT NULL</span>,
+    fecha_entrega   <span class="kw">DATE</span>,
+    <span class="kw">CONSTRAINT</span> pedidos_estado_ck  <span class="kw">CHECK</span> (estado <span class="kw">IN</span> (<span class="str">'PENDIENTE'</span>,<span class="str">'PROCESANDO'</span>,<span class="str">'ENVIADO'</span>,<span class="str">'ENTREGADO'</span>,<span class="str">'CANCELADO'</span>)),
+    <span class="kw">CONSTRAINT</span> pedidos_usuario_fk <span class="kw">FOREIGN KEY</span> (usuario_id) <span class="kw">REFERENCES</span> usuarios(usuario_id)
+);
+
+<span class="kw">CREATE TABLE</span> detalle_pedidos (
+    detalle_id      NUMBER       <span class="kw">GENERATED ALWAYS AS IDENTITY PRIMARY KEY</span>,
+    pedido_id       NUMBER       <span class="kw">NOT NULL</span>,
+    producto_id     NUMBER       <span class="kw">NOT NULL</span>,
+    cantidad        NUMBER(<span class="num">4</span>)    <span class="kw">NOT NULL</span>,
+    precio_unitario NUMBER(<span class="num">10</span>,<span class="num">2</span>) <span class="kw">NOT NULL</span>,
+    subtotal        NUMBER(<span class="num">12</span>,<span class="num">2</span>) <span class="kw">GENERATED ALWAYS AS</span> (cantidad * precio_unitario) <span class="kw">VIRTUAL</span>,
+    <span class="kw">CONSTRAINT</span> detalle_cantidad_ck  <span class="kw">CHECK</span> (cantidad &gt; <span class="num">0</span>),
+    <span class="kw">CONSTRAINT</span> detalle_pedido_fk    <span class="kw">FOREIGN KEY</span> (pedido_id)   <span class="kw">REFERENCES</span> pedidos(pedido_id),
+    <span class="kw">CONSTRAINT</span> detalle_producto_fk  <span class="kw">FOREIGN KEY</span> (producto_id) <span class="kw">REFERENCES</span> productos(producto_id),
+    <span class="kw">CONSTRAINT</span> detalle_uq           <span class="kw">UNIQUE</span> (pedido_id, producto_id)
+);
+
+<span class="cmt">-- Índices para optimizar consultas:</span>
+<span class="kw">CREATE INDEX</span> idx_usuarios_email   <span class="kw">ON</span> usuarios(email);
+<span class="kw">CREATE INDEX</span> idx_productos_cat    <span class="kw">ON</span> productos(categoria_id);
+<span class="kw">CREATE INDEX</span> idx_pedidos_usuario  <span class="kw">ON</span> pedidos(usuario_id);
+<span class="kw">CREATE INDEX</span> idx_pedidos_estado   <span class="kw">ON</span> pedidos(estado);
+<span class="kw">CREATE INDEX</span> idx_detalle_pedido   <span class="kw">ON</span> detalle_pedidos(pedido_id);
+
+<span class="cmt">-- Verificar tablas creadas:</span>
+<span class="kw">SELECT</span> table_name <span class="kw">FROM</span> user_tables <span class="kw">ORDER BY</span> <span class="num">1</span>;</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ SECCIÓN 8 -->
+<section id="s8">
+  <div class="sec-header"><div class="sec-num">8</div><h2>Triggers — CLI y DBeaver</h2></div>
+  <div class="sec-body">
+    <p>Un <strong>trigger</strong> es código PL/SQL que se ejecuta automáticamente <em>antes</em> o <em>después</em> de un INSERT, UPDATE o DELETE sobre una tabla. No requiere llamada explícita.</p>
+
+    <div class="code-wrap">
+      <div class="code-label">PL/SQL — Trigger 1: Registrar en logs_acceso al crear usuario</div>
+      <pre><span class="kw">CREATE OR REPLACE TRIGGER</span> trg_log_nuevo_usuario
+    <span class="kw">AFTER INSERT ON</span> usuarios
+    <span class="kw">FOR EACH ROW</span>
+<span class="kw">BEGIN</span>
+    <span class="kw">INSERT INTO</span> logs_acceso (usuario_id, accion, descripcion, resultado)
+    <span class="kw">VALUES</span> (
+        :NEW.usuario_id,
+        <span class="str">'REGISTRO'</span>,
+        <span class="str">'Nuevo usuario: '</span> || :NEW.username || <span class="str">' ('</span> || :NEW.email || <span class="str">')'</span>,
+        <span class="str">'S'</span>
+    );
+<span class="kw">END</span>;
+/</pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-label">PL/SQL — Trigger 2: Actualizar fecha_actualizacion al modificar producto</div>
+      <pre><span class="kw">CREATE OR REPLACE TRIGGER</span> trg_producto_actualizado
+    <span class="kw">BEFORE UPDATE ON</span> productos
+    <span class="kw">FOR EACH ROW</span>
+<span class="kw">BEGIN</span>
+    :NEW.fecha_actualizacion := <span class="kw">SYSDATE</span>;
+<span class="kw">END</span>;
+/</pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-label">PL/SQL — Trigger 3: Validar que el stock no sea negativo</div>
+      <pre><span class="kw">CREATE OR REPLACE TRIGGER</span> trg_validar_stock
+    <span class="kw">BEFORE UPDATE OF</span> stock <span class="kw">ON</span> productos
+    <span class="kw">FOR EACH ROW</span>
+<span class="kw">BEGIN</span>
+    <span class="kw">IF</span> :NEW.stock &lt; <span class="num">0</span> <span class="kw">THEN</span>
+        <span class="fn">RAISE_APPLICATION_ERROR</span>(<span class="num">-20001</span>,
+            <span class="str">'Error: stock negativo. Producto ID: '</span> || :OLD.producto_id);
+    <span class="kw">END IF</span>;
+<span class="kw">END</span>;
+/</pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-label">PL/SQL — Trigger 4: Actualizar total del pedido automáticamente</div>
+      <pre><span class="kw">CREATE OR REPLACE TRIGGER</span> trg_actualizar_total_pedido
+    <span class="kw">AFTER INSERT OR UPDATE OR DELETE ON</span> detalle_pedidos
+    <span class="kw">FOR EACH ROW</span>
+<span class="kw">DECLARE</span>
+    v_pedido_id NUMBER;
+<span class="kw">BEGIN</span>
+    v_pedido_id := <span class="kw">CASE</span>
+        <span class="kw">WHEN INSERTING OR UPDATING THEN</span> :NEW.pedido_id
+        <span class="kw">ELSE</span> :OLD.pedido_id
+    <span class="kw">END</span>;
+
+    <span class="kw">UPDATE</span> pedidos
+    <span class="kw">SET</span>    total = (
+               <span class="kw">SELECT NVL</span>(<span class="fn">SUM</span>(cantidad * precio_unitario), <span class="num">0</span>)
+               <span class="kw">FROM</span>   detalle_pedidos
+               <span class="kw">WHERE</span>  pedido_id = v_pedido_id
+           )
+    <span class="kw">WHERE</span>  pedido_id = v_pedido_id;
+<span class="kw">END</span>;
+/</pre>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-label">SQL — Gestión de triggers</div>
+      <pre><span class="cmt">-- Ver todos los triggers del esquema:</span>
+<span class="kw">SELECT</span> trigger_name, table_name, trigger_type, triggering_event, status
+<span class="kw">FROM</span>   user_triggers <span class="kw">ORDER BY</span> table_name;
+
+<span class="cmt">-- Habilitar / Deshabilitar:</span>
+<span class="kw">ALTER TRIGGER</span> trg_log_nuevo_usuario <span class="kw">ENABLE</span>;
+<span class="kw">ALTER TRIGGER</span> trg_log_nuevo_usuario <span class="kw">DISABLE</span>;
+
+<span class="cmt">-- Ver errores de compilación:</span>
+<span class="kw">SHOW ERRORS TRIGGER</span> trg_validar_stock;
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> user_errors <span class="kw">WHERE</span> name = <span class="str">'TRG_VALIDAR_STOCK'</span>;</pre>
+    </div>
+
+    <div class="tip"><strong>Desde DBeaver:</strong> expandir tabla → Triggers → doble click para editar el cuerpo PL/SQL con resaltado de sintaxis → Ctrl+S para guardar.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ SECCIÓN 9 -->
+<section id="s9">
+  <div class="sec-header"><div class="sec-num">9</div><h2>Asignación de Permisos</h2></div>
+  <div class="sec-body">
+    <div class="code-wrap">
+      <div class="code-label">SQL — Ejecutar como SYSDBA en XEPDB1</div>
+      <pre><span class="cmt">-- ADMIN_WEB — Administrador del esquema:</span>
+<span class="kw">GRANT CONNECT, RESOURCE   TO</span> admin_web;
+<span class="kw">GRANT UNLIMITED TABLESPACE TO</span> admin_web;
+<span class="kw">GRANT CREATE TRIGGER       TO</span> admin_web;
+<span class="kw">GRANT CREATE VIEW          TO</span> admin_web;
+
+<span class="cmt">-- DEV_WEB — Desarrollador:</span>
+<span class="kw">GRANT CONNECT, RESOURCE   TO</span> dev_web;
+<span class="kw">GRANT CREATE TRIGGER      TO</span> dev_web;
+<span class="kw">GRANT QUOTA</span> <span class="num">500</span>M <span class="kw">ON</span> users <span class="kw">TO</span> dev_web;
+
+<span class="cmt">-- APP_WEB — Usuario de Node.js (solo DML):</span>
+<span class="kw">GRANT CREATE SESSION        TO</span> app_web;
+<span class="kw">GRANT SELECT, INSERT ON</span> admin_web.usuarios        <span class="kw">TO</span> app_web;
+<span class="kw">GRANT SELECT, INSERT ON</span> admin_web.pedidos         <span class="kw">TO</span> app_web;
+<span class="kw">GRANT SELECT, INSERT ON</span> admin_web.detalle_pedidos <span class="kw">TO</span> app_web;
+<span class="kw">GRANT SELECT, INSERT ON</span> admin_web.sesiones        <span class="kw">TO</span> app_web;
+<span class="kw">GRANT SELECT, INSERT ON</span> admin_web.logs_acceso     <span class="kw">TO</span> app_web;
+<span class="kw">GRANT SELECT         ON</span> admin_web.productos       <span class="kw">TO</span> app_web;
+<span class="kw">GRANT SELECT         ON</span> admin_web.categorias      <span class="kw">TO</span> app_web;
+<span class="kw">GRANT SELECT         ON</span> admin_web.roles           <span class="kw">TO</span> app_web;
+<span class="kw">GRANT UPDATE         ON</span> admin_web.usuarios        <span class="kw">TO</span> app_web;
+<span class="kw">GRANT UPDATE         ON</span> admin_web.pedidos         <span class="kw">TO</span> app_web;
+<span class="kw">GRANT UPDATE         ON</span> admin_web.productos       <span class="kw">TO</span> app_web;
+
+<span class="cmt">-- REPORTE_WEB — Solo lectura:</span>
+<span class="kw">GRANT CREATE SESSION  TO</span> reporte_web;
+<span class="kw">GRANT SELECT ON</span> admin_web.usuarios        <span class="kw">TO</span> reporte_web;
+<span class="kw">GRANT SELECT ON</span> admin_web.productos       <span class="kw">TO</span> reporte_web;
+<span class="kw">GRANT SELECT ON</span> admin_web.pedidos         <span class="kw">TO</span> reporte_web;
+<span class="kw">GRANT SELECT ON</span> admin_web.detalle_pedidos <span class="kw">TO</span> reporte_web;
+
+<span class="cmt">-- Verificar permisos asignados:</span>
+<span class="kw">SELECT</span> grantee, privilege, admin_option
+<span class="kw">FROM</span>   dba_sys_privs
+<span class="kw">WHERE</span>  grantee <span class="kw">IN</span> (<span class="str">'ADMIN_WEB'</span>,<span class="str">'APP_WEB'</span>,<span class="str">'REPORTE_WEB'</span>)
+<span class="kw">ORDER BY</span> grantee, privilege;</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ SECCIÓN 10 -->
+<section id="s10">
+  <div class="sec-header"><div class="sec-num">10</div><h2>Inserción de Datos de Prueba</h2></div>
+  <div class="sec-body">
+    <div class="code-wrap">
+      <div class="code-label">SQL — admin_web@XEPDB1</div>
+      <pre><span class="cmt">-- Roles:</span>
+<span class="kw">INSERT INTO</span> roles (nombre, descripcion) <span class="kw">VALUES</span> (<span class="str">'Administrador'</span>, <span class="str">'Acceso total'</span>);
+<span class="kw">INSERT INTO</span> roles (nombre, descripcion) <span class="kw">VALUES</span> (<span class="str">'Vendedor'</span>, <span class="str">'Gestión de productos'</span>);
+<span class="kw">INSERT INTO</span> roles (nombre, descripcion) <span class="kw">VALUES</span> (<span class="str">'Cliente'</span>, <span class="str">'Compras personales'</span>);
+<span class="kw">COMMIT</span>;
+
+<span class="cmt">-- Usuarios:</span>
+<span class="kw">INSERT INTO</span> usuarios (rol_id, nombre, apellido, email, username, password_hash)
+<span class="kw">VALUES</span> (<span class="num">1</span>, <span class="str">'Carlos'</span>, <span class="str">'García'</span>, <span class="str">'carlos@empresa.com'</span>, <span class="str">'cgarcia'</span>, <span class="str">'e3b0c44298fc1c149afb...'</span>);
+<span class="kw">INSERT INTO</span> usuarios (rol_id, nombre, apellido, email, username, password_hash)
+<span class="kw">VALUES</span> (<span class="num">3</span>, <span class="str">'Ana'</span>, <span class="str">'Martínez'</span>, <span class="str">'ana@gmail.com'</span>, <span class="str">'amartinez'</span>, <span class="str">'a665a459204...'</span>);
+<span class="kw">COMMIT</span>;
+
+<span class="cmt">-- Categorías:</span>
+<span class="kw">INSERT INTO</span> categorias (nombre) <span class="kw">VALUES</span> (<span class="str">'Electrónica'</span>);
+<span class="kw">INSERT INTO</span> categorias (nombre) <span class="kw">VALUES</span> (<span class="str">'Ropa'</span>);
+<span class="kw">INSERT INTO</span> categorias (nombre) <span class="kw">VALUES</span> (<span class="str">'Deportes'</span>);
+<span class="kw">COMMIT</span>;
+
+<span class="cmt">-- Productos:</span>
+<span class="kw">INSERT INTO</span> productos (categoria_id, nombre, precio, stock)
+<span class="kw">VALUES</span> (<span class="num">1</span>, <span class="str">'Laptop HP 15'</span>, <span class="num">2500000</span>, <span class="num">15</span>);
+<span class="kw">INSERT INTO</span> productos (categoria_id, nombre, precio, stock)
+<span class="kw">VALUES</span> (<span class="num">1</span>, <span class="str">'Mouse Inalámbrico'</span>, <span class="num">85000</span>, <span class="num">50</span>);
+<span class="kw">INSERT INTO</span> productos (categoria_id, nombre, precio, stock)
+<span class="kw">VALUES</span> (<span class="num">3</span>, <span class="str">'Balón de Fútbol'</span>, <span class="num">65000</span>, <span class="num">35</span>);
+<span class="kw">COMMIT</span>;
+
+<span class="cmt">-- Pedido (el trigger trg_actualizar_total_pedido actualizará el total):</span>
+<span class="kw">INSERT INTO</span> pedidos (usuario_id, estado, direccion_envio)
+<span class="kw">VALUES</span> (<span class="num">2</span>, <span class="str">'PENDIENTE'</span>, <span class="str">'Av. España 123, Asunción'</span>);
+<span class="kw">INSERT INTO</span> detalle_pedidos (pedido_id, producto_id, cantidad, precio_unitario)
+<span class="kw">VALUES</span> (<span class="num">1</span>, <span class="num">1</span>, <span class="num">1</span>, <span class="num">2500000</span>);
+<span class="kw">INSERT INTO</span> detalle_pedidos (pedido_id, producto_id, cantidad, precio_unitario)
+<span class="kw">VALUES</span> (<span class="num">1</span>, <span class="num">2</span>, <span class="num">2</span>, <span class="num">85000</span>);
+<span class="kw">COMMIT</span>;
+
+<span class="cmt">-- Verificar que el trigger actualizó el total (2500000 + 2×85000 = 2670000):</span>
+<span class="kw">SELECT</span> pedido_id, total <span class="kw">FROM</span> pedidos <span class="kw">WHERE</span> pedido_id = <span class="num">1</span>;</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ SECCIÓN 11 -->
+<section id="s11">
+  <div class="sec-header"><div class="sec-num">11</div><h2>Consultas de Registros</h2></div>
+  <div class="sec-body">
+    <div class="code-wrap">
+      <div class="code-label">SQL — Consultas con JOIN y funciones</div>
+      <pre><span class="cmt">-- Usuarios con su rol:</span>
+<span class="kw">SELECT</span> u.usuario_id,
+       u.nombre || <span class="str">' '</span> || u.apellido <span class="kw">AS</span> nombre_completo,
+       r.nombre <span class="kw">AS</span> rol, u.activo
+<span class="kw">FROM</span>   usuarios u
+<span class="kw">JOIN</span>   roles r <span class="kw">ON</span> u.rol_id = r.rol_id
+<span class="kw">ORDER BY</span> u.nombre;
+
+<span class="cmt">-- Productos activos con precio formateado:</span>
+<span class="kw">SELECT</span> c.nombre <span class="kw">AS</span> categoria, p.nombre,
+       <span class="fn">TO_CHAR</span>(p.precio, <span class="str">'FM999,999,990'</span>) || <span class="str">' Gs.'</span> <span class="kw">AS</span> precio,
+       p.stock
+<span class="kw">FROM</span>   productos p
+<span class="kw">JOIN</span>   categorias c <span class="kw">ON</span> p.categoria_id = c.categoria_id
+<span class="kw">WHERE</span>  p.activo = <span class="str">'S'</span> <span class="kw">AND</span> p.stock &gt; <span class="num">0</span>
+<span class="kw">ORDER BY</span> c.nombre, p.nombre;
+
+<span class="cmt">-- Top 5 productos más vendidos:</span>
+<span class="kw">SELECT</span> p.nombre, <span class="fn">SUM</span>(dp.cantidad) <span class="kw">AS</span> vendidos
+<span class="kw">FROM</span>   detalle_pedidos dp
+<span class="kw">JOIN</span>   productos p <span class="kw">ON</span> dp.producto_id = p.producto_id
+<span class="kw">GROUP BY</span> p.nombre
+<span class="kw">ORDER BY</span> vendidos <span class="kw">DESC</span>
+<span class="kw">FETCH FIRST</span> <span class="num">5</span> <span class="kw">ROWS ONLY</span>;
+
+<span class="cmt">-- Resumen de ventas por categoría:</span>
+<span class="kw">SELECT</span> c.nombre <span class="kw">AS</span> categoria,
+       <span class="fn">COUNT</span>(<span class="kw">DISTINCT</span> dp.pedido_id)  <span class="kw">AS</span> pedidos,
+       <span class="fn">SUM</span>(dp.cantidad)              <span class="kw">AS</span> unidades,
+       <span class="fn">SUM</span>(dp.subtotal)              <span class="kw">AS</span> ingresos
+<span class="kw">FROM</span>   detalle_pedidos dp
+<span class="kw">JOIN</span>   productos pr  <span class="kw">ON</span> dp.producto_id  = pr.producto_id
+<span class="kw">JOIN</span>   categorias c  <span class="kw">ON</span> pr.categoria_id = c.categoria_id
+<span class="kw">JOIN</span>   pedidos ped   <span class="kw">ON</span> dp.pedido_id    = ped.pedido_id
+<span class="kw">WHERE</span>  ped.estado != <span class="str">'CANCELADO'</span>
+<span class="kw">GROUP BY</span> c.nombre
+<span class="kw">ORDER BY</span> ingresos <span class="kw">DESC</span>;
+
+<span class="cmt">-- Paginación moderna (Oracle 12c+):</span>
+<span class="kw">SELECT</span> nombre, precio, stock
+<span class="kw">FROM</span>   productos <span class="kw">WHERE</span> activo = <span class="str">'S'</span>
+<span class="kw">ORDER BY</span> nombre
+<span class="kw">OFFSET</span> <span class="num">0</span> <span class="kw">ROWS FETCH NEXT</span> <span class="num">10</span> <span class="kw">ROWS ONLY</span>;</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ SECCIÓN 12 -->
+<section id="s12">
+  <div class="sec-header"><div class="sec-num">12</div><h2>Validación de Tablas y Estructura</h2></div>
+  <div class="sec-body">
+    <div class="code-wrap">
+      <div class="code-label">SQL — Validar estructura, constraints e integridad</div>
+      <pre><span class="cmt">-- Ver estructura de una tabla (solo SQLPlus):</span>
+<span class="kw">DESC</span> usuarios;
+<span class="kw">DESC</span> productos;
+
+<span class="cmt">-- Listar tablas del esquema:</span>
+<span class="kw">SELECT</span> table_name, num_rows, last_analyzed
+<span class="kw">FROM</span>   user_tables <span class="kw">ORDER BY</span> table_name;
+
+<span class="cmt">-- Ver constraints y tipos:</span>
+<span class="kw">SELECT</span> constraint_name, constraint_type, table_name, status
+<span class="kw">FROM</span>   user_constraints <span class="kw">ORDER BY</span> table_name, constraint_type;
+
+<span class="cmt">-- Ver Foreign Keys y sus referencias:</span>
+<span class="kw">SELECT</span> uc.table_name <span class="kw">AS</span> tabla_origen,
+       ucc.column_name <span class="kw">AS</span> columna,
+       uc2.table_name  <span class="kw">AS</span> tabla_ref
+<span class="kw">FROM</span>   user_constraints  uc
+<span class="kw">JOIN</span>   user_cons_columns ucc  <span class="kw">ON</span> uc.constraint_name   = ucc.constraint_name
+<span class="kw">JOIN</span>   user_constraints  uc2  <span class="kw">ON</span> uc.r_constraint_name = uc2.constraint_name
+<span class="kw">WHERE</span>  uc.constraint_type = <span class="str">'R'</span> <span class="kw">ORDER BY</span> uc.table_name;
+
+<span class="cmt">-- Contar registros en todas las tablas:</span>
+<span class="kw">SELECT</span> <span class="str">'roles'</span>           <span class="kw">AS</span> tabla, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> n <span class="kw">FROM</span> roles          <span class="kw">UNION ALL</span>
+<span class="kw">SELECT</span> <span class="str">'usuarios'</span>,                  <span class="fn">COUNT</span>(*)              <span class="kw">FROM</span> usuarios        <span class="kw">UNION ALL</span>
+<span class="kw">SELECT</span> <span class="str">'categorias'</span>,                <span class="fn">COUNT</span>(*)              <span class="kw">FROM</span> categorias      <span class="kw">UNION ALL</span>
+<span class="kw">SELECT</span> <span class="str">'productos'</span>,                 <span class="fn">COUNT</span>(*)              <span class="kw">FROM</span> productos       <span class="kw">UNION ALL</span>
+<span class="kw">SELECT</span> <span class="str">'pedidos'</span>,                   <span class="fn">COUNT</span>(*)              <span class="kw">FROM</span> pedidos         <span class="kw">UNION ALL</span>
+<span class="kw">SELECT</span> <span class="str">'detalle_pedidos'</span>,           <span class="fn">COUNT</span>(*)              <span class="kw">FROM</span> detalle_pedidos <span class="kw">UNION ALL</span>
+<span class="kw">SELECT</span> <span class="str">'logs_acceso'</span>,               <span class="fn">COUNT</span>(*)              <span class="kw">FROM</span> logs_acceso
+<span class="kw">ORDER BY</span> tabla;
+
+<span class="cmt">-- Verificar totales calculados por triggers:</span>
+<span class="kw">SELECT</span> ped.pedido_id,
+       ped.total                      <span class="kw">AS</span> total_trigger,
+       <span class="fn">SUM</span>(dp.subtotal)              <span class="kw">AS</span> total_calculado,
+       ped.total - <span class="fn">SUM</span>(dp.subtotal) <span class="kw">AS</span> diferencia
+<span class="kw">FROM</span>   pedidos ped
+<span class="kw">JOIN</span>   detalle_pedidos dp <span class="kw">ON</span> ped.pedido_id = dp.pedido_id
+<span class="kw">GROUP BY</span> ped.pedido_id, ped.total
+<span class="kw">HAVING ABS</span>(ped.total - <span class="fn">SUM</span>(dp.subtotal)) &gt; <span class="num">0.01</span>;</pre>
+    </div>
+    <div class="tip">En <strong>DBeaver</strong>: Click derecho sobre el esquema → <strong>View Diagram</strong> para ver el ERD con todas las relaciones FK de forma visual.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ SECCIÓN 13 -->
+<section id="s13">
+  <div class="sec-header"><div class="sec-num">13</div><h2>Administración y Comandos Útiles</h2></div>
+  <div class="sec-body">
+    <div class="code-wrap">
+      <div class="code-label">SQL — Sesiones activas</div>
+      <pre><span class="kw">SELECT</span> sid, serial#, username, status,
+       <span class="fn">TO_CHAR</span>(logon_time,<span class="str">'DD/MM HH24:MI'</span>) <span class="kw">AS</span> logon
+<span class="kw">FROM</span>   v$session
+<span class="kw">WHERE</span>  username <span class="kw">IS NOT NULL ORDER BY</span> logon_time <span class="kw">DESC</span>;
+
+<span class="cmt">-- Terminar sesión colgada:</span>
+<span class="kw">ALTER SYSTEM KILL SESSION</span> <span class="str">'25,1234'</span> <span class="kw">IMMEDIATE</span>;</pre>
+    </div>
+    <div class="code-wrap">
+      <div class="code-label">PowerShell — Export Data Pump</div>
+      <pre"><span class="cmt"># Export del esquema admin_web a un .dmp:</span>
+expdp admin_web/AdminWeb2024#@localhost:<span class="num">1521</span>/XEPDB1 `
+  SCHEMAS=admin_web `
+  DIRECTORY=DATA_PUMP_DIR `
+  DUMPFILE=<span class="str">"proyecto_$(</span><span class="ps">Get-Date</span> -Format <span class="str">'yyyyMMdd'</span><span class="str">).dmp"</span> `
+  LOGFILE=<span class="str">"export_$(</span><span class="ps">Get-Date</span> -Format <span class="str">'yyyyMMdd'</span><span class="str">).log"</span></pre>
+    </div>
+    <div class="code-wrap">
+      <div class="code-label">PowerShell — Ejecutar SQL y guardar resultado</div>
+      <pre>$sql = <span class="str">@"
+SET LINESIZE 200
+SET PAGESIZE 50
+SELECT u.nombre, u.email, r.nombre AS rol
+FROM   usuarios u JOIN roles r ON u.rol_id = r.rol_id
+ORDER  BY u.nombre;
+EXIT;
+"@</span>
+$sql | <span class="ps">Out-File</span> -FilePath <span class="str">"C:\temp\consulta.sql"</span> -Encoding UTF8
+sqlplus -s admin_web/AdminWeb2024#@localhost:<span class="num">1521</span>/XEPDB1 <span class="str">"@C:\temp\consulta.sql"</span> | <span class="ps">Out-File</span> <span class="str">"C:\temp\resultado.txt"</span>
+<span class="ps">Get-Content</span> <span class="str">"C:\temp\resultado.txt"</span></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════ SECCIÓN 14 -->
+<section id="s14">
+  <div class="sec-header"><div class="sec-num">14</div><h2>Troubleshooting Oracle XE 21c</h2></div>
+  <div class="sec-body">
+    <table class="info-table">
+      <tr><th>Error</th><th>Causa</th><th>Solución</th></tr>
+      <tr><td>ORA-01017</td><td>Contraseña incorrecta (case-sensitive)</td><td><code>ALTER USER admin_web IDENTIFIED BY AdminWeb2024#;</code></td></tr>
+      <tr><td>ORA-01034</td><td>Servicio Oracle no está corriendo</td><td><code>Start-Service "OracleServiceXE"</code> → <code>STARTUP;</code></td></tr>
+      <tr><td>ORA-12541</td><td>Listener inactivo</td><td><code>Start-Service "OracleOraDB21Home1TNSListener"</code></td></tr>
+      <tr><td>ORA-12514</td><td>XEPDB1 no está abierta</td><td><code>ALTER PLUGGABLE DATABASE XEPDB1 OPEN;</code></td></tr>
+      <tr><td>ORA-65096</td><td>Crear usuario en CDB raíz (falta C##)</td><td>Conectarse a <code>XEPDB1</code> antes de CREATE USER</td></tr>
+      <tr><td>ORA-00942</td><td>Tabla no existe o sin permiso SELECT</td><td><code>GRANT SELECT ON admin_web.tabla TO usuario;</code></td></tr>
+      <tr><td>ORA-01950</td><td>Sin cuota en tablespace USERS</td><td><code>ALTER USER dev_web QUOTA UNLIMITED ON users;</code></td></tr>
+      <tr><td>ORA-02291</td><td>FK inválida: padre no existe</td><td>Insertar primero el registro padre (ej: rol antes de usuario)</td></tr>
+      <tr><td>ORA-04098</td><td>Trigger con error de compilación</td><td><code>SHOW ERRORS TRIGGER nombre_trigger;</code></td></tr>
+      <tr><td>ORA-20001</td><td>Stock negativo (trigger trg_validar_stock)</td><td>Verificar que la cantidad a descontar no supere el stock disponible</td></tr>
+    </table>
+    <div class="code-wrap">
+      <div class="code-label">PowerShell — Ver alert log de Oracle XE</div>
+      <pre>$log = <span class="str">"C:\app\$env:USERNAME\diag\rdbms\xe\XE\trace\alert_XE.log"</span>
+<span class="ps">Get-Content</span> $log -Tail <span class="num">50</span></pre>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <strong>Oracle Database Express Edition 21c — Guía Didáctica</strong><br>
+  Programación 2 (PR2) · Universidad Columbia del Paraguay · Prof. Richard Steven · 2025<br>
+  Herramientas: SQLPlus (CLI) + DBeaver (GUI) · PDB: XEPDB1 · Puerto: 1521
+</footer>
+
+</body>
+</html>

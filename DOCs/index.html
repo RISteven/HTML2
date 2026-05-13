@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Índice de Recursos — Programación 2 | Universidad Columbia del Paraguay</title>
+<style>
+  :root {
+    --p:    #0b6967;
+    --pd:   #094f4d;
+    --pl:   #0e8a87;
+    --acc:  #c47a28;
+    --accl: #e8a84e;
+    --bg:   #f2f8f8;
+    --surf: #ffffff;
+    --txt:  #172828;
+    --mid:  #3d5e5e;
+    --soft: #6e8f8f;
+    --bdr:  #bdd8d8;
+
+    /* Colores de fase — progresión visual */
+    --f0: #6e8f8f;   /* Gris-teal — Visión general */
+    --f1: #0b6967;   /* Teal — Base de datos */
+    --f2: #0d7a6e;   /* Teal medio — Node.js */
+    --f3: #c47a28;   /* Ámbar — Proyecto web */
+    --f4: #094f4d;   /* Teal oscuro — Aplicación */
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--txt);
+    line-height: 1.6;
+    font-size: 15px;
+    padding-bottom: 60px;
+  }
+
+  /* ── ENCABEZADO ── */
+  header {
+    background: linear-gradient(135deg, var(--pd) 0%, var(--p) 60%, var(--pl) 100%);
+    color: #fff;
+    padding: 32px 24px 28px;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(9,79,77,0.45);
+  }
+  header .inst {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.85;
+    margin-bottom: 8px;
+  }
+  header h1 {
+    font-size: 1.6rem;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    margin-bottom: 6px;
+  }
+  header p {
+    font-size: 0.9rem;
+    opacity: 0.82;
+  }
+  .header-meta {
+    margin-top: 14px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .meta-chip {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.28);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── CONTENEDOR PRINCIPAL ── */
+  main { max-width: 980px; margin: 0 auto; padding: 36px 20px 0; }
+
+  /* ── INTRODUCCIÓN ── */
+  .intro {
+    background: var(--surf);
+    border-radius: 12px;
+    border: 1px solid var(--bdr);
+    border-left: 5px solid var(--p);
+    padding: 20px 24px;
+    margin-bottom: 36px;
+    box-shadow: 0 2px 8px rgba(11,105,103,0.07);
+  }
+  .intro p { color: var(--mid); font-size: 0.9rem; margin-bottom: 8px; }
+  .intro p:last-child { margin-bottom: 0; }
+  .intro strong { color: var(--txt); }
+
+  /* ── BARRA DE PROGRESO GLOBAL ── */
+  .progress-bar {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 36px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .pb-step {
+    flex: 1;
+    min-width: 110px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    cursor: default;
+  }
+  .pb-step::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    right: -1px;
+    width: calc(50% + 1px);
+    height: 3px;
+    background: var(--bdr);
+    z-index: 0;
+  }
+  .pb-step::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: -1px;
+    width: calc(50%);
+    height: 3px;
+    background: var(--bdr);
+    z-index: 0;
+  }
+  .pb-step:first-child::before { display: none; }
+  .pb-step:last-child::after  { display: none; }
+
+  .pb-circle {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 0.85rem;
+    color: #fff;
+    z-index: 1;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    position: relative;
+  }
+  .pb-label {
+    margin-top: 8px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--soft);
+    text-align: center;
+    padding: 0 4px;
+  }
+
+  /* ── FASE CONTENEDORA ── */
+  .fase {
+    margin-bottom: 36px;
+  }
+
+  /* Encabezado de fase */
+  .fase-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    color: #fff;
+  }
+  .fase-num {
+    background: rgba(255,255,255,0.2);
+    border: 2px solid rgba(255,255,255,0.4);
+    border-radius: 50%;
+    width: 36px; height: 36px; min-width: 36px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 0.85rem;
+  }
+  .fase-header h2 { font-size: 1rem; font-weight: 700; }
+  .fase-header p  { font-size: 0.78rem; opacity: 0.88; margin-top: 2px; }
+
+  /* Grid de tarjetas dentro de cada fase */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  /* ── TARJETA DE DOCUMENTO ── */
+  .card {
+    background: var(--surf);
+    border-radius: 10px;
+    border: 1px solid var(--bdr);
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(11,105,103,0.07);
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+  .card:hover {
+    box-shadow: 0 6px 20px rgba(11,105,103,0.18);
+    transform: translateY(-2px);
+  }
+
+  /* Franja de color superior de la tarjeta */
+  .card-top {
+    height: 5px;
+  }
+
+  /* Cuerpo de la tarjeta */
+  .card-body {
+    padding: 18px 18px 14px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Número de orden dentro de la tarjeta */
+  .card-order {
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    opacity: 0.6;
+  }
+
+  .card-title {
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: var(--txt);
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+
+  .card-desc {
+    font-size: 0.84rem;
+    color: var(--mid);
+    line-height: 1.55;
+    flex: 1;
+    margin-bottom: 14px;
+  }
+
+  /* Listado de temas cubiertos */
+  .card-topics {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .card-topics li {
+    background: rgba(11,105,103,0.08);
+    color: var(--p);
+    border: 1px solid rgba(11,105,103,0.2);
+    border-radius: 20px;
+    padding: 2px 10px;
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+
+  /* Botón de apertura */
+  .btn-open {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 9px 16px;
+    border-radius: 7px;
+    letter-spacing: 0.3px;
+    transition: opacity 0.2s, filter 0.2s;
+  }
+  .btn-open:hover { opacity: 0.9; filter: brightness(1.08); }
+
+  /* Indicador de tipo de archivo */
+  .card-type {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+  .type-guia  { background: rgba(11,105,103,0.1);  color: var(--p);  }
+  .type-app   { background: rgba(196,122,40,0.1); color: var(--acc); }
+  .type-orden { background: rgba(110,143,143,0.15); color: var(--soft); }
+
+  /* ── SEPARADOR ── */
+  .sep {
+    border: none;
+    border-top: 2px dashed var(--bdr);
+    margin: 8px 0 20px;
+  }
+
+  /* ── NOTA AL PIE DE FASE ── */
+  .fase-note {
+    background: rgba(11,105,103,0.06);
+    border: 1px solid rgba(11,105,103,0.2);
+    border-radius: 8px;
+    padding: 10px 16px;
+    margin-top: 14px;
+    font-size: 0.83rem;
+    color: var(--pd);
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .fase-note::before { content: '→'; font-weight: 900; flex-shrink: 0; margin-top: 1px; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--pd);
+    color: rgba(255,255,255,0.7);
+    text-align: center;
+    padding: 20px;
+    font-size: 0.78rem;
+    line-height: 1.8;
+    margin-top: 40px;
+  }
+  footer strong { color: #fff; }
+
+  @media (max-width: 640px) {
+    header h1 { font-size: 1.25rem; }
+    .progress-bar { gap: 0; }
+    .pb-label { font-size: 0.62rem; }
+    .cards-grid { grid-template-columns: 1fr; }
+    main { padding: 20px 14px 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════ ENCABEZADO -->
+<header>
+  <div class="inst">Universidad Columbia del Paraguay</div>
+  <h1>Programación 2 — Proyecto WEB</h1>
+  <p>Guía de recursos didácticos: Oracle XE 21c · Node.js · CRUD · PowerShell</p>
+  <div class="header-meta">
+    <span class="meta-chip">PR2 · Bases de Datos</span>
+    <span class="meta-chip">Prof. Richard Steven</span>
+    <span class="meta-chip">2025</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- INTRODUCCIÓN -->
+  <div class="intro">
+    <p>Esta página centraliza todos los recursos del proyecto WEB de Programación 2. Los documentos están ordenados de forma <strong>progresiva en 7 pasos</strong>: cada fase consolida los conocimientos de la anterior. Seguir el orden indicado garantiza una comprensión completa del proceso, desde la base de datos hasta la aplicación web funcional.</p>
+    <p>Las <strong>guías de documentación</strong> (pasos 0 al 6) explican conceptos y muestran código paso a paso. Las <strong>páginas de aplicación</strong> (paso 7) son el resultado final que el alumno debe construir y demostrar funcionando.</p>
+  </div>
+
+  <!-- BARRA DE PROGRESO GLOBAL -->
+  <div class="progress-bar">
+    <div class="pb-step">
+      <div class="pb-circle" style="background:var(--f0)">0</div>
+      <div class="pb-label">Visión<br>General</div>
+    </div>
+    <div class="pb-step">
+      <div class="pb-circle" style="background:var(--f1)">1</div>
+      <div class="pb-label">Base de<br>Datos</div>
+    </div>
+    <div class="pb-step">
+      <div class="pb-circle" style="background:var(--f2)">2</div>
+      <div class="pb-label">Node.js<br>+ Oracle</div>
+    </div>
+    <div class="pb-step">
+      <div class="pb-circle" style="background:var(--f3)">3</div>
+      <div class="pb-label">Proyecto<br>Completo</div>
+    </div>
+    <div class="pb-step">
+      <div class="pb-circle" style="background:var(--f4)">4</div>
+      <div class="pb-label">App Web<br>Funcional</div>
+    </div>
+  </div>
+
+  <!-- ════════════════════ FASE 0 — VISIÓN GENERAL -->
+  <div class="fase">
+    <div class="fase-header" style="background: linear-gradient(90deg, var(--f0), #8aadad);">
+      <div class="fase-num">0</div>
+      <div>
+        <h2>Fase 0 — Visión general del proceso</h2>
+        <p>Antes de empezar, entender el mapa completo evita confusiones en cada etapa.</p>
+      </div>
+    </div>
+
+    <div class="cards-grid">
+
+      <div class="card">
+        <div class="card-top" style="background: var(--f0);"></div>
+        <div class="card-body">
+          <div class="card-type type-orden">Diagrama de flujo</div>
+          <div class="card-order">Paso 0 de 7</div>
+          <div class="card-title">Orden del Proceso — Clase PR2</div>
+          <div class="card-desc">Diagrama de flujo vertical con todas las etapas del proyecto WEB: desde la instalación de Oracle hasta la aplicación CRUD funcional. Ideal para leer primero y volver como referencia.</div>
+          <ul class="card-topics">
+            <li>Flujo de trabajo</li>
+            <li>Etapas del proyecto</li>
+            <li>Dependencias</li>
+          </ul>
+          <a href="OrdendelProceso.html" target="_blank" class="btn-open" style="background: var(--f0);">Abrir diagrama</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ════════════════════ FASE 1 — BASE DE DATOS -->
+  <div class="fase">
+    <div class="fase-header" style="background: linear-gradient(90deg, var(--f1), var(--pl));">
+      <div class="fase-num">1</div>
+      <div>
+        <h2>Fase 1 — Base de datos Oracle XE 21c</h2>
+        <p>Instalar Oracle, crear usuarios, esquemas y tablas relacionales desde PowerShell y DBeaver.</p>
+      </div>
+    </div>
+
+    <div class="cards-grid">
+
+      <div class="card">
+        <div class="card-top" style="background: var(--f1);"></div>
+        <div class="card-body">
+          <div class="card-type type-guia">Guía didáctica</div>
+          <div class="card-order">Paso 1 de 7</div>
+          <div class="card-title">Oracle XE 21c — Instalación y configuración completa</div>
+          <div class="card-desc">Guía paso a paso para instalar Oracle 21c XE en Windows, verificar servicios, conectarse con SQL*Plus, crear usuarios académicos, diseñar el modelo relacional e insertar datos. Incluye Anexo DBeaver.</div>
+          <ul class="card-topics">
+            <li>Instalación Oracle</li>
+            <li>SQL*Plus</li>
+            <li>Usuarios y esquemas</li>
+            <li>Tablas con FK</li>
+            <li>DBeaver</li>
+            <li>SPOOL</li>
+          </ul>
+          <a href="oracle.html" target="_blank" class="btn-open" style="background: var(--f1);">Abrir guía Oracle</a>
+        </div>
+      </div>
+
+    </div>
+    <div class="fase-note">Completar esta fase antes de avanzar. Node.js no puede conectarse si Oracle no está instalado y configurado correctamente.</div>
+  </div>
+
+  <!-- ════════════════════ FASE 2 — NODE.JS + ORACLE -->
+  <div class="fase">
+    <div class="fase-header" style="background: linear-gradient(90deg, var(--f2), #11a090);">
+      <div class="fase-num">2</div>
+      <div>
+        <h2>Fase 2 — Node.js: instalación, configuración y conexión con Oracle</h2>
+        <p>Instalar Node.js, verificar el entorno, preparar el proyecto y conectarlo con Oracle XE.</p>
+      </div>
+    </div>
+
+    <div class="cards-grid">
+
+      <div class="card">
+        <div class="card-top" style="background: var(--f2);"></div>
+        <div class="card-body">
+          <div class="card-type type-guia">Guía didáctica</div>
+          <div class="card-order">Paso 2 de 7</div>
+          <div class="card-title">Node.js — Instalación, configuración y ejecución</div>
+          <div class="card-desc">Descarga e instalación del MSI de Node.js LTS en Windows, verificación desde PowerShell, primer servidor "Hola Mundo", estructura del proyecto, instalación de dependencias npm y archivo <code>.env</code>.</div>
+          <ul class="card-topics">
+            <li>Descarga LTS</li>
+            <li>Verificación PATH</li>
+            <li>Hola Mundo</li>
+            <li>npm install</li>
+            <li>.env</li>
+            <li>nodemon</li>
+          </ul>
+          <a href="nodejs.html" target="_blank" class="btn-open" style="background: var(--f2);">Abrir guía Node.js</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-top" style="background: var(--f2);"></div>
+        <div class="card-body">
+          <div class="card-type type-guia">Guía didáctica</div>
+          <div class="card-order">Paso 3 de 7</div>
+          <div class="card-title">Conectar Node.js con Oracle XE</div>
+          <div class="card-desc">Instalación del driver <code>oracledb</code>, configuración del modo de conexión, primeras consultas a Oracle XE y manejo básico de errores de conexión desde PowerShell.</div>
+          <ul class="card-topics">
+            <li>oracledb</li>
+            <li>Thin / Thick Mode</li>
+            <li>Pool de conexiones</li>
+            <li>Consultas básicas</li>
+          </ul>
+          <a href="readme.html" target="_blank" class="btn-open" style="background: var(--f2);">Abrir conexión Oracle</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-top" style="background: var(--f2);"></div>
+        <div class="card-body">
+          <div class="card-type type-guia">Guía de integración</div>
+          <div class="card-order">Paso 4 de 7</div>
+          <div class="card-title">Oracle XE + Node.js — Guía de integración</div>
+          <div class="card-desc">Guía técnica completa de integración: estructura del proyecto, configuración de rutas Express, conexión segura a XEPDB1, manejo de transacciones y patrones de acceso a datos con Node.js.</div>
+          <ul class="card-topics">
+            <li>Express.js</li>
+            <li>Rutas API</li>
+            <li>Transacciones</li>
+            <li>Manejo de errores</li>
+            <li>Variables de entorno</li>
+          </ul>
+          <a href="oracle_nodejs.html" target="_blank" class="btn-open" style="background: var(--f2);">Abrir integración</a>
+        </div>
+      </div>
+
+    </div>
+    <div class="fase-note">Seguir el orden: primero instalar y verificar Node.js solo, luego instalar oracledb y conectar con Oracle. Mezclar ambos pasos sin verificar primero dificulta encontrar el origen de los errores.</div>
+  </div>
+
+  <!-- ════════════════════ FASE 3 — PROYECTO COMPLETO -->
+  <div class="fase">
+    <div class="fase-header" style="background: linear-gradient(90deg, var(--f3), #d98e3a);">
+      <div class="fase-num">3</div>
+      <div>
+        <h2>Fase 3 — Proyecto WEB completo</h2>
+        <p>Implementar el CRUD completo: backend Node.js + Oracle, vistas HTML, validaciones y buenas prácticas.</p>
+      </div>
+    </div>
+
+    <div class="cards-grid">
+
+      <div class="card">
+        <div class="card-top" style="background: var(--f3);"></div>
+        <div class="card-body">
+          <div class="card-type type-guia">Guía completa</div>
+          <div class="card-order">Paso 5 de 7</div>
+          <div class="card-title">Guía Completa — Node.js + Oracle XE</div>
+          <div class="card-desc">Implementación integral del proyecto WEB: estructura de carpetas, servidor Express, endpoints REST, vistas HTML para todas las operaciones CRUD y configuración del entorno de producción académica.</div>
+          <ul class="card-topics">
+            <li>Estructura proyecto</li>
+            <li>Endpoints REST</li>
+            <li>CREATE / READ</li>
+            <li>UPDATE / DELETE</li>
+            <li>Formularios HTML</li>
+          </ul>
+          <a href="Guia_completa.html" target="_blank" class="btn-open" style="background: var(--f3);">Abrir guía completa</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-top" style="background: var(--f3);"></div>
+        <div class="card-body">
+          <div class="card-type type-guia">Guía del estudiante</div>
+          <div class="card-order">Paso 6 de 7</div>
+          <div class="card-title">Guía del Estudiante — Node.js + Oracle XE</div>
+          <div class="card-desc">Versión orientada al alumno con instrucciones claras para cada práctica, código comentado línea por línea, errores frecuentes y checklist de entrega. Usar como referencia durante el trabajo práctico.</div>
+          <ul class="card-topics">
+            <li>Práctica guiada</li>
+            <li>Código comentado</li>
+            <li>Checklist entrega</li>
+            <li>Errores frecuentes</li>
+            <li>Rúbrica</li>
+          </ul>
+          <a href="Guia_Estudiante.html" target="_blank" class="btn-open" style="background: var(--f3);">Abrir guía del estudiante</a>
+        </div>
+      </div>
+
+    </div>
+    <div class="fase-note">Completar las fases 1 y 2 es imprescindible. La Guía Completa describe el "qué construir"; la Guía del Estudiante explica el "cómo construirlo paso a paso". Ambas cubren los pasos 5 y 6 del recorrido.</div>
+  </div>
+
+  <!-- ════════════════════ FASE 4 — APLICACIÓN WEB -->
+  <div class="fase">
+    <div class="fase-header" style="background: linear-gradient(90deg, var(--f4), var(--p));">
+      <div class="fase-num">4</div>
+      <div>
+        <h2>Fase 4 — Aplicación web funcional</h2>
+        <p>Las vistas HTML del sistema de gestión: resultado final que el alumno debe presentar funcionando.</p>
+      </div>
+    </div>
+
+    <div class="cards-grid">
+
+      <div class="card">
+        <div class="card-top" style="background: var(--f4);"></div>
+        <div class="card-body">
+          <div class="card-type type-app">Aplicación</div>
+          <div class="card-order">Paso 7 · Pantalla 1</div>
+          <div class="card-title">Login — Acceso al sistema</div>
+          <div class="card-desc">Pantalla de inicio de sesión. Primer punto de entrada de la aplicación. Valida credenciales contra la base de datos Oracle antes de permitir el acceso al menú.</div>
+          <ul class="card-topics">
+            <li>Autenticación</li>
+            <li>Formulario de login</li>
+            <li>Sesión de usuario</li>
+          </ul>
+          <a href="../public/login.html" target="_blank" class="btn-open" style="background: var(--f4);">Abrir Login</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-top" style="background: var(--f4);"></div>
+        <div class="card-body">
+          <div class="card-type type-app">Aplicación</div>
+          <div class="card-order">Paso 7 · Pantalla 2</div>
+          <div class="card-title">Menú principal</div>
+          <div class="card-desc">Panel de navegación central del sistema. Desde aquí el usuario accede a todas las operaciones: listar, crear, modificar, eliminar y generar reportes.</div>
+          <ul class="card-topics">
+            <li>Navegación</li>
+            <li>Panel de control</li>
+            <li>Accesos CRUD</li>
+          </ul>
+          <a href="../public/menu.html" target="_blank" class="btn-open" style="background: var(--f4);">Abrir Menú</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-top" style="background: var(--p);"></div>
+        <div class="card-body">
+          <div class="card-type type-app">Aplicación</div>
+          <div class="card-order">Paso 7 · Pantalla 3</div>
+          <div class="card-title">Listado de usuarios</div>
+          <div class="card-desc">Muestra todos los registros almacenados en la base de datos Oracle. Operación SELECT con paginación y búsqueda. Base del CRUD.</div>
+          <ul class="card-topics">
+            <li>SELECT / Listar</li>
+            <li>Tabla de datos</li>
+            <li>Búsqueda</li>
+          </ul>
+          <a href="../public/listar.html" target="_blank" class="btn-open" style="background: var(--p);">Abrir Listado</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-top" style="background: var(--p);"></div>
+        <div class="card-body">
+          <div class="card-type type-app">Aplicación</div>
+          <div class="card-order">Paso 7 · Pantalla 4</div>
+          <div class="card-title">Alta de usuario</div>
+          <div class="card-desc">Formulario para registrar un nuevo usuario en la base de datos. Operación INSERT con validación de datos antes del COMMIT.</div>
+          <ul class="card-topics">
+            <li>INSERT / Crear</li>
+            <li>Validación</li>
+            <li>COMMIT</li>
+          </ul>
+          <a href="../public/crear.html" target="_blank" class="btn-open" style="background: var(--p);">Abrir Alta</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-top" style="background: var(--pl);"></div>
+        <div class="card-body">
+          <div class="card-type type-app">Aplicación</div>
+          <div class="card-order">Paso 7 · Pantalla 5</div>
+          <div class="card-title">Modificación de usuario</div>
+          <div class="card-desc">Permite editar los datos de un usuario existente. Operación UPDATE con búsqueda previa por ID y confirmación antes de guardar cambios.</div>
+          <ul class="card-topics">
+            <li>UPDATE / Editar</li>
+            <li>Búsqueda por ID</li>
+            <li>Confirmación</li>
+          </ul>
+          <a href="../public/actualizar.html" target="_blank" class="btn-open" style="background: var(--pl);">Abrir Modificación</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-top" style="background: #9b3930;"></div>
+        <div class="card-body">
+          <div class="card-type type-app">Aplicación</div>
+          <div class="card-order">Paso 7 · Pantalla 6</div>
+          <div class="card-title">Baja de usuario</div>
+          <div class="card-desc">Elimina un registro de la base de datos. Operación DELETE con confirmación obligatoria para evitar pérdida accidental de datos.</div>
+          <ul class="card-topics">
+            <li>DELETE / Eliminar</li>
+            <li>Confirmación</li>
+            <li>Integridad referencial</li>
+          </ul>
+          <a href="../public/eliminar.html" target="_blank" class="btn-open" style="background: #9b3930;">Abrir Baja</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-top" style="background: var(--acc);"></div>
+        <div class="card-body">
+          <div class="card-type type-app">Aplicación</div>
+          <div class="card-order">Paso 7 · Pantalla 7</div>
+          <div class="card-title">Reporte de usuarios</div>
+          <div class="card-desc">Genera un informe visual con los registros de la base de datos. Puede incluir filtros, totales y exportación. Es la operación de consulta avanzada del sistema.</div>
+          <ul class="card-topics">
+            <li>SELECT avanzado</li>
+            <li>Filtros</li>
+            <li>Exportar datos</li>
+          </ul>
+          <a href="../public/reporte.html" target="_blank" class="btn-open" style="background: var(--acc);">Abrir Reporte</a>
+        </div>
+      </div>
+
+    </div>
+    <div class="fase-note">El servidor Node.js debe estar en ejecución (<code>node server.js</code> o <code>npm start</code>) para que las 7 páginas de la aplicación funcionen correctamente con Oracle XE.</div>
+  </div>
+
+</main>
+
+<!-- ═══════════════════════════════════ PIE DE PÁGINA -->
+<footer>
+  <strong>Programación 2 (PR2) — Proyecto WEB</strong><br>
+  Universidad Columbia del Paraguay · Prof. Richard Steven · 2026<br>
+  Oracle XE 21c · Node.js · Express · oracledb · PowerShell · DBeaver
+</footer>
+
+</body>
+</html>
