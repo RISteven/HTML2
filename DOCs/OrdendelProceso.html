@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orden del Proceso — Programación 2</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+
+    :root {
+      /* Colores institucionales principales */
+      --color-primario:         #0b6967;  /* Teal principal — identidad Columbia */
+      --color-primario-oscuro:  #094f4d;  /* Para headers y footers */
+      --color-primario-claro:   #0e8a87;  /* Para degradados y acentos */
+      --color-acento:           #c47a28;  /* Ámbar — color complementario */
+      --color-acento-claro:     #e8a84e;  /* Ámbar suave */
+
+      /* Fondos */
+      --color-fondo:            #f2f8f8;  /* Fondo de la página */
+      --color-superficie:       #ffffff;  /* Tarjetas y paneles */
+
+      /* Texto */
+      --color-texto:            #172828;  /* Texto principal */
+      --color-texto-medio:      #3d5e5e;  /* Párrafos */
+      --color-texto-suave:      #6e8f8f;  /* Texto secundario — gris teal */
+      --color-borde:            #bdd8d8;  /* Bordes y separadores */
+
+      /* Bloques b0–b6 mapeados a la paleta Columbia */
+      --b0-color: #6e8f8f;    /* b0 gris → gris-teal (--color-texto-suave) */
+      --b1-color: #0b6967;    /* b1 azul → teal principal */
+      --b2-color: #094f4d;    /* b2 índigo → teal oscuro */
+      --b3-color: #0d7a6e;    /* b3 verde → variante teal media */
+      --b4-color: #c47a28;    /* b4 naranja → ámbar (--color-acento) */
+      --b5-color: #9b3930;    /* b5 rojo → rojo suave armónico */
+      --b6-color: #6b5b2e;    /* b6 morado → dorado oscuro, armonía con ámbar */
+    }
+
+    /* ── Base del documento ── */
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--color-fondo);
+      padding: 0 0 40px;
+      color: var(--color-texto);
+    }
+
+    /* ══ BANNER INSTITUCIONAL ══
+       Header tipo universidad con degradado teal Columbia */
+    .site-header {
+      background: linear-gradient(135deg, var(--color-primario-oscuro) 0%, var(--color-primario) 60%, var(--color-primario-claro) 100%);
+      color: #fff;
+      padding: 24px 20px 20px;
+      text-align: center;
+      margin-bottom: 0;
+      box-shadow: 0 4px 12px rgba(9, 79, 77, 0.35);
+    }
+    .site-header .institución {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0.85;
+      margin-bottom: 5px;
+    }
+    .site-header h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+    }
+
+    /* ── Contenedor centrado del diagrama ── */
+    .container {
+      max-width: 740px;
+      margin: 0 auto;
+      padding: 30px 20px 0;
+    }
+
+    /* Título de la página — usa --color-borde en lugar de #adb5bd genérico */
+    h1.page-title {
+      text-align: center;
+      font-size: 1.5rem;
+      margin-bottom: 28px;
+      color: var(--color-texto);
+      letter-spacing: 0.5px;
+    }
+
+    /* ── DIAGRAMA DE FLUJO VERTICAL ── */
+    .flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    /* Bloque principal — tarjeta con header de color */
+    .block {
+      width: 100%;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.11);
+    }
+
+    /* Cabecera coloreada del bloque */
+    .block-header {
+      display: flex;
+      align-items: center;
+      padding: 12px 18px;
+      font-weight: 700;
+      font-size: 1rem;
+      gap: 10px;
+      color: #fff;
+    }
+
+    /* Número de bloque — círculo blanco semitransparente */
+    .block-num {
+      background: rgba(255,255,255,0.3);
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    /* Cuerpo blanco del bloque */
+    .block-body {
+      background: var(--color-superficie);
+      padding: 14px 18px;
+    }
+
+    /* Nota descriptiva en cursiva debajo del título del bloque */
+    .block-note {
+      font-size: 0.78rem;
+      color: var(--color-texto-suave);
+      font-style: italic;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed var(--color-borde);
+    }
+
+    /* Lista de ítems dentro del bloque */
+    .items {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.88rem;
+    }
+
+    /* Badge de tipo de archivo (HTML, JS, SQL, CSS) */
+    .item-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* Badges usando teal y ámbar Columbia en lugar de Bootstrap genérico */
+    .badge-html { background: #fdefd8; color: #7a4a10; }          /* HTML → ámbar */
+    .badge-js   { background: #d6eeed; color: var(--color-primario-oscuro); }  /* JS → teal */
+    .badge-sql  { background: #c8e8e7; color: var(--color-primario-oscuro); }  /* SQL → teal claro */
+    .badge-css  { background: #f8d7da; color: #842029; }           /* CSS → rojo suave */
+
+    .item-text {
+      line-height: 1.4;
+      color: var(--color-texto-medio);
+    }
+    .item-text strong { color: var(--color-texto); }
+
+    /* ── COLORES DE CABECERA POR BLOQUE ──
+       Mapeados a la paleta Columbia */
+    .b0 .block-header { background: var(--b0-color); }   /* gris-teal */
+    .b1 .block-header { background: var(--b1-color); }   /* teal principal */
+    .b2 .block-header { background: var(--b2-color); }   /* teal oscuro */
+    .b3 .block-header { background: var(--b3-color); }   /* teal medio */
+    .b4 .block-header { background: var(--b4-color); }   /* ámbar */
+    .b5 .block-header { background: var(--b5-color); }   /* rojo suave */
+    .b6 .block-header { background: var(--b6-color); }   /* dorado oscuro */
+
+    /* ── FLECHA ENTRE BLOQUES ──
+       Usa --color-borde en lugar de #adb5bd genérico */
+    .arrow {
+      width: 2px;
+      height: 28px;
+      background: var(--color-borde);
+      position: relative;
+    }
+    .arrow::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 7px solid transparent;
+      border-right: 7px solid transparent;
+      border-top: 10px solid var(--color-borde);
+    }
+
+    /* ── LEYENDA DE TIPOS ── */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 28px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8rem;
+      color: var(--color-texto-medio);
+    }
+    .legend-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ BANNER INSTITUCIONAL ══ -->
+<header class="site-header">
+  <div class="institución">Universidad Columbia del Paraguay — Programación 2</div>
+  <h1>Orden del Proceso — Clase Programación 2</h1>
+</header>
+
+<div class="container">
+
+  <div class="flow">
+
+    <!-- BLOQUE 0 — gris-teal: infraestructura previa -->
+    <div class="block b0">
+      <div class="block-header">
+        <div class="block-num">0</div>
+        Infraestructura — explicar, no codificar en clase
+      </div>
+      <div class="block-body">
+        <div class="block-note">Mostrar ya hecho o dictarlo como tarea previa</div>
+        <div class="items">
+          <div class="item">
+            <span class="item-badge badge-sql">SQL</span>
+            <span class="item-text">Crear tabla + insertar registro de prueba</span>
+          </div>
+          <div class="item">
+            <span class="item-badge badge-js">JS</span>
+            <span class="item-text"><strong>db.js</strong> — Configuración de conexión Oracle</span>
+          </div>
+          <div class="item">
+            <span class="item-badge badge-js">JS</span>
+            <span class="item-text"><strong>server.js</strong> — Punto de entrada del servidor</span>
+          </div>
+          <div class="item">
+            <span class="item-badge badge-css">CSS</span>
+            <span class="item-text"><strong>styles.css</strong> — Copiar/pegar, no es el foco pedagógico</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow"></div>
+
+    <!-- BLOQUE 1 — teal principal: primer resultado visible -->
+    <div class="block b1">
+      <div class="block-header">
+        <div class="block-num">1</div>
+        Login — primer resultado visible
+      </div>
+      <div class="block-body">
+        <div class="block-note">Objetivo: el estudiante ve la app funcionar por primera vez</div>
+        <div class="items">
+          <div class="item">
+            <span class="item-badge badge-html">HTML</span>
+            <span class="item-text"><strong>login.html</strong> — Formulario + fetch() al servidor</span>
+          </div>
+          <div class="item">
+            <span class="item-badge badge-js">JS</span>
+            <span class="item-text"><strong>routes/login.js</strong> — Ruta POST /api/login + consulta SQL</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow"></div>
+
+    <!-- BLOQUE 2 — teal oscuro: menú de navegación -->
+    <div class="block b2">
+      <div class="block-header">
+        <div class="block-num">2</div>
+        Menú
+      </div>
+      <div class="block-body">
+        <div class="items">
+          <div class="item">
+            <span class="item-badge badge-html">HTML</span>
+            <span class="item-text"><strong>menu.html</strong> — HTML puro, sin lógica de servidor (refuerza flujo login → menú)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow"></div>
+
+    <!-- BLOQUE 3 — teal medio: operación de solo lectura -->
+    <div class="block b3">
+      <div class="block-header">
+        <div class="block-num">3</div>
+        Consultar / Listar — operación más simple
+      </div>
+      <div class="block-body">
+        <div class="block-note">Introduce GET, la operación de solo lectura</div>
+        <div class="items">
+          <div class="item">
+            <span class="item-badge badge-html">HTML</span>
+            <span class="item-text"><strong>listar.html</strong> — fetch GET + construir tabla con JavaScript</span>
+          </div>
+          <div class="item">
+            <span class="item-badge badge-js">JS</span>
+            <span class="item-text"><strong>routes/usuarios.js</strong> — solo GET /api/usuarios</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow"></div>
+
+    <!-- BLOQUE 4 — ámbar: operación de alta -->
+    <div class="block b4">
+      <div class="block-header">
+        <div class="block-num">4</div>
+        Crear / Alta
+      </div>
+      <div class="block-body">
+        <div class="items">
+          <div class="item">
+            <span class="item-badge badge-html">HTML</span>
+            <span class="item-text"><strong>crear.html</strong> — Formulario + fetch POST</span>
+          </div>
+          <div class="item">
+            <span class="item-badge badge-js">JS</span>
+            <span class="item-text"><strong>routes/usuarios.js</strong> — agregar POST /api/usuarios</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow"></div>
+
+    <!-- BLOQUE 5 — rojo suave: modificar -->
+    <div class="block b5">
+      <div class="block-header">
+        <div class="block-num">5</div>
+        Modificar
+      </div>
+      <div class="block-body">
+        <div class="items">
+          <div class="item">
+            <span class="item-badge badge-html">HTML</span>
+            <span class="item-text"><strong>actualizar.html</strong> — Formulario + fetch PUT</span>
+          </div>
+          <div class="item">
+            <span class="item-badge badge-js">JS</span>
+            <span class="item-text"><strong>routes/usuarios.js</strong> — agregar PUT /api/usuarios/:nombre</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow"></div>
+
+    <!-- BLOQUE 6 — dorado oscuro: eliminar -->
+    <div class="block b6">
+      <div class="block-header">
+        <div class="block-num">6</div>
+        Eliminar
+      </div>
+      <div class="block-body">
+        <div class="items">
+          <div class="item">
+            <span class="item-badge badge-html">HTML</span>
+            <span class="item-text"><strong>eliminar.html</strong> — Formulario + fetch DELETE</span>
+          </div>
+          <div class="item">
+            <span class="item-badge badge-js">JS</span>
+            <span class="item-text"><strong>routes/usuarios.js</strong> — agregar DELETE /api/usuarios/:nombre</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Leyenda actualizada con colores Columbia -->
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#fdefd8;border:1px solid #ddd;"></div> HTML — Frontend</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#d6eeed;border:1px solid #ddd;"></div> JS — Backend / Rutas</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#c8e8e7;border:1px solid #ddd;"></div> SQL — Base de datos</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#f8d7da;border:1px solid #ddd;"></div> CSS — Estilos</div>
+  </div>
+
+</div>
+</body>
+</html>

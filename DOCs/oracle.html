@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oracle XE 21c — Guía Didáctica PR2 | Universidad Columbia del Paraguay</title>
+<style>
+
+  :root {
+    --p:    #0b6967;
+    --pd:   #094f4d;
+    --pl:   #0e8a87;
+    --acc:  #c47a28;
+    --accl: #e8a84e;
+    --bg:   #f2f8f8;
+    --surf: #ffffff;
+    --code: #0a2424;
+    --chl:  #133535;
+    --txt:  #172828;
+    --mid:  #3d5e5e;
+    --soft: #6e8f8f;
+    --bdr:  #bdd8d8;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--txt);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* ── ENCABEZADO ── */
+  header {
+    background: linear-gradient(135deg, var(--pd) 0%, var(--p) 60%, var(--pl) 100%);
+    color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 3px 12px rgba(9,79,77,0.45);
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 32px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+  }
+  .badge {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .htitle { flex: 1; }
+  .htitle h1 { font-size: 1.2rem; font-weight: 700; }
+  .htitle p  { font-size: 0.78rem; opacity: 0.78; margin-top: 2px; }
+  .hmeta { font-size: 0.72rem; opacity: 0.65; text-align: right; line-height: 1.5; }
+
+  /* ── BARRA DE NAVEGACIÓN ── */
+  .nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 8px 32px;
+    background: var(--pd);
+    overflow-x: auto;
+  }
+  .nav a {
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+    font-size: 0.69rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.15);
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .nav a:hover { background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.4); }
+
+  /* ── CONTENIDO PRINCIPAL ── */
+  main { max-width: 1020px; margin: 0 auto; padding: 28px 24px 60px; }
+
+  /* ── SECCIÓN ── */
+  section {
+    background: var(--surf);
+    border-radius: 12px;
+    margin-bottom: 24px;
+    border: 1px solid var(--bdr);
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(11,105,103,0.07);
+  }
+  .sec-head {
+    background: linear-gradient(90deg, var(--p) 0%, var(--pl) 100%);
+    color: #fff;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .sec-num {
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 6px;
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 0.8rem; flex-shrink: 0;
+  }
+  .sec-head h2 { font-size: 1rem; font-weight: 700; }
+  .sec-body { padding: 22px 24px; }
+
+  /* ── SUBSECCIÓN ── */
+  .sub { border-left: 3px solid var(--p); margin: 18px 0; padding-left: 16px; }
+  .sub h3 {
+    font-size: 0.87rem; font-weight: 700;
+    color: var(--p); text-transform: uppercase;
+    letter-spacing: 0.8px; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sub h3::before {
+    content: ''; display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--acc); border-radius: 50%;
+  }
+
+  /* ── BLOQUE DE CÓDIGO ── */
+  .code-wrap {
+    background: var(--code);
+    border-radius: 8px;
+    margin: 12px 0;
+    overflow: hidden;
+    border: 1px solid #1a4040;
+  }
+  .code-label {
+    background: var(--chl);
+    color: var(--accl);
+    font-size: 0.65rem; font-weight: 700;
+    letter-spacing: 1.2px; text-transform: uppercase;
+    padding: 5px 14px;
+    border-bottom: 1px solid #1a4040;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .code-label::before { content: '●'; color: var(--acc); font-size: 0.7rem; }
+  pre {
+    padding: 16px;
+    overflow-x: auto;
+    font-family: 'Cascadia Code', Consolas, 'Fira Code', monospace;
+    font-size: 0.82rem;
+    line-height: 1.65;
+    color: #d4efef;
+    tab-size: 4;
+  }
+
+  /* Colores sintácticos */
+  .kw  { color: #7dd8d6; font-weight: 600; }  /* SQL keywords */
+  .str { color: #a8d8a8; }                     /* strings */
+  .cmt { color: #5a8888; font-style: italic; } /* comentarios */
+  .num { color: var(--accl); }                 /* números */
+  .fn  { color: #9ecfcf; }                     /* funciones */
+  .ps  { color: #b8d4d4; }                     /* cmdlets PowerShell */
+  .var { color: #d4b8ef; }                     /* variables */
+
+  /* ── CÓDIGO INLINE ── */
+  code {
+    background: rgba(11,105,103,0.12);
+    color: var(--pd);
+    border: 1px solid var(--bdr);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-family: Consolas, monospace;
+    font-size: 0.82em;
+  }
+
+  /* ── TABLAS ── */
+  .tbl { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 12px 0; }
+  .tbl th {
+    background: var(--p); color: #fff;
+    padding: 8px 14px; text-align: left;
+    font-size: 0.75rem; letter-spacing: 0.5px; font-weight: 700;
+  }
+  .tbl td { padding: 8px 14px; border-bottom: 1px solid var(--bdr); vertical-align: top; }
+  .tbl tr:nth-child(even) td { background: #f5fbfb; }
+  .tbl tr:last-child td { border-bottom: none; }
+  .tbl td:first-child { font-weight: 600; color: var(--p); font-family: monospace; }
+
+  /* ── NOTA / ADVERTENCIA / TIP ── */
+  .aviso {
+    background: rgba(196,122,40,0.08);
+    border: 1px solid rgba(196,122,40,0.3);
+    border-left: 4px solid var(--acc);
+    border-radius: 6px;
+    padding: 11px 16px;
+    margin: 12px 0;
+    font-size: 0.85rem;
+    color: #5a3a0a;
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .aviso::before { content: '⚠'; font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+
+  .tip {
+    background: rgba(11,105,103,0.07);
+    border: 1px solid rgba(11,105,103,0.25);
+    border-left: 4px solid var(--p);
+    border-radius: 6px;
+    padding: 11px 16px;
+    margin: 12px 0;
+    font-size: 0.85rem;
+    color: var(--pd);
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .tip::before { content: '💡'; font-size: 0.9rem; flex-shrink: 0; margin-top: 1px; }
+
+  /* ── TEXTO ── */
+  p  { color: var(--mid); margin-bottom: 10px; font-size: 0.9rem; }
+  ul, ol { padding-left: 22px; margin-bottom: 10px; }
+  li { color: var(--mid); font-size: 0.9rem; margin-bottom: 4px; }
+  li strong { color: var(--txt); }
+
+  /* ── LISTA DE PASOS ── */
+  .steps { counter-reset: step; list-style: none; padding: 0; margin: 12px 0; }
+  .steps li {
+    counter-increment: step;
+    display: flex; gap: 14px; align-items: flex-start;
+    margin-bottom: 12px;
+  }
+  .steps li::before {
+    content: counter(step);
+    background: var(--p); color: #fff;
+    border-radius: 50%;
+    width: 24px; height: 24px; min-width: 24px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.72rem; font-weight: 800;
+    margin-top: 2px;
+  }
+  .steps li span { color: var(--mid); font-size: 0.88rem; }
+
+  /* ── LISTA DE OBJETIVOS (check) ── */
+  .check-list { list-style: none; padding: 0; margin: 10px 0; }
+  .check-list li { padding: 5px 0; color: var(--mid); font-size: 0.9rem; }
+  .check-list li::before { content: '✓ '; color: var(--p); font-weight: 700; }
+
+  /* ── GRID COMPARATIVA ── */
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 12px 0; }
+  .cbox { border-radius: 8px; overflow: hidden; border: 1px solid var(--bdr); }
+  .cbox .chead {
+    background: var(--p); color: #fff;
+    padding: 8px 14px; font-size: 0.78rem; font-weight: 700;
+  }
+  .cbox:last-child .chead { background: var(--acc); }
+  .cbox ul { padding: 12px 12px 12px 28px; background: #f5fbfb; }
+  .cbox ul li { font-size: 0.83rem; }
+
+  /* ── BADGE DE RESULTADO ESPERADO ── */
+  .result-box {
+    background: #f0faf0;
+    border: 1px solid #b0ddb0;
+    border-left: 4px solid #4caf50;
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin: 10px 0;
+    font-size: 0.83rem;
+    color: #1a4a1a;
+    font-family: Consolas, monospace;
+  }
+
+  /* ── RÚBRICA ── */
+  .rubrica { border-collapse: collapse; width: 100%; font-size: 0.83rem; margin: 12px 0; }
+  .rubrica th { background: var(--pd); color: #fff; padding: 8px 12px; text-align: left; }
+  .rubrica td { padding: 7px 12px; border-bottom: 1px solid var(--bdr); vertical-align: top; }
+  .rubrica td:last-child { font-weight: 700; color: var(--p); text-align: center; }
+  .rubrica tr:nth-child(even) td { background: #f5fbfb; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--pd); color: rgba(255,255,255,0.7);
+    text-align: center; padding: 20px;
+    font-size: 0.78rem; line-height: 1.8;
+  }
+  footer strong { color: #fff; }
+
+  @media (max-width: 680px) {
+    .header-top { padding: 12px 16px; flex-wrap: wrap; }
+    .nav { padding: 8px 16px; }
+    main { padding: 16px 12px 40px; }
+    .sec-body { padding: 16px; }
+    .compare { grid-template-columns: 1fr; }
+    .hmeta { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════ ENCABEZADO -->
+<header>
+  <div class="header-top">
+    <div class="badge">PR2 · BD</div>
+    <div class="htitle">
+      <h1>Oracle Database Express Edition 21c</h1>
+      <p>Instalación · PowerShell · SQL*Plus · DBeaver — Guía Didáctica de Bases de Datos</p>
+    </div>
+    <div class="hmeta">
+      Universidad Columbia del Paraguay<br>
+      Prof. Richard Steven<br>
+      Programación 2 · 2025
+    </div>
+  </div>
+  <nav class="nav">
+    <a href="#s1">1. Propósito</a>
+    <a href="#s2">2. Conceptos</a>
+    <a href="#s3">3. Requisitos</a>
+    <a href="#s4">4. Instalación</a>
+    <a href="#s5">5. Verificación</a>
+    <a href="#s6">6. Conexión</a>
+    <a href="#s7">7. Usuarios</a>
+    <a href="#s8">8. Tablas</a>
+    <a href="#s9">9. Datos</a>
+    <a href="#s10">10. Administración</a>
+    <a href="#s11">11. Scripts .sql</a>
+    <a href="#s12">12. Evidencias</a>
+    <a href="#s13">13. Errores</a>
+    <a href="#s14">14. Práctica Final</a>
+    <a href="#s15">15. Referencias</a>
+    <a href="#sa">Anexo A</a>
+    <a href="#sb">Anexo B · DBeaver</a>
+  </nav>
+</header>
+
+<main>
+
+<!-- ══════════════════════════════════════════════ SECCIÓN 1 -->
+<section id="s1">
+  <div class="sec-head"><div class="sec-num">1</div><h2>Propósito de la guía</h2></div>
+  <div class="sec-body">
+    <p>Esta guía tiene como objetivo acompañar al alumno, paso a paso, en la instalación y uso básico de <strong>Oracle Database 21c Express Edition</strong> en Windows, utilizando <strong>PowerShell</strong> como consola principal de trabajo.</p>
+    <p>Al finalizar, el alumno será capaz de:</p>
+    <ul class="check-list">
+      <li>Instalar Oracle Database 21c XE en Windows.</li>
+      <li>Verificar que los servicios de Oracle estén activos.</li>
+      <li>Conectarse a Oracle desde PowerShell mediante SQL*Plus.</li>
+      <li>Comprender la diferencia entre base de datos, usuario y esquema en Oracle.</li>
+      <li>Crear usuarios académicos con permisos controlados.</li>
+      <li>Crear tablas relacionales con claves primarias y foráneas.</li>
+      <li>Insertar, consultar, actualizar y eliminar datos.</li>
+      <li>Configurar DBeaver como cliente gráfico para conectarse a Oracle XE.</li>
+      <li>Ejecutar scripts <code>.sql</code> desde PowerShell para automatizar prácticas.</li>
+    </ul>
+    <div class="aviso">El enfoque es académico. Las contraseñas usadas son ejemplos para laboratorio y <strong>no deben utilizarse en ambientes reales de producción</strong>.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ SECCIÓN 2 -->
+<section id="s2">
+  <div class="sec-head"><div class="sec-num">2</div><h2>Conceptos mínimos antes de instalar</h2></div>
+  <div class="sec-body">
+    <p>Antes de ejecutar comandos, es importante entender cómo organiza Oracle sus componentes. Muchos errores de alumnos ocurren porque intentan trabajar Oracle <strong>como si fuera MySQL, SQL Server o Access</strong>.</p>
+
+    <table class="tbl">
+      <tr><th>Concepto</th><th>Explicación sencilla</th><th>Ejemplo en Oracle XE</th></tr>
+      <tr><td>Base de datos</td><td>Conjunto de archivos, memoria y procesos donde se guardan y administran los datos.</td><td>XE</td></tr>
+      <tr><td>Instancia</td><td>Procesos y memoria que permiten abrir y operar la base de datos.</td><td>Instancia XE</td></tr>
+      <tr><td>CDB</td><td>Container Database. Es el contenedor principal de Oracle multitenant.</td><td>CDB$ROOT, servicio XE</td></tr>
+      <tr><td>PDB</td><td>Pluggable Database. Es la base de trabajo donde se crean usuarios de práctica.</td><td>XEPDB1</td></tr>
+      <tr><td>Servicio</td><td>Nombre usado para conectarse a una base o PDB por red.</td><td>//localhost:1521/XEPDB1</td></tr>
+      <tr><td>Listener</td><td>Servicio que escucha conexiones externas o locales por TCP/IP.</td><td>Puerto 1521</td></tr>
+      <tr><td>Usuario</td><td>Cuenta que permite iniciar sesión en Oracle.</td><td>alumno_prg2</td></tr>
+      <tr><td>Esquema</td><td>Conjunto de objetos que pertenecen a un usuario: tablas, vistas, secuencias, procedimientos.</td><td>Tablas creadas por alumno_prg2</td></tr>
+      <tr><td>Tablespace</td><td>Espacio lógico donde Oracle almacena los objetos de los usuarios.</td><td>USERS</td></tr>
+    </table>
+
+    <div class="tip">En Oracle, cuando se crea un usuario, también se crea su esquema. Por eso, para una práctica universitaria normalmente se crea <strong>un usuario por alumno o por grupo</strong>. Ese usuario será dueño de sus tablas.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ SECCIÓN 3 -->
+<section id="s3">
+  <div class="sec-head"><div class="sec-num">3</div><h2>Requisitos previos</h2></div>
+  <div class="sec-body">
+    <p>Antes de instalar, revise los siguientes puntos:</p>
+    <ul>
+      <li>Usar <strong>Windows de 64 bits</strong> en una edición compatible con Oracle XE.</li>
+      <li>Ingresar con una cuenta que sea miembro directo del grupo <strong>Administradores de Windows</strong>.</li>
+      <li>No tener instalada otra versión de Oracle XE con el mismo SID <code>XE</code>.</li>
+      <li>Eliminar o desactivar temporalmente variables de entorno antiguas <code>ORACLE_HOME</code> o <code>TNS_ADMIN</code> si existen.</li>
+      <li>Tener espacio suficiente en disco. El instalador ocupa varios GB y la base puede crecer durante las prácticas.</li>
+      <li>Tener permisos para iniciar, detener y consultar servicios de Windows.</li>
+    </ul>
+
+    <div class="sub"><h3>Comandos previos de diagnóstico en PowerShell</h3>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell — Diagnóstico previo a la instalación</div>
+        <pre><span class="cmt"># Verificar la versión y arquitectura de Windows</span>
+<span class="ps">Get-ComputerInfo</span> | <span class="ps">Select-Object</span> WindowsProductName, WindowsVersion, OsArchitecture
+
+<span class="cmt"># Verificar si existen variables de entorno Oracle antiguas</span>
+[Environment]::<span class="fn">GetEnvironmentVariable</span>(<span class="str">"ORACLE_HOME"</span>, <span class="str">"Machine"</span>)
+[Environment]::<span class="fn">GetEnvironmentVariable</span>(<span class="str">"TNS_ADMIN"</span>,  <span class="str">"Machine"</span>)
+
+<span class="cmt"># Verificar si ya existen servicios Oracle instalados</span>
+<span class="ps">Get-Service</span> *Oracle* | <span class="ps">Select-Object</span> Name, Status, StartType</pre>
+      </div>
+    </div>
+
+    <div class="aviso">Si aparecen servicios Oracle antiguos y el laboratorio requiere una instalación limpia, <strong>no elimine carpetas manualmente</strong> sin indicación del docente. Primero se debe desinstalar correctamente desde Windows.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ SECCIÓN 4 -->
+<section id="s4">
+  <div class="sec-head"><div class="sec-num">4</div><h2>Descarga e instalación de Oracle 21c XE</h2></div>
+  <div class="sec-body">
+
+    <div class="sub"><h3>4.1 Descargar Oracle Database 21c Express Edition</h3>
+      <p>Ingrese al sitio oficial de Oracle y descargue la versión para <strong>Microsoft Windows de 64 bits</strong>. El archivo suele llamarse <code>OracleXE213_Win64.zip</code>.</p>
+      <div class="tip">Página oficial de descarga: <strong>Oracle Database XE Downloads</strong> — busque en oracle.com/database/technologies/xe-downloads.html</div>
+    </div>
+
+    <div class="sub"><h3>4.2 Extraer el archivo ZIP</h3>
+      <ol class="steps">
+        <li><span>Cree una carpeta temporal, por ejemplo <code>C:\oracle_instalador</code>.</span></li>
+        <li><span>Copie el archivo ZIP a esa carpeta.</span></li>
+        <li><span>Haga clic derecho sobre el ZIP y seleccione <strong>Extraer todo</strong>.</span></li>
+        <li><span>Verifique que dentro de la carpeta extraída exista el archivo <code>setup.exe</code>.</span></li>
+      </ol>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell — Crear carpeta y abrirla</div>
+        <pre><span class="cmt"># Crear carpeta temporal para el instalador</span>
+<span class="ps">New-Item</span> -ItemType Directory -Path <span class="str">C:\oracle_instalador</span> -Force
+
+<span class="cmt"># Abrir la carpeta desde PowerShell</span>
+<span class="ps">explorer</span> <span class="str">C:\oracle_instalador</span></pre>
+      </div>
+    </div>
+
+    <div class="sub"><h3>4.3 Ejecutar el instalador</h3>
+      <ol class="steps">
+        <li><span>Ubique el archivo <code>setup.exe</code> dentro de la carpeta extraída.</span></li>
+        <li><span>Ejecute <code>setup.exe</code>. Si Windows solicita permisos, <strong>acepte la elevación</strong>.</span></li>
+        <li><span>En la pantalla de bienvenida, seleccione <strong>Next</strong>.</span></li>
+        <li><span>Acepte el acuerdo de licencia si corresponde al uso académico indicado.</span></li>
+        <li><span>Use una carpeta de instalación <strong>sin espacios en la ruta</strong>. Se recomienda aceptar la ruta propuesta.</span></li>
+        <li><span>Defina la contraseña para las cuentas administrativas <code>SYS</code>, <code>SYSTEM</code> y <code>PDBADMIN</code>.</span></li>
+        <li><span><strong>Anote la contraseña en un lugar seguro.</strong> Sin ella, no podrá administrar la base.</span></li>
+        <li><span>Finalice la instalación y registre las cadenas de conexión mostradas al final.</span></li>
+      </ol>
+      <div class="tip">Use una contraseña de laboratorio con mayúscula, minúscula, número y símbolo. Ejemplo didáctico: <strong>AdminWeb2026#</strong>. Cada alumno debe reemplazarla por una propia.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ SECCIÓN 5 -->
+<section id="s5">
+  <div class="sec-head"><div class="sec-num">5</div><h2>Verificación inicial desde PowerShell</h2></div>
+  <div class="sec-body">
+    <p>Después de instalar, no se debe comenzar a crear tablas inmediatamente. <strong>Primero se verifica que Oracle esté activo.</strong></p>
+
+    <div class="sub"><h3>5.1 Abrir PowerShell</h3>
+      <p>Presione <strong>Inicio</strong>, escriba <em>PowerShell</em> y abra <strong>Windows PowerShell</strong>. Para administrar servicios, conviene ejecutarlo <strong>como administrador</strong>.</p>
+    </div>
+
+    <div class="sub"><h3>5.2 Verificar servicios de Oracle</h3>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell — Verificar estado de servicios</div>
+        <pre><span class="cmt"># Listar todos los servicios Oracle instalados en Windows</span>
+<span class="ps">Get-Service</span> *Oracle* | <span class="ps">Select-Object</span> Name, Status, StartType
+
+<span class="cmt"># Verificar el servicio principal de la base XE</span>
+<span class="ps">Get-Service</span> OracleServiceXE
+
+<span class="cmt"># Buscar el servicio listener (el nombre puede variar según el equipo)</span>
+<span class="ps">Get-Service</span> *TNSListener*</pre>
+      </div>
+
+      <p>Resultado esperado:</p>
+      <ul>
+        <li><code>OracleServiceXE</code> debe estar en estado <strong>Running</strong>.</li>
+        <li>El servicio listener debe estar en estado <strong>Running</strong>.</li>
+        <li>Si están detenidos, se deben iniciar antes de conectarse.</li>
+      </ul>
+    </div>
+
+    <div class="sub"><h3>5.3 Iniciar y detener servicios</h3>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell — Iniciar / Detener Oracle XE</div>
+        <pre><span class="cmt"># Iniciar el servicio principal de Oracle XE</span>
+<span class="ps">Start-Service</span> OracleServiceXE
+
+<span class="cmt"># Iniciar el listener (busque primero el nombre real con Get-Service *TNSListener*)</span>
+<span class="ps">Start-Service</span> OracleOraDB21Home1TNSListener
+
+<span class="cmt"># Detener el servicio principal (solo si el docente lo solicita)</span>
+<span class="ps">Stop-Service</span> OracleServiceXE</pre>
+      </div>
+      <div class="tip">No todos los equipos tendrán exactamente el mismo nombre de listener. Por eso primero se usa <code>Get-Service *TNSListener*</code> y luego se copia el nombre real del servicio.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ SECCIÓN 6 -->
+<section id="s6">
+  <div class="sec-head"><div class="sec-num">6</div><h2>Conexión a Oracle desde PowerShell con SQL*Plus</h2></div>
+  <div class="sec-body">
+    <p>SQL*Plus es una herramienta de línea de comandos incluida con Oracle. Permite conectarse a la base de datos y ejecutar sentencias SQL.</p>
+
+    <div class="sub"><h3>6.1 Ubicar SQL*Plus</h3>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell — Buscar sqlplus.exe</div>
+        <pre><span class="cmt"># Buscar sqlplus.exe dentro de C:\app</span>
+<span class="ps">Get-ChildItem</span> <span class="str">"C:\app"</span> -Recurse -Filter sqlplus.exe -ErrorAction SilentlyContinue |
+    <span class="ps">Select-Object</span> -First <span class="num">1</span> -ExpandProperty FullName</pre>
+      </div>
+      <p>Una ruta típica puede ser:</p>
+      <div class="result-box">C:\app\&lt;usuario_windows&gt;\product\21.0.0\dbhomeXE\bin\sqlplus.exe</div>
+    </div>
+
+    <div class="sub"><h3>6.2 Entrar a la carpeta bin de Oracle</h3>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell — Navegar a la carpeta bin</div>
+        <pre><span class="cmt"># Reemplace &lt;usuario_windows&gt; por el nombre de su usuario real de Windows</span>
+<span class="ps">cd</span> <span class="str">C:\app\&lt;usuario_windows&gt;\product\21.0.0\dbhomeXE\bin</span>
+
+<span class="cmt"># Probar que SQL*Plus responde</span>
+.\sqlplus -V</pre>
+      </div>
+      <div class="tip">Si <code>sqlplus</code> no se reconoce, puede ser solo un problema de PATH. Entre a la carpeta bin y ejecute <code>.\sqlplus</code> con el punto y barra al inicio.</div>
+    </div>
+
+    <div class="sub"><h3>6.3 Verificar el listener</h3>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell — Estado del listener</div>
+        <pre><span class="cmt"># Desde la carpeta bin de Oracle</span>
+.\lsnrctl status</pre>
+      </div>
+      <p>En la salida deben aparecer servicios como <code>XE</code> y <code>XEPDB1</code>. El servicio <strong>XEPDB1</strong> es el que se usará para crear usuarios y tablas de laboratorio.</p>
+    </div>
+
+    <div class="sub"><h3>6.4 Conectarse como administrador</h3>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell — Conexiones SQL*Plus</div>
+        <pre><span class="cmt">-- Forma recomendada: conectarse a XEPDB1 con SYSTEM para crear usuarios de laboratorio</span>
+.\sqlplus system/SuPassword@//localhost:<span class="num">1521</span>/XEPDB1
+
+<span class="cmt">-- También puede conectarse como SYSDBA al contenedor principal (usar con cuidado)</span>
+.\sqlplus sys/SuPassword@//localhost:<span class="num">1521</span>/XE <span class="kw">as</span> sysdba</pre>
+      </div>
+      <div class="aviso">Para crear usuarios normales de clase, conéctese a <strong>XEPDB1</strong>, no al contenedor raíz <code>XE/CDB$ROOT</code>. Si se conecta al lugar incorrecto, aparecerá el error <strong>ORA-65096</strong>.</div>
+    </div>
+
+    <div class="sub"><h3>6.5 Comandos básicos dentro de SQL*Plus</h3>
+      <div class="code-wrap">
+        <div class="code-label">SQL*Plus — Comandos de orientación</div>
+        <pre><span class="cmt">-- Ver con qué usuario está conectado</span>
+<span class="kw">SHOW USER</span>;
+
+<span class="cmt">-- Ver en qué contenedor está conectado</span>
+<span class="kw">SHOW CON_NAME</span>;
+
+<span class="cmt">-- Ver PDBs disponibles (solo conectado como SYSDBA al CDB)</span>
+<span class="kw">SHOW PDBS</span>;
+
+<span class="cmt">-- Salir de SQL*Plus</span>
+<span class="kw">EXIT</span>;</pre>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ SECCIÓN 7 -->
+<section id="s7">
+  <div class="sec-head"><div class="sec-num">7</div><h2>Creación de usuarios y esquemas</h2></div>
+  <div class="sec-body">
+    <p>En Oracle, un usuario puede iniciar sesión y también puede ser propietario de objetos. El <strong>esquema</strong> es el conjunto de objetos que pertenecen a ese usuario. Por ejemplo, si el usuario <code>alumno_prg2</code> crea una tabla llamada <code>alumnos</code>, esa tabla pertenece al esquema <code>alumno_prg2</code>.</p>
+
+    <div class="sub"><h3>7.1 Conectarse a XEPDB1 como SYSTEM</h3>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell — Conexión administrativa a XEPDB1</div>
+        <pre><span class="ps">cd</span> <span class="str">C:\app\&lt;usuario_windows&gt;\product\21.0.0\dbhomeXE\bin</span>
+.\sqlplus system/SuPassword@//localhost:<span class="num">1521</span>/XEPDB1</pre>
+      </div>
+    </div>
+
+    <div class="sub"><h3>7.2 Crear un usuario académico</h3>
+      <div class="code-wrap">
+        <div class="code-label">SQL — CREATE USER línea por línea</div>
+        <pre><span class="kw">CREATE USER</span> alumno_prg2               <span class="cmt">-- Nombre de la nueva cuenta</span>
+    <span class="kw">IDENTIFIED BY</span> <span class="str">Alumno2026#</span>           <span class="cmt">-- Contraseña del usuario</span>
+    <span class="kw">DEFAULT TABLESPACE</span> users            <span class="cmt">-- Sus objetos se guardan en USERS</span>
+    <span class="kw">TEMPORARY TABLESPACE</span> temp           <span class="cmt">-- Espacio para ordenamientos internos</span>
+    <span class="kw">QUOTA</span> <span class="num">100</span>M <span class="kw">ON</span> users;                <span class="cmt">-- Permite usar hasta 100 MB</span></pre>
+      </div>
+    </div>
+
+    <div class="sub"><h3>7.3 Otorgar permisos mínimos de laboratorio</h3>
+      <div class="code-wrap">
+        <div class="code-label">SQL — GRANT de privilegios académicos</div>
+        <pre><span class="kw">GRANT CREATE SESSION   TO</span> alumno_prg2;  <span class="cmt">-- Permite iniciar sesión</span>
+<span class="kw">GRANT CREATE TABLE     TO</span> alumno_prg2;  <span class="cmt">-- Permite crear tablas</span>
+<span class="kw">GRANT CREATE VIEW      TO</span> alumno_prg2;  <span class="cmt">-- Permite crear vistas</span>
+<span class="kw">GRANT CREATE SEQUENCE  TO</span> alumno_prg2;  <span class="cmt">-- Permite crear secuencias</span>
+<span class="kw">GRANT CREATE PROCEDURE TO</span> alumno_prg2;  <span class="cmt">-- Permite crear procedimientos</span></pre>
+      </div>
+      <div class="aviso"><strong>No otorgue DBA a usuarios de alumnos.</strong> DBA es un permiso administrativo amplio y no corresponde a prácticas iniciales. Para clase basta con CREATE SESSION, CREATE TABLE y otros permisos específicos.</div>
+    </div>
+
+    <div class="sub"><h3>7.4 Probar conexión con el nuevo usuario</h3>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell + SQL*Plus — Verificar conexión del alumno</div>
+        <pre><span class="kw">EXIT</span>;   <span class="cmt">-- Salir de la sesión SYSTEM</span>
+
+<span class="cmt"># Conectarse con el usuario recién creado</span>
+.\sqlplus alumno_prg2/<span class="str">Alumno2026#</span>@//localhost:<span class="num">1521</span>/XEPDB1
+
+<span class="cmt">-- Dentro de SQL*Plus, verificar identidad y contenedor</span>
+<span class="kw">SHOW USER</span>;
+<span class="kw">SHOW CON_NAME</span>;</pre>
+      </div>
+      <div class="result-box">USER is "ALUMNO_PRG2"<br>CON_NAME<br>------------------------------<br>XEPDB1</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ SECCIÓN 8 -->
+<section id="s8">
+  <div class="sec-head"><div class="sec-num">8</div><h2>Creación de tablas del caso académico</h2></div>
+  <div class="sec-body">
+    <p>Para practicar diseño relacional, se usará un caso sencillo: <strong>gestión académica básica</strong> con carreras, alumnos, materias, inscripciones y evaluaciones.</p>
+
+    <table class="tbl">
+      <tr><th>Tabla</th><th>Qué representa</th><th>Clave principal</th></tr>
+      <tr><td>carreras</td><td>Carreras habilitadas en la institución.</td><td>id_carrera</td></tr>
+      <tr><td>alumnos</td><td>Datos básicos de alumnos.</td><td>id_alumno</td></tr>
+      <tr><td>materias</td><td>Materias disponibles.</td><td>id_materia</td></tr>
+      <tr><td>inscripciones</td><td>Relación entre alumnos y materias.</td><td>id_inscripcion</td></tr>
+      <tr><td>evaluaciones</td><td>Puntajes obtenidos por inscripción.</td><td>id_evaluacion</td></tr>
+    </table>
+
+    <div class="tip">Conectarse como <code>alumno_prg2</code> a <code>XEPDB1</code> antes de ejecutar los CREATE TABLE.</div>
+
+    <div class="sub"><h3>8.1 Tabla carreras</h3>
+      <div class="code-wrap">
+        <div class="code-label">SQL — CREATE TABLE carreras</div>
+        <pre><span class="kw">CREATE TABLE</span> carreras (
+    id_carrera <span class="kw">NUMBER GENERATED BY DEFAULT AS IDENTITY</span>,
+    nombre     <span class="kw">VARCHAR2</span>(<span class="num">100</span>) <span class="kw">NOT NULL</span>,
+    estado     <span class="kw">CHAR</span>(<span class="num">1</span>) <span class="kw">DEFAULT</span> <span class="str">'A'</span> <span class="kw">NOT NULL</span>,
+    <span class="kw">CONSTRAINT</span> pk_carreras        <span class="kw">PRIMARY KEY</span> (id_carrera),
+    <span class="kw">CONSTRAINT</span> ck_carreras_estado <span class="kw">CHECK</span> (estado <span class="kw">IN</span> (<span class="str">'A'</span>,<span class="str">'I'</span>))  <span class="cmt">-- A=Activa I=Inactiva</span>
+);</pre>
+      </div>
+    </div>
+
+    <div class="sub"><h3>8.2 Tabla alumnos</h3>
+      <div class="code-wrap">
+        <div class="code-label">SQL — CREATE TABLE alumnos</div>
+        <pre><span class="kw">CREATE TABLE</span> alumnos (
+    id_alumno      <span class="kw">NUMBER GENERATED BY DEFAULT AS IDENTITY</span>,
+    cedula         <span class="kw">VARCHAR2</span>(<span class="num">20</span>)  <span class="kw">NOT NULL</span>,
+    nombre         <span class="kw">VARCHAR2</span>(<span class="num">80</span>)  <span class="kw">NOT NULL</span>,
+    apellido       <span class="kw">VARCHAR2</span>(<span class="num">80</span>)  <span class="kw">NOT NULL</span>,
+    email          <span class="kw">VARCHAR2</span>(<span class="num">120</span>),
+    fecha_registro <span class="kw">DATE DEFAULT SYSDATE NOT NULL</span>,
+    id_carrera     <span class="kw">NUMBER NOT NULL</span>,
+    <span class="kw">CONSTRAINT</span> pk_alumnos         <span class="kw">PRIMARY KEY</span> (id_alumno),
+    <span class="kw">CONSTRAINT</span> uk_alumnos_cedula  <span class="kw">UNIQUE</span> (cedula),
+    <span class="kw">CONSTRAINT</span> fk_alumnos_carreras <span class="kw">FOREIGN KEY</span> (id_carrera)
+        <span class="kw">REFERENCES</span> carreras(id_carrera)
+);</pre>
+      </div>
+    </div>
+
+    <div class="sub"><h3>8.3 Tabla materias</h3>
+      <div class="code-wrap">
+        <div class="code-label">SQL — CREATE TABLE materias</div>
+        <pre><span class="kw">CREATE TABLE</span> materias (
+    id_materia <span class="kw">NUMBER GENERATED BY DEFAULT AS IDENTITY</span>,
+    nombre     <span class="kw">VARCHAR2</span>(<span class="num">100</span>) <span class="kw">NOT NULL</span>,
+    semestre   <span class="kw">NUMBER</span>(<span class="num">2</span>) <span class="kw">NOT NULL</span>,
+    creditos   <span class="kw">NUMBER</span>(<span class="num">2</span>) <span class="kw">DEFAULT</span> <span class="num">4</span> <span class="kw">NOT NULL</span>,
+    <span class="kw">CONSTRAINT</span> pk_materias          <span class="kw">PRIMARY KEY</span> (id_materia),
+    <span class="kw">CONSTRAINT</span> ck_materias_semestre <span class="kw">CHECK</span> (semestre <span class="kw">BETWEEN</span> <span class="num">1</span> <span class="kw">AND</span> <span class="num">10</span>),
+    <span class="kw">CONSTRAINT</span> ck_materias_creditos <span class="kw">CHECK</span> (creditos <span class="kw">BETWEEN</span> <span class="num">1</span> <span class="kw">AND</span> <span class="num">10</span>)
+);</pre>
+      </div>
+    </div>
+
+    <div class="sub"><h3>8.4 Tabla inscripciones</h3>
+      <div class="code-wrap">
+        <div class="code-label">SQL — CREATE TABLE inscripciones</div>
+        <pre><span class="kw">CREATE TABLE</span> inscripciones (
+    id_inscripcion    <span class="kw">NUMBER GENERATED BY DEFAULT AS IDENTITY</span>,
+    id_alumno         <span class="kw">NUMBER NOT NULL</span>,
+    id_materia        <span class="kw">NUMBER NOT NULL</span>,
+    fecha_inscripcion <span class="kw">DATE DEFAULT SYSDATE NOT NULL</span>,
+    estado            <span class="kw">VARCHAR2</span>(<span class="num">20</span>) <span class="kw">DEFAULT</span> <span class="str">'INSCRIPTO'</span> <span class="kw">NOT NULL</span>,
+    <span class="kw">CONSTRAINT</span> pk_inscripciones         <span class="kw">PRIMARY KEY</span> (id_inscripcion),
+    <span class="kw">CONSTRAINT</span> fk_ins_alumno             <span class="kw">FOREIGN KEY</span> (id_alumno)
+        <span class="kw">REFERENCES</span> alumnos(id_alumno),
+    <span class="kw">CONSTRAINT</span> fk_ins_materia            <span class="kw">FOREIGN KEY</span> (id_materia)
+        <span class="kw">REFERENCES</span> materias(id_materia),
+    <span class="kw">CONSTRAINT</span> uk_ins_alumno_materia     <span class="kw">UNIQUE</span> (id_alumno, id_materia),
+    <span class="kw">CONSTRAINT</span> ck_ins_estado             <span class="kw">CHECK</span> (estado <span class="kw">IN</span>
+        (<span class="str">'INSCRIPTO'</span>,<span class="str">'APROBADO'</span>,<span class="str">'REPROBADO'</span>,<span class="str">'RETIRADO'</span>))
+);</pre>
+      </div>
+    </div>
+
+    <div class="sub"><h3>8.5 Tabla evaluaciones</h3>
+      <div class="code-wrap">
+        <div class="code-label">SQL — CREATE TABLE evaluaciones</div>
+        <pre><span class="kw">CREATE TABLE</span> evaluaciones (
+    id_evaluacion    <span class="kw">NUMBER GENERATED BY DEFAULT AS IDENTITY</span>,
+    id_inscripcion   <span class="kw">NUMBER NOT NULL</span>,
+    tipo             <span class="kw">VARCHAR2</span>(<span class="num">30</span>) <span class="kw">NOT NULL</span>,
+    puntaje          <span class="kw">NUMBER</span>(<span class="num">5</span>,<span class="num">2</span>) <span class="kw">NOT NULL</span>,
+    fecha_evaluacion <span class="kw">DATE DEFAULT SYSDATE NOT NULL</span>,
+    <span class="kw">CONSTRAINT</span> pk_evaluaciones      <span class="kw">PRIMARY KEY</span> (id_evaluacion),
+    <span class="kw">CONSTRAINT</span> fk_eval_inscripcion  <span class="kw">FOREIGN KEY</span> (id_inscripcion)
+        <span class="kw">REFERENCES</span> inscripciones(id_inscripcion),
+    <span class="kw">CONSTRAINT</span> ck_eval_tipo         <span class="kw">CHECK</span> (tipo <span class="kw">IN</span>
+        (<span class="str">'PARCIAL'</span>,<span class="str">'FINAL'</span>,<span class="str">'RECUPERATORIO'</span>,<span class="str">'TRABAJO'</span>)),
+    <span class="kw">CONSTRAINT</span> ck_eval_puntaje      <span class="kw">CHECK</span> (puntaje <span class="kw">BETWEEN</span> <span class="num">0</span> <span class="kw">AND</span> <span class="num">100</span>)
+);</pre>
+      </div>
+    </div>
+
+    <div class="sub"><h3>8.6 Verificar tablas creadas</h3>
+      <div class="code-wrap">
+        <div class="code-label">SQL — Consultar el catálogo del esquema</div>
+        <pre><span class="kw">SELECT</span> table_name
+<span class="kw">FROM</span>   user_tables
+<span class="kw">ORDER BY</span> table_name;
+
+<span class="kw">DESCRIBE</span> alumnos;
+<span class="kw">DESCRIBE</span> inscripciones;</pre>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ SECCIÓN 9 -->
+<section id="s9">
+  <div class="sec-head"><div class="sec-num">9</div><h2>Inserción y consulta de datos</h2></div>
+  <div class="sec-body">
+
+    <div class="sub"><h3>9.1 Insertar datos iniciales</h3>
+      <div class="code-wrap">
+        <div class="code-label">SQL — INSERT de datos de prueba</div>
+        <pre><span class="kw">INSERT INTO</span> carreras (nombre) <span class="kw">VALUES</span> (<span class="str">'Ingeniería en Informática'</span>);
+<span class="kw">INSERT INTO</span> carreras (nombre) <span class="kw">VALUES</span> (<span class="str">'Ingeniería Comercial'</span>);
+
+<span class="kw">INSERT INTO</span> materias (nombre, semestre, creditos) <span class="kw">VALUES</span> (<span class="str">'Programación 2'</span>, <span class="num">3</span>, <span class="num">5</span>);
+<span class="kw">INSERT INTO</span> materias (nombre, semestre, creditos) <span class="kw">VALUES</span> (<span class="str">'Base de Datos 1'</span>, <span class="num">4</span>, <span class="num">5</span>);
+
+<span class="kw">INSERT INTO</span> alumnos (cedula, nombre, apellido, email, id_carrera)
+<span class="kw">VALUES</span> (<span class="str">'1234567'</span>, <span class="str">'Ana'</span>, <span class="str">'Gómez'</span>, <span class="str">'ana.gomez@correo.com'</span>, <span class="num">1</span>);
+
+<span class="kw">INSERT INTO</span> alumnos (cedula, nombre, apellido, email, id_carrera)
+<span class="kw">VALUES</span> (<span class="str">'2345678'</span>, <span class="str">'Carlos'</span>, <span class="str">'Pérez'</span>, <span class="str">'carlos.perez@correo.com'</span>, <span class="num">1</span>);
+
+<span class="kw">INSERT INTO</span> inscripciones (id_alumno, id_materia) <span class="kw">VALUES</span> (<span class="num">1</span>, <span class="num">1</span>);
+<span class="kw">INSERT INTO</span> inscripciones (id_alumno, id_materia) <span class="kw">VALUES</span> (<span class="num">2</span>, <span class="num">1</span>);
+
+<span class="kw">INSERT INTO</span> evaluaciones (id_inscripcion, tipo, puntaje) <span class="kw">VALUES</span> (<span class="num">1</span>, <span class="str">'PARCIAL'</span>, <span class="num">85</span>);
+<span class="kw">INSERT INTO</span> evaluaciones (id_inscripcion, tipo, puntaje) <span class="kw">VALUES</span> (<span class="num">2</span>, <span class="str">'PARCIAL'</span>, <span class="num">72</span>);
+
+<span class="kw">COMMIT</span>;  <span class="cmt">-- Confirmar todos los cambios</span></pre>
+      </div>
+    </div>
+
+    <div class="sub"><h3>9.2 Consultas básicas</h3>
+      <div class="code-wrap">
+        <div class="code-label">SQL — SELECT simples por tabla</div>
+        <pre><span class="kw">SELECT</span> * <span class="kw">FROM</span> carreras;
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> alumnos;
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> materias;
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> inscripciones;
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> evaluaciones;</pre>
+      </div>
+    </div>
+
+    <div class="sub"><h3>9.3 Consulta con JOIN</h3>
+      <div class="code-wrap">
+        <div class="code-label">SQL — Consulta completa con múltiples JOINs</div>
+        <pre><span class="kw">SELECT</span>
+    a.nombre || <span class="str">' '</span> || a.apellido  <span class="kw">AS</span> alumno,
+    c.nombre                        <span class="kw">AS</span> carrera,
+    m.nombre                        <span class="kw">AS</span> materia,
+    i.estado                        <span class="kw">AS</span> estado_inscripcion,
+    e.tipo                          <span class="kw">AS</span> evaluacion,
+    e.puntaje
+<span class="kw">FROM</span>       alumnos a
+<span class="kw">JOIN</span>       carreras c      <span class="kw">ON</span> c.id_carrera    = a.id_carrera
+<span class="kw">JOIN</span>       inscripciones i <span class="kw">ON</span> i.id_alumno     = a.id_alumno
+<span class="kw">JOIN</span>       materias m      <span class="kw">ON</span> m.id_materia    = i.id_materia
+<span class="kw">LEFT JOIN</span>  evaluaciones e  <span class="kw">ON</span> e.id_inscripcion = i.id_inscripcion
+<span class="kw">ORDER BY</span>   a.apellido, a.nombre;</pre>
+      </div>
+    </div>
+
+    <div class="sub"><h3>9.4 Actualizar y eliminar datos</h3>
+      <div class="code-wrap">
+        <div class="code-label">SQL — UPDATE y DELETE controlados</div>
+        <pre><span class="cmt">-- Actualizar un puntaje existente</span>
+<span class="kw">UPDATE</span> evaluaciones
+<span class="kw">SET</span>    puntaje = <span class="num">90</span>
+<span class="kw">WHERE</span>  id_evaluacion = <span class="num">1</span>;
+
+<span class="kw">COMMIT</span>;
+
+<span class="cmt">-- Eliminar una evaluación específica</span>
+<span class="kw">DELETE FROM</span> evaluaciones
+<span class="kw">WHERE</span>  id_evaluacion = <span class="num">2</span>;
+
+<span class="kw">COMMIT</span>;</pre>
+      </div>
+      <div class="aviso">No elimine registros padres si existen registros hijos relacionados. Por ejemplo, no podrá eliminar un alumno que ya tiene inscripciones sin antes eliminar o modificar esas inscripciones.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ SECCIÓN 10 -->
+<section id="s10">
+  <div class="sec-head"><div class="sec-num">10</div><h2>Administración básica de usuarios</h2></div>
+  <div class="sec-body">
+    <p>Estos comandos deben ejecutarse conectado como <code>SYSTEM</code> en <code>XEPDB1</code>.</p>
+    <div class="code-wrap">
+      <div class="code-label">SQL — Administración de cuentas de usuario</div>
+      <pre><span class="cmt">-- Cambiar contraseña</span>
+<span class="kw">ALTER USER</span> alumno_prg2 <span class="kw">IDENTIFIED BY</span> <span class="str">NuevaClave2026#</span>;
+
+<span class="cmt">-- Bloquear cuenta</span>
+<span class="kw">ALTER USER</span> alumno_prg2 <span class="kw">ACCOUNT LOCK</span>;
+
+<span class="cmt">-- Desbloquear cuenta</span>
+<span class="kw">ALTER USER</span> alumno_prg2 <span class="kw">ACCOUNT UNLOCK</span>;
+
+<span class="cmt">-- Aumentar cuota de almacenamiento</span>
+<span class="kw">ALTER USER</span> alumno_prg2 <span class="kw">QUOTA</span> <span class="num">200</span>M <span class="kw">ON</span> users;
+
+<span class="cmt">-- Ver usuarios creados en la PDB</span>
+<span class="kw">SELECT</span> username, account_status, default_tablespace
+<span class="kw">FROM</span>   dba_users
+<span class="kw">WHERE</span>  username <span class="kw">LIKE</span> <span class="str">'ALUMNO%'</span>
+<span class="kw">ORDER BY</span> username;</pre>
+    </div>
+
+    <div class="aviso">Para eliminar un usuario y todos sus objetos se usa <code>DROP USER usuario CASCADE</code>. Este comando borra tablas, datos y objetos del esquema. Debe usarse <strong>solo con autorización del docente</strong>.
+      <br><br>
+      <strong>Ejemplo:</strong> <code>DROP USER alumno_prg2 CASCADE;</code>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ SECCIÓN 11 -->
+<section id="s11">
+  <div class="sec-head"><div class="sec-num">11</div><h2>Ejecución de scripts .sql desde PowerShell</h2></div>
+  <div class="sec-body">
+    <p>En lugar de escribir todo manualmente dentro de SQL*Plus, se pueden crear archivos <code>.sql</code> y ejecutarlos desde PowerShell. Esto es más ordenado y reduce errores.</p>
+
+    <div class="sub"><h3>11.1 Crear carpeta de laboratorio</h3>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell — Preparar carpeta de trabajo</div>
+        <pre><span class="ps">New-Item</span> -ItemType Directory -Path <span class="str">C:\oracle_lab</span> -Force
+notepad <span class="str">C:\oracle_lab\01_crear_usuario.sql</span></pre>
+      </div>
+    </div>
+
+    <div class="sub"><h3>11.2 Contenido del script 01_crear_usuario.sql</h3>
+      <div class="code-wrap">
+        <div class="code-label">SQL — 01_crear_usuario.sql</div>
+        <pre><span class="kw">CREATE USER</span> grupo01
+    <span class="kw">IDENTIFIED BY</span> <span class="str">Grupo012026#</span>
+    <span class="kw">DEFAULT TABLESPACE</span> users
+    <span class="kw">TEMPORARY TABLESPACE</span> temp
+    <span class="kw">QUOTA</span> <span class="num">100</span>M <span class="kw">ON</span> users;
+
+<span class="kw">GRANT CREATE SESSION   TO</span> grupo01;
+<span class="kw">GRANT CREATE TABLE     TO</span> grupo01;
+<span class="kw">GRANT CREATE VIEW      TO</span> grupo01;
+<span class="kw">GRANT CREATE SEQUENCE  TO</span> grupo01;
+
+<span class="kw">EXIT</span>;</pre>
+      </div>
+    </div>
+
+    <div class="sub"><h3>11.3 Ejecutar el script desde PowerShell</h3>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell — Llamar SQL*Plus con un archivo .sql</div>
+        <pre><span class="ps">cd</span> <span class="str">C:\app\&lt;usuario_windows&gt;\product\21.0.0\dbhomeXE\bin</span>
+
+<span class="cmt"># El símbolo @ le indica a SQL*Plus que ejecute un archivo</span>
+.\sqlplus system/SuPassword@//localhost:<span class="num">1521</span>/XEPDB1 @<span class="str">C:\oracle_lab\01_crear_usuario.sql</span></pre>
+      </div>
+    </div>
+
+    <div class="sub"><h3>11.4 Guardar evidencia con SPOOL</h3>
+      <div class="code-wrap">
+        <div class="code-label">SQL — Capturar salida en un archivo de texto</div>
+        <pre><span class="cmt">-- SPOOL inicia la grabación de la sesión en un archivo .txt</span>
+<span class="kw">SPOOL</span> <span class="str">C:\oracle_lab\evidencia_alumno_prg2.txt</span>
+
+<span class="kw">SHOW USER</span>;
+<span class="kw">SHOW CON_NAME</span>;
+
+<span class="kw">SELECT</span> table_name <span class="kw">FROM</span> user_tables <span class="kw">ORDER BY</span> table_name;
+<span class="kw">SELECT COUNT</span>(*) <span class="kw">AS</span> cantidad_alumnos <span class="kw">FROM</span> alumnos;
+
+<span class="kw">SPOOL OFF</span>;  <span class="cmt">-- Detener la grabación</span>
+<span class="kw">EXIT</span>;</pre>
+      </div>
+      <div class="tip">SPOOL crea un archivo de texto con toda la salida de SQL*Plus. Es útil para entregar evidencia de la práctica sin depender únicamente de capturas de pantalla.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ SECCIÓN 12 -->
+<section id="s12">
+  <div class="sec-head"><div class="sec-num">12</div><h2>Evidencias que debe entregar el alumno</h2></div>
+  <div class="sec-body">
+    <table class="tbl">
+      <tr><th>N.º</th><th>Evidencia</th><th>Comando sugerido</th></tr>
+      <tr><td>1</td><td>Servicios Oracle activos</td><td><code>Get-Service *Oracle*</code></td></tr>
+      <tr><td>2</td><td>Listener funcionando</td><td><code>.\lsnrctl status</code></td></tr>
+      <tr><td>3</td><td>Conexión a XEPDB1</td><td><code>SHOW CON_NAME;</code></td></tr>
+      <tr><td>4</td><td>Usuario conectado</td><td><code>SHOW USER;</code></td></tr>
+      <tr><td>5</td><td>Tablas creadas</td><td><code>SELECT table_name FROM user_tables;</code></td></tr>
+      <tr><td>6</td><td>Datos insertados</td><td><code>SELECT * FROM alumnos;</code></td></tr>
+      <tr><td>7</td><td>Consulta JOIN funcionando</td><td>Consulta del punto 9.3</td></tr>
+      <tr><td>8</td><td>Archivo de evidencia</td><td><code>SPOOL evidencia.txt</code></td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ SECCIÓN 13 -->
+<section id="s13">
+  <div class="sec-head"><div class="sec-num">13</div><h2>Errores frecuentes y soluciones</h2></div>
+  <div class="sec-body">
+    <table class="tbl">
+      <tr><th>Error o síntoma</th><th>Causa probable</th><th>Solución didáctica</th></tr>
+      <tr><td>sqlplus no se reconoce</td><td>La carpeta bin de Oracle no está en el PATH.</td><td>Entrar con <code>cd</code> a <code>dbhomeXE\bin</code> y ejecutar <code>.\sqlplus</code>.</td></tr>
+      <tr><td>ORA-01017</td><td>Usuario, contraseña o servicio incorrecto.</td><td>Verificar credenciales y usar <code>//localhost:1521/XEPDB1</code>.</td></tr>
+      <tr><td>ORA-12541</td><td>El listener no está iniciado.</td><td>Ejecutar <code>Get-Service *TNSListener*</code> y <code>Start-Service</code>.</td></tr>
+      <tr><td>ORA-65096</td><td>Se intentó crear usuario en CDB$ROOT.</td><td>Conectarse a XEPDB1 y crear allí el usuario académico.</td></tr>
+      <tr><td>ORA-01950</td><td>El usuario no tiene cuota en tablespace USERS.</td><td><code>ALTER USER usuario QUOTA 100M ON users;</code></td></tr>
+      <tr><td>ORA-00942</td><td>La tabla no existe o pertenece a otro esquema.</td><td>Verificar <code>SHOW USER</code> y <code>SELECT table_name FROM user_tables</code>.</td></tr>
+      <tr><td>ORA-28000</td><td>Cuenta bloqueada.</td><td><code>ALTER USER usuario ACCOUNT UNLOCK;</code></td></tr>
+      <tr><td>ORA-01031</td><td>Permisos insuficientes.</td><td>Conceder el privilegio necesario con <code>GRANT</code>.</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ SECCIÓN 14 -->
+<section id="s14">
+  <div class="sec-head"><div class="sec-num">14</div><h2>Práctica integradora final</h2></div>
+  <div class="sec-body">
+    <p>El alumno debe realizar la siguiente práctica en su equipo o laboratorio:</p>
+    <ol class="steps">
+      <li><span>Instalar o verificar Oracle Database 21c XE.</span></li>
+      <li><span>Comprobar servicios de Oracle desde PowerShell.</span></li>
+      <li><span>Conectarse a XEPDB1 con SQL*Plus.</span></li>
+      <li><span>Crear un usuario llamado <code>practica_apellido</code>, reemplazando <em>apellido</em> por el suyo.</span></li>
+      <li><span>Otorgar permisos mínimos: CREATE SESSION, CREATE TABLE, CREATE VIEW y CREATE SEQUENCE.</span></li>
+      <li><span>Conectarse con el usuario creado.</span></li>
+      <li><span>Crear las tablas <code>carreras</code>, <code>alumnos</code>, <code>materias</code>, <code>inscripciones</code> y <code>evaluaciones</code>.</span></li>
+      <li><span>Insertar al menos 3 carreras, 5 alumnos, 4 materias, 5 inscripciones y 5 evaluaciones.</span></li>
+      <li><span>Ejecutar una consulta JOIN que muestre alumno, carrera, materia y puntaje.</span></li>
+      <li><span>Guardar evidencia con SPOOL y entregar el archivo resultante.</span></li>
+    </ol>
+
+    <table class="rubrica">
+      <tr><th>Criterio</th><th>Puntaje sugerido</th></tr>
+      <tr><td>Instalación / verificación de servicios</td><td>15 pts</td></tr>
+      <tr><td>Conexión correcta a XEPDB1</td><td>10 pts</td></tr>
+      <tr><td>Creación correcta de usuario / esquema</td><td>15 pts</td></tr>
+      <tr><td>Diseño de tablas con PK, FK y restricciones</td><td>25 pts</td></tr>
+      <tr><td>Inserción y consulta de datos</td><td>20 pts</td></tr>
+      <tr><td>Evidencia ordenada con SPOOL / capturas</td><td>15 pts</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ SECCIÓN 15 -->
+<section id="s15">
+  <div class="sec-head"><div class="sec-num">15</div><h2>Referencias oficiales</h2></div>
+  <div class="sec-body">
+    <p>Material utilizado como base técnica para esta guía:</p>
+    <ul>
+      <li>Oracle Database Express Edition Installation Guide, 21c for Microsoft Windows</li>
+      <li>Oracle Database XE Quick Start</li>
+      <li>Oracle Database XE Downloads</li>
+      <li>Oracle Database XE Licensing Restrictions</li>
+      <li>Oracle Database XE — Connecting to Oracle Database XE</li>
+    </ul>
+    <div class="tip">Toda la documentación oficial está disponible en <strong>docs.oracle.com</strong> buscando "Oracle Database Express Edition 21c".</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ ANEXO A -->
+<section id="sa">
+  <div class="sec-head"><div class="sec-num">A</div><h2>Anexo A — Scripts completos para copiar y ejecutar</h2></div>
+  <div class="sec-body">
+
+    <div class="sub"><h3>A.1 Script 01_crear_usuario_alumno.sql</h3>
+      <div class="code-wrap">
+        <div class="code-label">SQL — Crear usuario y otorgar permisos</div>
+        <pre><span class="kw">CREATE USER</span> alumno_prg2
+    <span class="kw">IDENTIFIED BY</span> <span class="str">Alumno2026#</span>
+    <span class="kw">DEFAULT TABLESPACE</span> users
+    <span class="kw">TEMPORARY TABLESPACE</span> temp
+    <span class="kw">QUOTA</span> <span class="num">100</span>M <span class="kw">ON</span> users;
+
+<span class="kw">GRANT CREATE SESSION   TO</span> alumno_prg2;
+<span class="kw">GRANT CREATE TABLE     TO</span> alumno_prg2;
+<span class="kw">GRANT CREATE VIEW      TO</span> alumno_prg2;
+<span class="kw">GRANT CREATE SEQUENCE  TO</span> alumno_prg2;
+<span class="kw">GRANT CREATE PROCEDURE TO</span> alumno_prg2;
+
+<span class="kw">EXIT</span>;</pre>
+      </div>
+    </div>
+
+    <div class="sub"><h3>A.2 Script 02_crear_tablas_academicas.sql</h3>
+      <div class="code-wrap">
+        <div class="code-label">SQL — Crear modelo académico completo</div>
+        <pre><span class="kw">CREATE TABLE</span> carreras (
+    id_carrera <span class="kw">NUMBER GENERATED BY DEFAULT AS IDENTITY</span>,
+    nombre     <span class="kw">VARCHAR2</span>(<span class="num">100</span>) <span class="kw">NOT NULL</span>,
+    estado     <span class="kw">CHAR</span>(<span class="num">1</span>) <span class="kw">DEFAULT</span> <span class="str">'A'</span> <span class="kw">NOT NULL</span>,
+    <span class="kw">CONSTRAINT</span> pk_carreras        <span class="kw">PRIMARY KEY</span> (id_carrera),
+    <span class="kw">CONSTRAINT</span> ck_carreras_estado <span class="kw">CHECK</span> (estado <span class="kw">IN</span> (<span class="str">'A'</span>,<span class="str">'I'</span>))
+);
+
+<span class="kw">CREATE TABLE</span> alumnos (
+    id_alumno      <span class="kw">NUMBER GENERATED BY DEFAULT AS IDENTITY</span>,
+    cedula         <span class="kw">VARCHAR2</span>(<span class="num">20</span>)  <span class="kw">NOT NULL</span>,
+    nombre         <span class="kw">VARCHAR2</span>(<span class="num">80</span>)  <span class="kw">NOT NULL</span>,
+    apellido       <span class="kw">VARCHAR2</span>(<span class="num">80</span>)  <span class="kw">NOT NULL</span>,
+    email          <span class="kw">VARCHAR2</span>(<span class="num">120</span>),
+    fecha_registro <span class="kw">DATE DEFAULT SYSDATE NOT NULL</span>,
+    id_carrera     <span class="kw">NUMBER NOT NULL</span>,
+    <span class="kw">CONSTRAINT</span> pk_alumnos          <span class="kw">PRIMARY KEY</span> (id_alumno),
+    <span class="kw">CONSTRAINT</span> uk_alumnos_cedula   <span class="kw">UNIQUE</span> (cedula),
+    <span class="kw">CONSTRAINT</span> fk_alumnos_carreras <span class="kw">FOREIGN KEY</span> (id_carrera)
+        <span class="kw">REFERENCES</span> carreras(id_carrera)
+);
+
+<span class="kw">CREATE TABLE</span> materias (
+    id_materia <span class="kw">NUMBER GENERATED BY DEFAULT AS IDENTITY</span>,
+    nombre     <span class="kw">VARCHAR2</span>(<span class="num">100</span>) <span class="kw">NOT NULL</span>,
+    semestre   <span class="kw">NUMBER</span>(<span class="num">2</span>) <span class="kw">NOT NULL</span>,
+    creditos   <span class="kw">NUMBER</span>(<span class="num">2</span>) <span class="kw">DEFAULT</span> <span class="num">4</span> <span class="kw">NOT NULL</span>,
+    <span class="kw">CONSTRAINT</span> pk_materias          <span class="kw">PRIMARY KEY</span> (id_materia),
+    <span class="kw">CONSTRAINT</span> ck_materias_semestre <span class="kw">CHECK</span> (semestre <span class="kw">BETWEEN</span> <span class="num">1</span> <span class="kw">AND</span> <span class="num">10</span>),
+    <span class="kw">CONSTRAINT</span> ck_materias_creditos <span class="kw">CHECK</span> (creditos <span class="kw">BETWEEN</span> <span class="num">1</span> <span class="kw">AND</span> <span class="num">10</span>)
+);
+
+<span class="kw">CREATE TABLE</span> inscripciones (
+    id_inscripcion    <span class="kw">NUMBER GENERATED BY DEFAULT AS IDENTITY</span>,
+    id_alumno         <span class="kw">NUMBER NOT NULL</span>,
+    id_materia        <span class="kw">NUMBER NOT NULL</span>,
+    fecha_inscripcion <span class="kw">DATE DEFAULT SYSDATE NOT NULL</span>,
+    estado            <span class="kw">VARCHAR2</span>(<span class="num">20</span>) <span class="kw">DEFAULT</span> <span class="str">'INSCRIPTO'</span> <span class="kw">NOT NULL</span>,
+    <span class="kw">CONSTRAINT</span> pk_inscripciones     <span class="kw">PRIMARY KEY</span> (id_inscripcion),
+    <span class="kw">CONSTRAINT</span> fk_ins_alumno        <span class="kw">FOREIGN KEY</span> (id_alumno)
+        <span class="kw">REFERENCES</span> alumnos(id_alumno),
+    <span class="kw">CONSTRAINT</span> fk_ins_materia       <span class="kw">FOREIGN KEY</span> (id_materia)
+        <span class="kw">REFERENCES</span> materias(id_materia),
+    <span class="kw">CONSTRAINT</span> uk_ins_alumno_materia <span class="kw">UNIQUE</span> (id_alumno, id_materia),
+    <span class="kw">CONSTRAINT</span> ck_ins_estado        <span class="kw">CHECK</span> (estado <span class="kw">IN</span>
+        (<span class="str">'INSCRIPTO'</span>,<span class="str">'APROBADO'</span>,<span class="str">'REPROBADO'</span>,<span class="str">'RETIRADO'</span>))
+);
+
+<span class="kw">CREATE TABLE</span> evaluaciones (
+    id_evaluacion    <span class="kw">NUMBER GENERATED BY DEFAULT AS IDENTITY</span>,
+    id_inscripcion   <span class="kw">NUMBER NOT NULL</span>,
+    tipo             <span class="kw">VARCHAR2</span>(<span class="num">30</span>) <span class="kw">NOT NULL</span>,
+    puntaje          <span class="kw">NUMBER</span>(<span class="num">5</span>,<span class="num">2</span>) <span class="kw">NOT NULL</span>,
+    fecha_evaluacion <span class="kw">DATE DEFAULT SYSDATE NOT NULL</span>,
+    <span class="kw">CONSTRAINT</span> pk_evaluaciones     <span class="kw">PRIMARY KEY</span> (id_evaluacion),
+    <span class="kw">CONSTRAINT</span> fk_eval_inscripcion <span class="kw">FOREIGN KEY</span> (id_inscripcion)
+        <span class="kw">REFERENCES</span> inscripciones(id_inscripcion),
+    <span class="kw">CONSTRAINT</span> ck_eval_tipo        <span class="kw">CHECK</span> (tipo <span class="kw">IN</span>
+        (<span class="str">'PARCIAL'</span>,<span class="str">'FINAL'</span>,<span class="str">'RECUPERATORIO'</span>,<span class="str">'TRABAJO'</span>)),
+    <span class="kw">CONSTRAINT</span> ck_eval_puntaje     <span class="kw">CHECK</span> (puntaje <span class="kw">BETWEEN</span> <span class="num">0</span> <span class="kw">AND</span> <span class="num">100</span>)
+);
+
+<span class="kw">EXIT</span>;</pre>
+      </div>
+    </div>
+
+    <div class="sub"><h3>A.3 Script 03_insertar_datos.sql</h3>
+      <div class="code-wrap">
+        <div class="code-label">SQL — Datos de ejemplo para las 5 tablas</div>
+        <pre><span class="kw">INSERT INTO</span> carreras (nombre) <span class="kw">VALUES</span> (<span class="str">'Ingeniería en Informática'</span>);
+<span class="kw">INSERT INTO</span> carreras (nombre) <span class="kw">VALUES</span> (<span class="str">'Ingeniería Comercial'</span>);
+<span class="kw">INSERT INTO</span> carreras (nombre) <span class="kw">VALUES</span> (<span class="str">'Administración de Empresas'</span>);
+
+<span class="kw">INSERT INTO</span> materias (nombre, semestre, creditos) <span class="kw">VALUES</span> (<span class="str">'Programación 2'</span>,     <span class="num">3</span>, <span class="num">5</span>);
+<span class="kw">INSERT INTO</span> materias (nombre, semestre, creditos) <span class="kw">VALUES</span> (<span class="str">'Base de Datos 1'</span>,     <span class="num">4</span>, <span class="num">5</span>);
+<span class="kw">INSERT INTO</span> materias (nombre, semestre, creditos) <span class="kw">VALUES</span> (<span class="str">'Estructura de Datos'</span>,  <span class="num">3</span>, <span class="num">4</span>);
+<span class="kw">INSERT INTO</span> materias (nombre, semestre, creditos) <span class="kw">VALUES</span> (<span class="str">'Sistemas de Información'</span>, <span class="num">2</span>, <span class="num">4</span>);
+
+<span class="kw">INSERT INTO</span> alumnos (cedula, nombre, apellido, email, id_carrera)
+<span class="kw">VALUES</span> (<span class="str">'1234567'</span>, <span class="str">'Ana'</span>,   <span class="str">'Gómez'</span>, <span class="str">'ana.gomez@correo.com'</span>,    <span class="num">1</span>);
+<span class="kw">INSERT INTO</span> alumnos (cedula, nombre, apellido, email, id_carrera)
+<span class="kw">VALUES</span> (<span class="str">'2345678'</span>, <span class="str">'Carlos'</span>,<span class="str">'Pérez'</span>, <span class="str">'carlos.perez@correo.com'</span>, <span class="num">1</span>);
+<span class="kw">INSERT INTO</span> alumnos (cedula, nombre, apellido, email, id_carrera)
+<span class="kw">VALUES</span> (<span class="str">'3456789'</span>, <span class="str">'María'</span>, <span class="str">'López'</span>, <span class="str">'maria.lopez@correo.com'</span>,  <span class="num">2</span>);
+
+<span class="kw">INSERT INTO</span> inscripciones (id_alumno, id_materia) <span class="kw">VALUES</span> (<span class="num">1</span>, <span class="num">1</span>);
+<span class="kw">INSERT INTO</span> inscripciones (id_alumno, id_materia) <span class="kw">VALUES</span> (<span class="num">1</span>, <span class="num">2</span>);
+<span class="kw">INSERT INTO</span> inscripciones (id_alumno, id_materia) <span class="kw">VALUES</span> (<span class="num">2</span>, <span class="num">1</span>);
+<span class="kw">INSERT INTO</span> inscripciones (id_alumno, id_materia) <span class="kw">VALUES</span> (<span class="num">3</span>, <span class="num">4</span>);
+
+<span class="kw">INSERT INTO</span> evaluaciones (id_inscripcion, tipo, puntaje) <span class="kw">VALUES</span> (<span class="num">1</span>, <span class="str">'PARCIAL'</span>, <span class="num">85</span>);
+<span class="kw">INSERT INTO</span> evaluaciones (id_inscripcion, tipo, puntaje) <span class="kw">VALUES</span> (<span class="num">2</span>, <span class="str">'PARCIAL'</span>, <span class="num">78</span>);
+<span class="kw">INSERT INTO</span> evaluaciones (id_inscripcion, tipo, puntaje) <span class="kw">VALUES</span> (<span class="num">3</span>, <span class="str">'PARCIAL'</span>, <span class="num">72</span>);
+<span class="kw">INSERT INTO</span> evaluaciones (id_inscripcion, tipo, puntaje) <span class="kw">VALUES</span> (<span class="num">4</span>, <span class="str">'TRABAJO'</span>, <span class="num">95</span>);
+
+<span class="kw">COMMIT</span>;
+<span class="kw">EXIT</span>;</pre>
+      </div>
+    </div>
+
+    <div class="sub"><h3>A.4 Script 04_consultas_evidencia.sql</h3>
+      <div class="code-wrap">
+        <div class="code-label">SQL — Consultas de evidencia con SPOOL</div>
+        <pre><span class="kw">SPOOL</span> <span class="str">C:\oracle_lab\evidencia_oracle_prg2.txt</span>
+
+<span class="kw">SHOW USER</span>;
+<span class="kw">SHOW CON_NAME</span>;
+
+<span class="kw">SELECT</span> table_name <span class="kw">FROM</span> user_tables <span class="kw">ORDER BY</span> table_name;
+
+<span class="kw">SELECT</span>
+    a.nombre || <span class="str">' '</span> || a.apellido <span class="kw">AS</span> alumno,
+    c.nombre                       <span class="kw">AS</span> carrera,
+    m.nombre                       <span class="kw">AS</span> materia,
+    i.estado                       <span class="kw">AS</span> estado_inscripcion,
+    e.tipo                         <span class="kw">AS</span> evaluacion,
+    e.puntaje
+<span class="kw">FROM</span>       alumnos a
+<span class="kw">JOIN</span>       carreras c      <span class="kw">ON</span> c.id_carrera    = a.id_carrera
+<span class="kw">JOIN</span>       inscripciones i <span class="kw">ON</span> i.id_alumno     = a.id_alumno
+<span class="kw">JOIN</span>       materias m      <span class="kw">ON</span> m.id_materia    = i.id_materia
+<span class="kw">LEFT JOIN</span>  evaluaciones e  <span class="kw">ON</span> e.id_inscripcion = i.id_inscripcion
+<span class="kw">ORDER BY</span>   a.apellido, a.nombre;
+
+<span class="kw">SPOOL OFF</span>;
+<span class="kw">EXIT</span>;</pre>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════ ANEXO B -->
+<section id="sb">
+  <div class="sec-head"><div class="sec-num">B</div><h2>Anexo B — Instalación y configuración de DBeaver para Oracle 21c XE</h2></div>
+  <div class="sec-body">
+    <p>Este complemento muestra cómo instalar <strong>DBeaver</strong> en Windows y configurarlo para trabajar con Oracle Database 21c Express Edition. La finalidad es que el alumno pueda ejecutar consultas SQL, revisar sus tablas y validar datos desde una interfaz gráfica.</p>
+    <div class="tip"><strong>DBeaver no reemplaza a Oracle.</strong> Oracle es el motor de base de datos; DBeaver es un cliente que se conecta a Oracle mediante JDBC para facilitar la administración y ejecución de SQL.</div>
+
+    <div class="sub"><h3>B.1 Objetivos del complemento</h3>
+      <ul class="check-list">
+        <li>Instalar DBeaver Community en Windows.</li>
+        <li>Crear una conexión gráfica hacia Oracle XE usando el servicio XEPDB1.</li>
+        <li>Conectarse con el usuario / esquema creado en la guía principal.</li>
+        <li>Ejecutar scripts SQL desde el editor de DBeaver.</li>
+        <li>Crear tablas, insertar datos, consultar registros y verificar errores.</li>
+        <li>Diferenciar entre conexión administrativa del docente y conexión académica del alumno.</li>
+      </ul>
+    </div>
+
+    <div class="sub"><h3>B.2 Requisitos previos antes de abrir DBeaver</h3>
+      <p>Antes de configurar DBeaver, Oracle XE debe estar funcionando. Si Oracle no responde, DBeaver tampoco podrá conectarse.</p>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell — Diagnóstico antes de abrir DBeaver</div>
+        <pre><span class="cmt"># Verificar servicios de Oracle</span>
+<span class="ps">Get-Service</span> *Oracle* | <span class="ps">Select-Object</span> Name, Status, StartType
+
+<span class="cmt"># Verificar si el puerto 1521 responde en la máquina local</span>
+<span class="ps">Test-NetConnection</span> localhost -Port <span class="num">1521</span>
+
+<span class="cmt"># Probar conexión directa con SQL*Plus antes de usar DBeaver</span>
+sqlplus alumno01/<span class="str">Alumno2026#</span>@//localhost:<span class="num">1521</span>/XEPDB1</pre>
+      </div>
+      <div class="aviso">Si <code>Test-NetConnection</code> indica <code>TcpTestSucceeded: False</code>, revise que el listener esté iniciado. Si SQL*Plus no conecta, corrija primero Oracle antes de abrir DBeaver.</div>
+    </div>
+
+    <div class="sub"><h3>B.3 Instalar DBeaver Community</h3>
+      <ol class="steps">
+        <li><span>Ingresar al sitio oficial de DBeaver y descargar la edición <strong>Community</strong> para Windows.</span></li>
+        <li><span>Seleccionar el instalador estándar para Windows (no portable, salvo indicación del docente).</span></li>
+        <li><span>Ejecutar el archivo descargado. Si Windows solicita permisos de administrador, aceptarlos.</span></li>
+        <li><span>Avanzar con <strong>Next</strong> en el asistente de instalación y aceptar la licencia.</span></li>
+        <li><span>Mantener las opciones predeterminadas de instalación.</span></li>
+        <li><span>Finalizar la instalación y abrir DBeaver desde el menú Inicio.</span></li>
+      </ol>
+      <div class="tip">Las versiones actuales de DBeaver para Windows incluyen OpenJDK integrado, por lo que normalmente el alumno <strong>no necesita instalar Java manualmente</strong>.</div>
+    </div>
+
+    <div class="sub"><h3>B.4 Crear la conexión de alumno hacia Oracle XE</h3>
+      <ol class="steps">
+        <li><span>Abrir DBeaver → menú <strong>Database &gt; New Database Connection</strong> (Ctrl+Shift+N).</span></li>
+        <li><span>En la lista de motores, buscar y seleccionar <strong>Oracle</strong>. Si DBeaver solicita descargar el driver JDBC, aceptar.</span></li>
+        <li><span>Completar los datos de conexión de la tabla siguiente.</span></li>
+        <li><span>Presionar <strong>Test Connection</strong>. Si muestra "Connected", presionar <strong>Finish</strong>.</span></li>
+      </ol>
+
+      <table class="tbl">
+        <tr><th>Campo en DBeaver</th><th>Valor para laboratorio</th><th>Explicación</th></tr>
+        <tr><td>Host</td><td>localhost</td><td>Oracle está instalado en la misma computadora.</td></tr>
+        <tr><td>Port</td><td>1521</td><td>Puerto estándar del listener Oracle.</td></tr>
+        <tr><td>Database</td><td>XEPDB1</td><td>Nombre del servicio de la Pluggable Database de trabajo.</td></tr>
+        <tr><td>Connection identifier</td><td>Service name</td><td>Para Oracle XE 21c usar Service Name, no SID.</td></tr>
+        <tr><td>Username</td><td>ALUMNO01</td><td>Usuario / esquema creado para la práctica.</td></tr>
+        <tr><td>Password</td><td>Alumno2026#</td><td>Contraseña asignada por el docente.</td></tr>
+        <tr><td>Role</td><td>Normal</td><td>Los alumnos <strong>no</strong> deben conectarse como SYSDBA.</td></tr>
+      </table>
+
+      <div class="code-wrap">
+        <div class="code-label">Referencia — Cadena JDBC equivalente</div>
+        <pre><span class="cmt">-- Cadena JDBC que DBeaver usa internamente para conectarse:</span>
+jdbc:oracle:thin:@//localhost:<span class="num">1521</span>/XEPDB1</pre>
+      </div>
+    </div>
+
+    <div class="sub"><h3>B.5 Primeras consultas para ejecutar en DBeaver</h3>
+      <div class="code-wrap">
+        <div class="code-label">SQL — Verificaciones iniciales en DBeaver</div>
+        <pre><span class="cmt">-- Verificar con qué usuario está conectado el alumno</span>
+<span class="kw">SELECT USER FROM</span> dual;
+
+<span class="cmt">-- Ver fecha y hora del servidor Oracle</span>
+<span class="kw">SELECT SYSDATE FROM</span> dual;
+
+<span class="cmt">-- Ver tablas propias del usuario conectado</span>
+<span class="kw">SELECT</span> table_name
+<span class="kw">FROM</span>   user_tables
+<span class="kw">ORDER BY</span> table_name;</pre>
+      </div>
+    </div>
+
+    <div class="sub"><h3>B.6 Errores frecuentes al conectar DBeaver con Oracle XE</h3>
+      <table class="tbl">
+        <tr><th>Error o síntoma</th><th>Causa probable</th><th>Solución didáctica</th></tr>
+        <tr><td>ORA-01017</td><td>Usuario, contraseña o servicio incorrecto.</td><td>Reescribir credenciales. Verificar que use XEPDB1.</td></tr>
+        <tr><td>ORA-12541</td><td>Listener detenido o puerto 1521 no disponible.</td><td>Revisar servicios Oracle y ejecutar <code>Test-NetConnection localhost -Port 1521</code>.</td></tr>
+        <tr><td>ORA-12514</td><td>Se usó XE en vez de XEPDB1.</td><td>Usar Service name: <code>XEPDB1</code> para usuarios académicos.</td></tr>
+        <tr><td>ORA-65096</td><td>Se intentó crear usuario en CDB$ROOT.</td><td>Conectarse a XEPDB1 antes de crear usuarios.</td></tr>
+        <tr><td>ORA-01950</td><td>El usuario no tiene cuota en tablespace USERS.</td><td><code>ALTER USER alumno01 QUOTA 50M ON users;</code></td></tr>
+        <tr><td>DBeaver no muestra tabla recién creada</td><td>El navegador no fue actualizado.</td><td>Presionar <strong>Refresh</strong> sobre el esquema o reconectar.</td></tr>
+        <tr><td>Driver files are missing</td><td>El driver JDBC de Oracle no está descargado.</td><td>Aceptar descarga del driver o agregar ojdbc manualmente.</td></tr>
+        <tr><td>Connection timeout</td><td>Firewall, antivirus o servicio detenido.</td><td>Validar localhost, puerto 1521 y estado de servicios.</td></tr>
+      </table>
+    </div>
+
+    <div class="sub"><h3>B.7 Diferencia entre trabajar con el usuario propio y cambiar de esquema</h3>
+      <p>La forma correcta para estudiantes es que cada uno se conecte con <strong>su propio usuario</strong>. En Oracle, el usuario y el esquema tienen una relación directa.</p>
+      <table class="tbl">
+        <tr><th>Caso</th><th>Ejemplo</th><th>Recomendación</th></tr>
+        <tr><td>Alumno trabaja en su práctica</td><td>Conectarse como ALUMNO01.</td><td>Recomendado. Sus tablas quedan en su propio esquema.</td></tr>
+        <tr><td>Docente revisa otro esquema</td><td>Conectarse como ADMIN_WEB y consultar ALUMNO01.ALUMNOS.</td><td>Útil para corrección, si tiene permisos.</td></tr>
+        <tr><td>Cambiar esquema de sesión</td><td><code>ALTER SESSION SET CURRENT_SCHEMA = ALUMNO01;</code></td><td>Solo para revisión avanzada. No crea permisos nuevos.</td></tr>
+      </table>
+    </div>
+
+    <div class="sub"><h3>B.8 Rúbrica de evaluación del uso de DBeaver</h3>
+      <table class="rubrica">
+        <tr><th>Criterio</th><th>Excelente</th><th>Aceptable</th><th>Insuficiente</th><th>Pts</th></tr>
+        <tr><td>Instalación</td><td>Instala DBeaver y reconoce su función como cliente.</td><td>Instala con ayuda.</td><td>No logra abrir la herramienta.</td><td>10</td></tr>
+        <tr><td>Conexión Oracle</td><td>Configura correctamente host, puerto, servicio, usuario y rol.</td><td>Conecta con correcciones menores.</td><td>No distingue XE de XEPDB1.</td><td>20</td></tr>
+        <tr><td>Uso del esquema</td><td>Trabaja con su usuario y comprende usuario/esquema.</td><td>Crea objetos con ayuda.</td><td>Intenta crear objetos en el lugar incorrecto.</td><td>20</td></tr>
+        <tr><td>Ejecución SQL</td><td>Ejecuta CREATE, INSERT, SELECT y COMMIT correctamente.</td><td>Ejecuta consultas simples.</td><td>No interpreta errores SQL.</td><td>25</td></tr>
+        <tr><td>Verificación y evidencias</td><td>Entrega capturas claras y resultados consistentes.</td><td>Entrega evidencias parciales.</td><td>No demuestra funcionamiento.</td><td>15</td></tr>
+        <tr><td>Buenas prácticas</td><td>No usa SYSDBA como alumno y evita permisos excesivos.</td><td>Requiere recordatorios.</td><td>Usa credenciales administrativas sin control.</td><td>10</td></tr>
+      </table>
+    </div>
+
+    <div class="sub"><h3>B.9 Checklist rápido para laboratorio</h3>
+      <ul class="check-list">
+        <li><code>OracleServiceXE</code> está iniciado.</li>
+        <li>El listener Oracle está iniciado y responde en el puerto 1521.</li>
+        <li>La PDB XEPDB1 está disponible.</li>
+        <li>Existen usuarios de práctica o existe script para crearlos.</li>
+        <li>DBeaver abre correctamente en cada equipo.</li>
+        <li>DBeaver puede descargar el driver Oracle o el docente dispone del archivo JDBC.</li>
+        <li>Los alumnos <strong>no</strong> tienen acceso a la contraseña SYS.</li>
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+</main>
+
+<!-- ═══════════════════════════════════════════════ PIE DE PÁGINA -->
+<footer>
+  <strong>Oracle Database Express Edition 21c — Guía Didáctica</strong><br>
+  Programación 2 (PR2) · Universidad Columbia del Paraguay · Prof. Richard Steven · 2025<br>
+  Motor: Oracle XE 21c · Herramientas: SQL*Plus (CLI) + DBeaver (GUI) · PDB: XEPDB1 · Puerto: 1521
+</footer>
+
+</body>
+</html>

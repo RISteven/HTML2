@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menú Principal — Sistema de Gestión</title>
+
+  <style>
+    /* ── PALETA COLUMBIA ── */
+    :root {
+      --color-primario:        #0b6967;
+      --color-primario-oscuro: #094f4d;
+      --color-primario-claro:  #0e8a87;
+      --color-acento:          #c47a28;
+      --color-acento-claro:    #e8a84e;
+      --color-fondo:           #f2f8f8;
+      --color-superficie:      #ffffff;
+      --color-texto:           #172828;
+      --color-texto-medio:     #3d5e5e;
+      --color-borde:           #bdd8d8;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background:  var(--color-fondo);
+      color:       var(--color-texto);
+      min-height:  100vh;
+      display:     flex;
+      flex-direction: column;
+    }
+
+    /* ── HEADER ── */
+    .encabezado-pagina {
+      background: linear-gradient(135deg,
+        var(--color-primario-oscuro) 0%,
+        var(--color-primario)        60%,
+        var(--color-primario-claro)  100%);
+      color:   #fff;
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 3px 12px rgba(9,79,77,0.35);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .encabezado-pagina .info-usuario {
+      font-size:  0.82rem;
+      opacity:    0.85;
+      text-align: right;
+    }
+    .encabezado-pagina h1 { font-size: 1.2rem; font-weight: 700; }
+
+    /* ── BOTÓN CERRAR SESIÓN ── */
+    .boton-salir {
+      background:    rgba(255,255,255,0.15);
+      color:         #fff;
+      border:        1px solid rgba(255,255,255,0.4);
+      border-radius: 8px;
+      padding:       6px 16px;
+      font-size:     0.82rem;
+      font-weight:   600;
+      cursor:        pointer;
+      margin-top:    4px;
+      transition:    background 0.2s;
+    }
+    .boton-salir:hover { background: rgba(255,255,255,0.25); }
+
+    /* ── CONTENEDOR PRINCIPAL ── */
+    .contenedor-principal {
+      max-width: 860px;
+      margin:    0 auto;
+      padding:   40px 20px;
+      flex-grow: 1;
+    }
+
+    /* ── TÍTULO DE SECCIÓN ── */
+    .titulo-seccion {
+      font-size:     0.72rem;
+      font-weight:   700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color:         var(--color-texto-medio);
+      margin-bottom: 16px;
+    }
+
+    /* ── GRILLA DE OPCIONES ── */
+    /* auto-fill → crea tantas columnas como quepan; minmax → mínimo 220px cada una */
+    .grilla-opciones {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    /* ── TARJETA DE OPCIÓN ── */
+    .tarjeta-opcion {
+      background:    var(--color-superficie);
+      border:        1px solid var(--color-borde);
+      border-radius: 12px;
+      padding:       28px 20px;
+      text-align:    center;
+      cursor:        pointer;
+      transition:    transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+      box-shadow:    0 2px 8px rgba(11,105,103,0.06);
+      border-top:    4px solid var(--color-primario); /* Borde superior de color */
+    }
+    .tarjeta-opcion:hover {
+      transform:    translateY(-3px); /* Sube 3px al pasar el mouse */
+      box-shadow:   0 6px 20px rgba(11,105,103,0.14);
+      border-color: var(--color-primario);
+    }
+
+    /* La tarjeta de Reporte tiene acento ámbar */
+    .tarjeta-opcion.tarjeta-reporte { border-top-color: var(--color-acento); }
+    .tarjeta-opcion.tarjeta-reporte .icono-opcion { color: var(--color-acento); }
+
+    .icono-opcion {
+      font-size:     2.2rem;
+      margin-bottom: 10px;
+      color:         var(--color-primario);
+    }
+    .titulo-opcion {
+      font-size:   1rem;
+      font-weight: 700;
+      color:       var(--color-texto);
+      margin-bottom: 4px;
+    }
+    .descripcion-opcion {
+      font-size: 0.78rem;
+      color:     var(--color-texto-medio);
+      line-height: 1.4;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 480px) {
+      .grilla-opciones { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── HEADER CON BIENVENIDA ── -->
+  <div class="encabezado-pagina">
+    <div>
+      <h1>Panel de Administración de Usuarios</h1>
+      <p style="font-size:0.78rem;opacity:0.75;margin-top:2px">Universidad Columbia del Paraguay · Programación 2</p>
+    </div>
+    <div class="info-usuario">
+      <!-- El nombre se llena desde JavaScript usando sessionStorage -->
+      Bienvenido/a, <strong id="nombreUsuarioActivo">Usuario</strong>
+      <br>
+      <button class="boton-salir" onclick="cerrarSesion()">Cerrar sesión</button>
+    </div>
+  </div>
+
+  <!-- ── CONTENEDOR PRINCIPAL ── -->
+  <div class="contenedor-principal">
+
+    <p class="titulo-seccion">Operaciones disponibles</p>
+
+    <!-- Grilla de tarjetas — una por operación -->
+    <div class="grilla-opciones">
+
+      <!-- ALTA: Crear nuevo usuario -->
+      <div class="tarjeta-opcion" onclick="irA('crear.html')">
+        <div class="icono-opcion">➕</div>
+        <div class="titulo-opcion">Alta</div>
+        <div class="descripcion-opcion">Registrar un nuevo usuario en el sistema</div>
+      </div>
+
+      <!-- CONSULTA: Listar todos los usuarios -->
+      <div class="tarjeta-opcion" onclick="irA('listar.html')">
+        <div class="icono-opcion">📋</div>
+        <div class="titulo-opcion">Consulta</div>
+        <div class="descripcion-opcion">Ver la lista completa de usuarios registrados</div>
+      </div>
+
+      <!-- MODIFICACIÓN: Actualizar contraseña -->
+      <div class="tarjeta-opcion" onclick="irA('actualizar.html')">
+        <div class="icono-opcion">✏️</div>
+        <div class="titulo-opcion">Modificación</div>
+        <div class="descripcion-opcion">Actualizar la contraseña de un usuario existente</div>
+      </div>
+
+      <!-- BAJA: Eliminar usuario -->
+      <div class="tarjeta-opcion" onclick="irA('eliminar.html')">
+        <div class="icono-opcion">🗑️</div>
+        <div class="titulo-opcion">Baja</div>
+        <div class="descripcion-opcion">Eliminar un usuario del sistema de forma permanente</div>
+      </div>
+
+      <!-- REPORTE: DataTables interactivo -->
+      <div class="tarjeta-opcion tarjeta-reporte" onclick="irA('reporte.html')">
+        <div class="icono-opcion">📊</div>
+        <div class="titulo-opcion">Reporte</div>
+        <div class="descripcion-opcion">Tabla interactiva con búsqueda, paginación y exportación</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       JAVASCRIPT — LÓGICA DEL MENÚ
+  ══════════════════════════════════════════════════════════ -->
+  <script>
+    // ── FUNCIÓN: Navegar a otra página ────────────────────────
+    function irA(urlDestino) {
+      window.location.href = urlDestino;
+    }
+
+    // ── FUNCIÓN: Cerrar sesión ────────────────────────────────
+    // Elimina los datos de sessionStorage y vuelve al login.
+    function cerrarSesion() {
+      sessionStorage.clear();           // Limpiamos todos los datos de la sesión
+      window.location.href = 'login.html';
+    }
+
+    // ── INICIO: Mostrar nombre del usuario activo ─────────────
+    // Recuperamos el nombre guardado en sessionStorage durante el login.
+    const nombreDelUsuario = sessionStorage.getItem('usuarioActivo');
+
+    if (nombreDelUsuario) {
+      // Si existe el nombre, lo mostramos en el encabezado.
+      document.getElementById('nombreUsuarioActivo').textContent = nombreDelUsuario;
+    } else {
+      // Si no hay sesión activa, redirigimos al login (protección básica de ruta).
+      window.location.href = 'login.html';
+    }
+  </script>
+
+</body>
+</html>

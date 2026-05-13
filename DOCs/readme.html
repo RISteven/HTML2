@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conectar Node.js con Oracle XE</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      /* Colores institucionales principales */
+      --color-primario:         #0b6967;  /* Teal principal — identidad Columbia */
+      --color-primario-oscuro:  #094f4d;  /* Para headers y footers */
+      --color-primario-claro:   #0e8a87;  /* Para degradados y acentos */
+      --color-acento:           #c47a28;  /* Ámbar — color complementario */
+      --color-acento-claro:     #e8a84e;  /* Ámbar suave */
+
+      /* Fondos */
+      --color-fondo:            #f2f8f8;  /* Fondo de la página */
+      --color-superficie:       #ffffff;  /* Tarjetas y paneles */
+
+      /* Código */
+      --color-codigo-fondo:     #0a2424;  /* Fondo oscuro para bloques de código */
+
+      /* Texto */
+      --color-texto:            #172828;  /* Texto principal */
+      --color-texto-medio:      #3d5e5e;  /* Párrafos */
+      --color-texto-suave:      #6e8f8f;  /* Texto secundario */
+      --color-borde:            #bdd8d8;  /* Bordes y separadores */
+
+      /* Estados */
+      --color-advertencia:      #664d03;  /* Amarillo-café para advertencias */
+      --color-fondo-advertencia:#fff3cd;  /* Fondo amarillo suave */
+    }
+
+    /* ── Base del documento ── */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--color-fondo);
+      color: var(--color-texto);
+      padding: 0 0 3rem;
+    }
+
+    /* ══ BANNER INSTITUCIONAL ══
+       Header tipo universidad con degradado teal Columbia */
+    .site-header {
+      background: linear-gradient(135deg, var(--color-primario-oscuro) 0%, var(--color-primario) 60%, var(--color-primario-claro) 100%);
+      color: #fff;
+      padding: 28px 20px 24px;
+      text-align: center;
+      margin-bottom: 0;
+      box-shadow: 0 4px 12px rgba(9, 79, 77, 0.35);
+    }
+    .site-header .institución {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0.85;
+      margin-bottom: 6px;
+    }
+    .site-header h1 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 0;
+    }
+
+    /* ── Contenedor principal centrado ── */
+    .container {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    /* ── Título de página (dentro del contenido) ── */
+    h1.page-title {
+      text-align: center;
+      color: var(--color-texto);
+      font-size: 1.8rem;
+      margin-bottom: 2rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 3px solid var(--color-acento);  /* ámbar en lugar de rojo */
+    }
+
+    /* ── Bloque de paso ──
+       Cada paso es una tarjeta con borde izquierdo en teal */
+    .step {
+      background: var(--color-superficie);
+      border-radius: 8px;
+      padding: 1.5rem 1.75rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      border-left: 5px solid var(--color-primario);  /* teal en lugar de rojo */
+    }
+
+    /* Título de cada paso — teal en lugar de rojo */
+    .step h2 {
+      font-size: 1.1rem;
+      color: var(--color-primario);
+      margin-bottom: 0.75rem;
+    }
+
+    .step p {
+      margin-bottom: 0.75rem;
+      line-height: 1.6;
+      color: var(--color-texto-medio);
+    }
+
+    /* Bloque de código multilinea — fondo oscuro institucional */
+    pre {
+      background: var(--color-codigo-fondo);
+      color: #c9d1d9;
+      border-radius: 0 6px 6px 6px;
+      padding: 1rem 1.25rem;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 0.88rem;
+      overflow-x: auto;
+      margin-top: 0.5rem;
+      line-height: 1.6;
+    }
+
+    /* Etiqueta de lenguaje — ámbar en lugar de rojo */
+    .lang-label {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: var(--color-primario-oscuro);  /* teal oscuro */
+      color: #fff;
+      border-radius: 4px 4px 0 0;
+      padding: 0.2rem 0.6rem;
+      margin-top: 0.75rem;
+    }
+
+    /* Resaltado de sintaxis dentro de <pre> */
+    .comment { color: #8b949e; font-style: italic; }  /* comentarios */
+    .keyword { color: #ff7b72; }                       /* palabras clave */
+    .string  { color: #a5d6ff; }                       /* strings */
+    .func    { color: #d2a8ff; }                       /* funciones */
+
+    /* Árbol de archivos del proyecto (estilo terminal) */
+    .file-tree {
+      background: var(--color-codigo-fondo);
+      color: #c9d1d9;
+      border-radius: 6px;
+      padding: 1rem 1.25rem;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 0.88rem;
+      margin-top: 0.5rem;
+      line-height: 1.7;
+    }
+
+    /* URL de acceso al servidor */
+    .url {
+      display: inline-block;
+      background: #e3eded;
+      border: 1px solid var(--color-borde);
+      border-radius: 4px;
+      padding: 0.2rem 0.6rem;
+      font-family: monospace;
+      color: var(--color-primario);
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ BANNER INSTITUCIONAL ══ -->
+<header class="site-header">
+  <div class="institución">Universidad Columbia del Paraguay — Programación 2</div>
+  <h1>Conectar Node.js con Oracle XE 21c</h1>
+</header>
+
+<div class="container">
+
+  <!-- Paso 1 -->
+  <div class="step">
+    <h2>Paso 1 — Instalar el cliente de Oracle para Node.js</h2>
+    <p>En tu proyecto, ejecutá:</p>
+    <span class="lang-label">PowerShell</span>
+    <pre>npm install oracledb</pre>
+    <p>Esto instala el driver oficial de Oracle para Node.js.</p>
+  </div>
+
+  <!-- Paso 2 -->
+  <div class="step">
+    <h2>Paso 2 — Configurar la conexión</h2>
+    <p>Crea un archivo <strong>db.js</strong> con la configuración:</p>
+    <span class="lang-label">JavaScript — db.js</span>
+    <pre><span class="keyword">const</span> oracledb = <span class="func">require</span>(<span class="string">'oracledb'</span>);
+
+<span class="keyword">const</span> config = {
+  user:          <span class="string">"system"</span>,             <span class="comment">// Usuario de Oracle</span>
+  password:      <span class="string">"tu_contraseña"</span>,      <span class="comment">// Contraseña definida en la instalación</span>
+  connectString: <span class="string">"localhost/XEPDB1"</span>    <span class="comment">// Puede ser XE o XEPDB1 según tu instalación</span>
+};
+
+module.exports = config;</pre>
+  </div>
+
+  <!-- Paso 3 -->
+  <div class="step">
+    <h2>Paso 3 — Crear el servidor con Express</h2>
+    <p>En <strong>server.js</strong>:</p>
+    <span class="lang-label">JavaScript — server.js</span>
+    <pre><span class="keyword">const</span> express    = <span class="func">require</span>(<span class="string">'express'</span>);
+<span class="keyword">const</span> oracledb   = <span class="func">require</span>(<span class="string">'oracledb'</span>);
+<span class="keyword">const</span> bodyParser = <span class="func">require</span>(<span class="string">'body-parser'</span>);
+<span class="keyword">const</span> config     = <span class="func">require</span>(<span class="string">'./db'</span>);
+
+<span class="keyword">const</span> app = <span class="func">express</span>();
+app.<span class="func">use</span>(bodyParser.<span class="func">urlencoded</span>({ extended: <span class="keyword">true</span> }));
+app.<span class="func">use</span>(bodyParser.<span class="func">json</span>());
+
+<span class="comment">// Ruta de login</span>
+app.<span class="func">post</span>(<span class="string">'/login'</span>, <span class="keyword">async</span> (req, res) =&gt; {
+  <span class="keyword">const</span> { usuario, clave } = req.body;
+
+  <span class="keyword">try</span> {
+    <span class="keyword">const</span> connection = <span class="keyword">await</span> oracledb.<span class="func">getConnection</span>(config);
+
+    <span class="keyword">const</span> result = <span class="keyword">await</span> connection.<span class="func">execute</span>(
+      <span class="string">`SELECT * FROM usuario WHERE nombre = :usuario AND clave = :clave`</span>,
+      [usuario, clave]
+    );
+
+    <span class="keyword">await</span> connection.<span class="func">close</span>();
+
+    <span class="keyword">if</span> (result.rows.length &gt; <span class="string">0</span>) {
+      res.<span class="func">send</span>(<span class="string">"Login exitoso. Bienvenido "</span> + usuario);
+    } <span class="keyword">else</span> {
+      res.<span class="func">status</span>(<span class="string">401</span>).<span class="func">send</span>(<span class="string">"Usuario o contraseña incorrectos"</span>);
+    }
+
+  } <span class="keyword">catch</span> (err) {
+    console.<span class="func">error</span>(err);
+    res.<span class="func">status</span>(<span class="string">500</span>).<span class="func">send</span>(<span class="string">"Error en el servidor"</span>);
+  }
+});
+
+app.<span class="func">listen</span>(<span class="string">3000</span>, () =&gt; {
+  console.<span class="func">log</span>(<span class="string">"Servidor corriendo en http://localhost:3000"</span>);
+});</pre>
+  </div>
+
+  <!-- Paso 4 -->
+  <div class="step">
+    <h2>Paso 4 — Crear el formulario HTML</h2>
+    <p>En tu carpeta <strong>public/index.html</strong>:</p>
+    <span class="lang-label">HTML — public/index.html</span>
+    <pre><span class="keyword">&lt;!DOCTYPE html&gt;</span>
+<span class="keyword">&lt;html&gt;</span>
+<span class="keyword">&lt;head&gt;</span>
+  <span class="keyword">&lt;title&gt;</span>Login<span class="keyword">&lt;/title&gt;</span>
+<span class="keyword">&lt;/head&gt;</span>
+<span class="keyword">&lt;body&gt;</span>
+  <span class="keyword">&lt;form</span> action=<span class="string">"/login"</span> method=<span class="string">"POST"</span><span class="keyword">&gt;</span>
+    <span class="keyword">&lt;label&gt;</span>Usuario:<span class="keyword">&lt;/label&gt;</span>
+    <span class="keyword">&lt;input</span> type=<span class="string">"text"</span> name=<span class="string">"usuario"</span> required<span class="keyword">&gt;</span>
+    <span class="keyword">&lt;br&gt;</span>
+    <span class="keyword">&lt;label&gt;</span>Contraseña:<span class="keyword">&lt;/label&gt;</span>
+    <span class="keyword">&lt;input</span> type=<span class="string">"password"</span> name=<span class="string">"clave"</span> required<span class="keyword">&gt;</span>
+    <span class="keyword">&lt;br&gt;</span>
+    <span class="keyword">&lt;button</span> type=<span class="string">"submit"</span><span class="keyword">&gt;</span>Ingresar<span class="keyword">&lt;/button&gt;</span>
+  <span class="keyword">&lt;/form&gt;</span>
+<span class="keyword">&lt;/body&gt;</span>
+<span class="keyword">&lt;/html&gt;</span></pre>
+  </div>
+
+  <!-- Paso 5 -->
+  <div class="step">
+    <h2>Paso 5 — Probar el login</h2>
+    <p>Ejecutá el servidor:</p>
+    <span class="lang-label">PowerShell</span>
+    <pre>node server.js</pre>
+    <p>Abrí en el navegador:</p>
+    <div class="url">http://localhost:3000/index.html</div>
+  </div>
+
+  <!-- Paso 6 — Inicializar proyecto -->
+  <div class="step">
+    <h2>Paso 6 — Inicializar el proyecto Node (carpeta js)</h2>
+    <p>Conectar Node a Oracle. En la carpeta <strong>js</strong>, ejecutá:</p>
+    <span class="lang-label">PowerShell</span>
+    <pre>npm init -y
+npm install express oracledb body-parser</pre>
+    <p>Verificá que se instalaron. En la carpeta del proyecto deberías ver:</p>
+    <div class="file-tree">/node_modules
+package.json
+package-lock.json
+server.js
+db.js</div>
+  </div>
+
+</div>
+</body>
+</html>

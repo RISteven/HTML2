@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Listado de Usuarios — Sistema de Gestión</title>
+
+  <style>
+    /* ── PALETA COLUMBIA ── */
+    :root {
+      --color-primario:        #0b6967;
+      --color-primario-oscuro: #094f4d;
+      --color-primario-claro:  #0e8a87;
+      --color-acento:          #c47a28;
+      --color-fondo:           #f2f8f8;
+      --color-superficie:      #ffffff;
+      --color-texto:           #172828;
+      --color-texto-medio:     #3d5e5e;
+      --color-borde:           #bdd8d8;
+      --color-error:           #842029;
+      --color-fondo-error:     #f8d7da;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background:  var(--color-fondo);
+      color:       var(--color-texto);
+      min-height:  100vh;
+    }
+
+    /* ── HEADER ── */
+    .encabezado-pagina {
+      background: linear-gradient(135deg,
+        var(--color-primario-oscuro) 0%,
+        var(--color-primario) 100%);
+      color:   #fff;
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 3px 10px rgba(9,79,77,0.3);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .encabezado-pagina h1 { font-size: 1.1rem; font-weight: 700; }
+    .encabezado-pagina p  { font-size: 0.75rem; opacity: 0.75; margin-top: 2px; }
+
+    /* ── BOTONES DEL HEADER ── */
+    .botones-header {
+      display: flex;
+      gap:     8px;
+    }
+    .boton-accion {
+      padding:       7px 16px;
+      border-radius: 8px;
+      font-size:     0.82rem;
+      font-weight:   600;
+      cursor:        pointer;
+      border:        none;
+      transition:    background 0.2s;
+    }
+    .boton-recargar {
+      background: rgba(255,255,255,0.15);
+      color:      #fff;
+      border:     1px solid rgba(255,255,255,0.4);
+    }
+    .boton-recargar:hover { background: rgba(255,255,255,0.25); }
+    .boton-volver {
+      background: var(--color-acento);
+      color:      #fff;
+    }
+    .boton-volver:hover { background: #a86622; }
+
+    /* ── CONTENEDOR ── */
+    .contenedor-principal {
+      max-width: 1000px;
+      margin:    0 auto;
+      padding:   28px 20px;
+    }
+
+    /* ── BARRA DE RESUMEN ── */
+    .barra-resumen {
+      display:       flex;
+      align-items:   center;
+      gap:           12px;
+      margin-bottom: 16px;
+      font-size:     0.88rem;
+      color:         var(--color-texto-medio);
+    }
+    .contador-total {
+      background:    var(--color-primario);
+      color:         #fff;
+      padding:       3px 12px;
+      border-radius: 20px;
+      font-weight:   700;
+      font-size:     0.82rem;
+    }
+
+    /* ── TARJETA DE LA TABLA ── */
+    .tarjeta-tabla {
+      background:    var(--color-superficie);
+      border-radius: 12px;
+      border:        1px solid var(--color-borde);
+      box-shadow:    0 2px 12px rgba(11,105,103,0.07);
+      overflow:      hidden;  /* Los bordes redondeados cortan la tabla */
+    }
+
+    /* ── TABLA ── */
+    .tabla-usuarios {
+      width:           100%;
+      border-collapse: collapse;  /* Elimina el espacio entre bordes de celdas */
+    }
+
+    /* ── ENCABEZADO DE LA TABLA ── */
+    .tabla-usuarios thead th {
+      background:   var(--color-primario);
+      color:        #fff;
+      padding:      10px 16px;
+      text-align:   left;
+      font-size:    0.78rem;
+      font-weight:  700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    /* ── CELDAS DE DATOS ── */
+    .tabla-usuarios tbody td {
+      padding:      10px 16px;
+      border-bottom: 1px solid var(--color-borde);
+      font-size:    0.88rem;
+      color:        var(--color-texto-medio);
+      vertical-align: middle;
+    }
+    .tabla-usuarios tbody tr:last-child td { border-bottom: none; }
+
+    /* ── FILA HOVER ── */
+    /* Al pasar el mouse sobre una fila, cambia el fondo suavemente */
+    .tabla-usuarios tbody tr:hover td {
+      background: rgba(11,105,103,0.04);
+    }
+
+    /* ── FILAS ALTERNADAS ── */
+    .tabla-usuarios tbody tr:nth-child(even) td { background: #f5fbfb; }
+    .tabla-usuarios tbody tr:nth-child(even):hover td { background: rgba(11,105,103,0.06); }
+
+    /* ── BADGE DE ESTADO ── */
+    .badge-estado {
+      padding:       3px 10px;
+      border-radius: 20px;
+      font-size:     0.75rem;
+      font-weight:   700;
+      display:       inline-block;
+    }
+    .badge-activo   { background: rgba(11,105,103,0.12); color: var(--color-primario-oscuro); }
+    .badge-inactivo { background: var(--color-fondo-error); color: var(--color-error); }
+
+    /* ── MENSAJE DE ERROR O VACÍO ── */
+    .mensaje-estado {
+      padding:    24px;
+      text-align: center;
+      font-size:  0.9rem;
+      color:      var(--color-texto-medio);
+    }
+    .mensaje-estado.error { color: var(--color-error); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 680px) {
+      .tabla-usuarios thead th:nth-child(4),
+      .tabla-usuarios tbody td:nth-child(4) { display: none; } /* Ocultar Email en móvil */
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── HEADER ── -->
+  <div class="encabezado-pagina">
+    <div>
+      <h1>Listado de Usuarios</h1>
+      <p>Datos consultados en tiempo real desde Oracle XE · XEPDB1</p>
+    </div>
+    <div class="botones-header">
+      <button class="boton-accion boton-recargar" onclick="cargarListaDeUsuarios()">↻ Recargar</button>
+      <button class="boton-accion boton-volver"   onclick="window.location.href='menu.html'">← Menú</button>
+    </div>
+  </div>
+
+  <!-- ── CONTENEDOR PRINCIPAL ── -->
+  <div class="contenedor-principal">
+
+    <!-- Barra de resumen con contador -->
+    <div class="barra-resumen">
+      <span>Total de usuarios:</span>
+      <span class="contador-total" id="contadorTotal">—</span>
+    </div>
+
+    <!-- Tarjeta que contiene la tabla -->
+    <div class="tarjeta-tabla">
+      <table class="tabla-usuarios">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Email</th>
+            <th>Fecha Registro</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <!-- tbody vacío — JavaScript lo llena dinámicamente al cargar la página -->
+        <tbody id="cuerpoDeTabla"></tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       JAVASCRIPT — LÓGICA DE LISTADO DE USUARIOS
+  ══════════════════════════════════════════════════════════ -->
+  <script>
+    // ── REFERENCIA AL CUERPO DE LA TABLA ─────────────────────
+    const cuerpoDeTabla  = document.getElementById('cuerpoDeTabla');
+    const contadorTotal  = document.getElementById('contadorTotal');
+
+    // ── FUNCIÓN: Formatear fecha ISO a dd/mm/aaaa ─────────────
+    // Oracle devuelve fechas en formato ISO: "2024-03-15T00:00:00.000Z"
+    // Esta función la convierte a "15/03/2024", más legible para el usuario.
+    function formatearFechaADDMMAAAA(fechaISO) {
+      if (!fechaISO) return '—'; // Si no hay fecha, mostramos un guión
+
+      const fecha = new Date(fechaISO);
+      const dia   = String(fecha.getDate()).padStart(2, '0');  // padStart → asegura 2 dígitos
+      const mes   = String(fecha.getMonth() + 1).padStart(2, '0'); // getMonth() empieza en 0
+      const anio  = fecha.getFullYear();
+
+      return `${dia}/${mes}/${anio}`;
+    }
+
+    // ── FUNCIÓN: Crear badge visual según estado ──────────────
+    // Devuelve HTML con el badge coloreado según si el usuario está activo o no.
+    function crearBadgeDeEstado(estadoEnBD) {
+      // El estado puede venir como 'A' (Activo) o 'I' (Inactivo) desde Oracle.
+      const esActivo = (estadoEnBD === 'A' || estadoEnBD === '1' || estadoEnBD === 1);
+
+      if (esActivo) {
+        return '<span class="badge-estado badge-activo">Activo</span>';
+      } else {
+        return '<span class="badge-estado badge-inactivo">Inactivo</span>';
+      }
+    }
+
+    // ── FUNCIÓN: Construir una fila HTML para un usuario ──────
+    // Recibe un objeto usuario (del formato Oracle) y devuelve una fila <tr> completa.
+    // Oracle devuelve los nombres de columna en MAYÚSCULAS: NOMBRE, APELLIDO, etc.
+    function construirFilaDeLaTabla(usuario) {
+      const nuevaFila = document.createElement('tr');
+
+      nuevaFila.innerHTML = `
+        <td>${usuario.ID_USUARIO}</td>
+        <td><strong>${usuario.NOMBRE}</strong></td>
+        <td>${usuario.APELLIDO}</td>
+        <td>${usuario.EMAIL}</td>
+        <td>${formatearFechaADDMMAAAA(usuario.FECHA_CREACION)}</td>
+        <td>${crearBadgeDeEstado(usuario.ESTADO)}</td>
+      `;
+
+      return nuevaFila;
+    }
+
+    // ── FUNCIÓN PRINCIPAL: Cargar y mostrar lista de usuarios ──
+    // Se llama al cargar la página y también cuando el usuario hace clic en "Recargar".
+    async function cargarListaDeUsuarios() {
+
+      // Limpiamos la tabla antes de cargar los datos nuevos.
+      cuerpoDeTabla.innerHTML = '<tr><td colspan="6" class="mensaje-estado">Cargando datos...</td></tr>';
+      contadorTotal.textContent = '…';
+
+      try {
+        // PASO 1: Pedimos la lista de usuarios al servidor con GET.
+        // GET → solo pedimos datos, no enviamos ningún body.
+        const respuestaDelServidor = await fetch('/api/usuarios');
+
+        // PASO 2: Convertimos la respuesta JSON a objeto JavaScript.
+        const datosRecibidos = await respuestaDelServidor.json();
+
+        // PASO 3: Verificamos si el servidor reportó un error.
+        if (!datosRecibidos.exito) {
+          cuerpoDeTabla.innerHTML = `<tr><td colspan="6" class="mensaje-estado error">${datosRecibidos.mensaje}</td></tr>`;
+          return;
+        }
+
+        // PASO 4: Obtenemos el arreglo de usuarios.
+        const listaDeUsuarios = datosRecibidos.usuarios;
+
+        // PASO 5: Actualizamos el contador total.
+        contadorTotal.textContent = listaDeUsuarios.length + ' usuarios';
+
+        // PASO 6: Si no hay usuarios, mostramos un mensaje.
+        if (listaDeUsuarios.length === 0) {
+          cuerpoDeTabla.innerHTML = '<tr><td colspan="6" class="mensaje-estado">No hay usuarios registrados en el sistema.</td></tr>';
+          return;
+        }
+
+        // PASO 7: Vaciamos la tabla y construimos una fila por cada usuario.
+        cuerpoDeTabla.innerHTML = ''; // Limpiamos el "Cargando..."
+
+        listaDeUsuarios.forEach(function(usuario) {
+          const fila = construirFilaDeLaTabla(usuario);
+          cuerpoDeTabla.appendChild(fila); // Agregamos la fila al DOM
+        });
+
+      } catch (errorDeRed) {
+        cuerpoDeTabla.innerHTML = '<tr><td colspan="6" class="mensaje-estado error">No se pudo conectar con el servidor. ¿Está corriendo Node.js?</td></tr>';
+        console.error('[LISTAR] Error de red:', errorDeRed.message);
+      }
+    }
+
+    // ── INICIO: Cargamos la lista al abrir la página ──────────
+    // DOMContentLoaded se dispara cuando el HTML terminó de parsear (antes de imágenes/CSS externos).
+    document.addEventListener('DOMContentLoaded', cargarListaDeUsuarios);
+  </script>
+
+</body>
+</html>

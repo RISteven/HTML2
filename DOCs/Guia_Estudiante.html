@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guía del Estudiante — Node.js + Oracle XE</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      /* Colores institucionales principales */
+      --color-primario:         #0b6967;  /* Teal principal — identidad Columbia */
+      --color-primario-oscuro:  #094f4d;  /* Para headers y footers */
+      --color-primario-claro:   #0e8a87;  /* Para degradados y acentos secundarios */
+      --color-acento:           #c47a28;  /* Ámbar — color complementario */
+      --color-acento-claro:     #e8a84e;  /* Ámbar suave para fondos de acento */
+
+      /* Fondos de página y superficie */
+      --color-fondo:            #f2f8f8;  /* Fondo general de la página */
+      --color-superficie:       #ffffff;  /* Tarjetas y paneles blancos */
+
+      /* Bloques de código */
+      --color-codigo-fondo:     #0a2424;  /* Fondo oscuro para <pre> y bloques de código */
+      --color-codigo-resalte:   #133535;  /* Resalte dentro del código */
+
+      /* Texto en distintos niveles de jerarquía */
+      --color-texto:            #172828;  /* Texto principal */
+      --color-texto-medio:      #3d5e5e;  /* Párrafos y descripciones */
+      --color-texto-suave:      #6e8f8f;  /* Texto secundario / metadatos */
+      --color-borde:            #bdd8d8;  /* Bordes y separadores */
+
+      /* Estados de interfaz */
+      --color-exito:            #1a6b3c;  /* Verde para éxito / check */
+      --color-fondo-exito:      #d4ede0;  /* Fondo verde suave */
+      --color-error:            #842029;  /* Rojo para errores */
+      --color-fondo-error:      #f8d7da;  /* Fondo rojo suave */
+      --color-advertencia:      #664d03;  /* Amarillo-café para advertencias */
+      --color-fondo-advertencia:#fff3cd;  /* Fondo amarillo suave */
+    }
+
+    /* ── Base del documento ── */
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--color-fondo);
+      color: var(--color-texto);
+      padding: 0 0 60px;
+    }
+
+    /* ══ BANNER INSTITUCIONAL ══
+       Header tipo universidad con degradado teal Columbia */
+    .site-header {
+      background: linear-gradient(135deg, var(--color-primario-oscuro) 0%, var(--color-primario) 60%, var(--color-primario-claro) 100%);
+      color: #fff;
+      padding: 28px 20px 24px;
+      text-align: center;
+      margin-bottom: 0;
+      box-shadow: 0 4px 12px rgba(9, 79, 77, 0.35);
+    }
+    .site-header .institución {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0.85;
+      margin-bottom: 6px;
+    }
+    .site-header h1 {
+      font-size: 1.55rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+      letter-spacing: 0.2px;
+    }
+    .site-header p {
+      font-size: 0.9rem;
+      opacity: 0.85;
+    }
+
+    /* ── LAYOUT — contenedor centrado ── */
+    .container { max-width: 860px; margin: 0 auto; padding: 30px 16px 0; }
+
+    /* ── TARJETA DE SECCIÓN ── */
+    .card {
+      background: var(--color-superficie);
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.08);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    /* Cabecera de cada tarjeta — siempre texto blanco sobre fondo de color */
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px;
+      font-weight: 700;
+      font-size: 1rem;
+      color: #fff;
+    }
+
+    /* Número o letra de sección dentro del header */
+    .card-header .num {
+      background: rgba(255,255,255,.28);
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; font-weight: 800; flex-shrink: 0;
+    }
+    .card-body { padding: 18px 20px; }
+
+    /* ── VARIANTES DE COLOR PARA CABECERAS ──
+       Usando la paleta Columbia en lugar de colores Bootstrap genéricos */
+    .bg-primario        { background: var(--color-primario); }         /* Teal principal */
+    .bg-primario-oscuro { background: var(--color-primario-oscuro); }  /* Teal oscuro — para secciones clave */
+    .bg-primario-claro  { background: var(--color-primario-claro); }   /* Teal claro */
+    .bg-acento          { background: var(--color-acento); }           /* Ámbar — Oracle / configuración */
+    .bg-acento-claro    { background: var(--color-acento-claro); color: var(--color-primario-oscuro) !important; } /* Ámbar suave */
+    .bg-error           { background: var(--color-error); }            /* Rojo — errores */
+    .bg-exito           { background: var(--color-exito); }            /* Verde — éxito / checklist */
+    .bg-texto-suave     { background: var(--color-texto-suave); }      /* Gris-teal — secciones neutras */
+
+    /* ── DIAGRAMA DE ARQUITECTURA ── */
+    .arch {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+      margin: 10px 0 16px;
+    }
+    .arch-box {
+      text-align: center;
+      border-radius: 10px;
+      padding: 14px 18px;
+      min-width: 140px;
+    }
+    .arch-box .icon  { font-size: 2rem; margin-bottom: 4px; }
+    .arch-box .label { font-weight: 700; font-size: 0.9rem; }
+    .arch-box .sub   { font-size: 0.75rem; color: var(--color-texto-suave); margin-top: 3px; }
+
+    /* Conectores de flecha entre cajas del diagrama */
+    .arch-arrow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 0.7rem;
+      color: var(--color-texto-suave);
+      padding: 0 6px;
+      gap: 2px;
+    }
+    .arch-arrow .line {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      font-size: 0.72rem;
+    }
+    .arch-arrow .dash {
+      width: 40px;
+      height: 2px;
+      background: var(--color-borde);
+      position: relative;
+    }
+    .arch-arrow .dash.right::after {
+      content: '';
+      position: absolute;
+      right: -1px; top: -4px;
+      border-left: 8px solid var(--color-borde);
+      border-top: 5px solid transparent;
+      border-bottom: 5px solid transparent;
+    }
+    .arch-arrow .dash.left::before {
+      content: '';
+      position: absolute;
+      left: -1px; top: -4px;
+      border-right: 8px solid var(--color-borde);
+      border-top: 5px solid transparent;
+      border-bottom: 5px solid transparent;
+    }
+
+    /* Cajas del diagrama — teal y ámbar en lugar de azul/verde/amarillo genérico */
+    .box-browser { background: #d6eeed; border: 2px solid var(--color-primario-claro); }
+    .box-node    { background: #d4ede0; border: 2px solid #6ab89a; }
+    .box-oracle  { background: #fdefd8; border: 2px solid var(--color-acento-claro); }
+
+    /* Pasos numerados dentro del diagrama de flujo */
+    .flow-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 12px;
+    }
+    .flow-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.85rem;
+      color: var(--color-texto-medio);
+    }
+    .flow-step .step-n {
+      background: var(--color-primario);
+      color: #fff;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.72rem; font-weight: 700; flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ── ÁRBOL DE CARPETAS (monospace) ── */
+    .tree {
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 0.85rem;
+      line-height: 1.9;
+      background: var(--color-fondo);
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+    .tree .folder { color: var(--color-primario); font-weight: 700; }  /* Nombres de carpeta en teal */
+    .tree .file   { color: var(--color-texto); }
+    .tree .desc   { color: var(--color-texto-suave); font-size: 0.78rem; }
+    .tree .indent { color: var(--color-borde); }
+
+    /* ── GRILLA DE TARJETAS DE CARPETA ──
+       Muestra js/, routes/, public/, etc. con colores teal y ámbar */
+    .folder-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 4px;
+    }
+    .folder-card {
+      border-radius: 8px;
+      padding: 12px 14px;
+      border-left: 4px solid;
+    }
+    .folder-card .fc-name {
+      font-family: monospace;
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+    }
+    .folder-card .fc-desc { font-size: 0.8rem; color: var(--color-texto-medio); }
+
+    /* Cada carpeta con variaciones de teal y ámbar Columbia */
+    .fc-js     { background: #d6eeed; border-color: var(--color-primario); }          /* js/ — teal principal */
+    .fc-routes { background: #c8e8e7; border-color: var(--color-primario-claro); }    /* routes/ — teal claro */
+    .fc-public { background: #fdefd8; border-color: var(--color-acento); }            /* public/ — ámbar */
+    .fc-docs   { background: #fde8d8; border-color: #c46428; }                        /* DOCs/ — ámbar oscuro */
+    .fc-img    { background: #e3f0ef; border-color: var(--color-primario-oscuro); }   /* img/ — teal oscuro */
+    .fc-nm     { background: #edf4f4; border-color: var(--color-borde); }             /* node_modules/ — neutro */
+
+    /* ── PASOS NUMERADOS (instalación) ── */
+    .steps { display: flex; flex-direction: column; gap: 10px; }
+    .step {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .step-badge {
+      background: var(--color-primario);
+      color: #fff;
+      min-width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.82rem; flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .step-content { flex: 1; }
+    .step-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; color: var(--color-texto); }
+    .step-detail { font-size: 0.83rem; color: var(--color-texto-medio); line-height: 1.5; }
+
+    /* Caja de advertencia / nota informativa */
+    .note {
+      background: var(--color-fondo-advertencia);
+      border-left: 4px solid var(--color-acento);
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 0.82rem;
+      color: var(--color-advertencia);
+      margin-top: 10px;
+    }
+    .note strong { color: #533c00; }
+
+    /* ── CÓDIGO EN LÍNEA ── */
+    code {
+      background: #e3eded;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-family: 'Consolas', monospace;
+      font-size: 0.83rem;
+      color: var(--color-primario-oscuro);
+    }
+
+    /* Bloque de código multilinea — fondo oscuro institucional */
+    pre {
+      background: var(--color-codigo-fondo);
+      color: #cdd6f4;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-family: 'Consolas', monospace;
+      font-size: 0.82rem;
+      overflow-x: auto;
+      line-height: 1.6;
+      margin: 8px 0;
+    }
+    /* Resaltado de sintaxis dentro de <pre> */
+    pre .kw  { color: #cba6f7; }   /* palabras clave JS/SQL */
+    pre .str { color: #a6e3a1; }   /* strings */
+    pre .cm  { color: #6c7086; font-style: italic; }  /* comentarios */
+    pre .fn  { color: #89b4fa; }   /* funciones */
+
+    /* ── TABLA DE RUTAS HTTP ── */
+    .routes-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    .routes-table th {
+      background: var(--color-primario-oscuro);
+      color: #fff;
+      padding: 9px 12px;
+      text-align: left;
+      font-size: 0.8rem;
+      letter-spacing: 0.3px;
+    }
+    .routes-table td {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--color-borde);
+      vertical-align: middle;
+    }
+    .routes-table tr:last-child td { border-bottom: none; }
+    .routes-table tr:nth-child(even) td { background: var(--color-fondo); }
+
+    /* Badges de método HTTP — colores semánticos Columbia */
+    .method {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 0.75rem;
+      font-family: monospace;
+    }
+    .m-get    { background: #d6eeed; color: var(--color-primario-oscuro); }   /* GET → teal */
+    .m-post   { background: #fdefd8; color: #7a4a10; }                        /* POST → ámbar */
+    .m-put    { background: #c8e8e7; color: var(--color-primario-oscuro); }   /* PUT → teal claro */
+    .m-delete { background: var(--color-fondo-error); color: var(--color-error); } /* DELETE → rojo suave */
+
+    /* ── TARJETAS DE PAQUETES NPM ── */
+    .pkg-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 10px;
+      margin-top: 6px;
+    }
+    .pkg-card {
+      border-radius: 8px;
+      padding: 12px 14px;
+      border: 1px solid;
+    }
+    .pkg-name { font-weight: 700; font-family: monospace; font-size: 0.9rem; margin-bottom: 4px; color: var(--color-texto); }
+    .pkg-desc { font-size: 0.78rem; color: var(--color-texto-medio); }
+    .pkg-express { background: #d6eeed; border-color: var(--color-primario); }         /* express → teal */
+    .pkg-bp      { background: #c8e8e7; border-color: var(--color-primario-claro); }   /* body-parser → teal claro */
+    .pkg-oracle  { background: #fdefd8; border-color: var(--color-acento-claro); }     /* oracledb → ámbar */
+
+    /* ── LISTA DE ERRORES FRECUENTES ── */
+    .error-list { display: flex; flex-direction: column; gap: 10px; }
+    .error-item {
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #f5c2c7;
+    }
+    .error-head {
+      background: var(--color-fondo-error);
+      padding: 8px 12px;
+      font-family: monospace;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--color-error);
+    }
+    .error-body {
+      background: #fff;
+      padding: 9px 12px;
+      font-size: 0.82rem;
+      display: flex;
+      gap: 20px;
+    }
+    .error-body span { flex: 1; color: var(--color-texto-medio); }
+    .error-body span strong { color: var(--color-texto); display: block; margin-bottom: 2px; }
+
+    /* ── CHECKLIST DE VERIFICACIÓN FINAL ── */
+    .checklist { display: flex; flex-direction: column; gap: 8px; }
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 9px 12px;
+      background: var(--color-fondo);
+      border-radius: 8px;
+      border-left: 4px solid var(--color-exito);
+      font-size: 0.86rem;
+      color: var(--color-texto);
+    }
+    .check-box {
+      width: 20px; height: 20px;
+      border: 2px solid var(--color-exito);
+      border-radius: 4px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ── ETIQUETA DE SECCIÓN DIVISORA ── */
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--color-texto-suave);
+      margin: 28px 0 10px;
+    }
+
+    @media (max-width: 580px) {
+      .arch { flex-direction: column; }
+      .arch-arrow { flex-direction: row; transform: rotate(90deg); }
+      .error-body { flex-direction: column; gap: 6px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ BANNER INSTITUCIONAL ══ -->
+<header class="site-header">
+  <div class="institución">Universidad Columbia del Paraguay — Programación 2</div>
+  <h1>Guía del Estudiante — Aplicación Web con Node.js y Oracle XE 21c</h1>
+  <p>Para estudiantes que inician en programación web</p>
+</header>
+
+<div class="container">
+
+  <!-- ── ARQUITECTURA ── -->
+  <p class="section-label">Conceptos base</p>
+
+  <div class="card">
+    <div class="card-header bg-primario-oscuro">
+      <div class="num">A</div>
+      Arquitectura de la Aplicación
+    </div>
+    <div class="card-body">
+      <div class="arch">
+        <div class="arch-box box-browser">
+          <div class="icon">🌐</div>
+          <div class="label">Navegador</div>
+          <div class="sub">HTML + JavaScript</div>
+          <div class="sub" style="margin-top:4px">fetch()</div>
+        </div>
+        <div class="arch-arrow">
+          <div class="line"><div class="dash right"></div> <span>JSON ←</span></div>
+          <div class="line"><span>→ fetch()</span><div class="dash right"></div></div>
+        </div>
+        <div class="arch-box box-node">
+          <div class="icon">⚙️</div>
+          <div class="label">Node.js / Express</div>
+          <div class="sub">server.js</div>
+          <div class="sub">routes/</div>
+        </div>
+        <div class="arch-arrow">
+          <div class="line"><div class="dash right"></div> <span>datos ←</span></div>
+          <div class="line"><span>→ SQL</span><div class="dash right"></div></div>
+        </div>
+        <div class="arch-box box-oracle">
+          <div class="icon">🗄️</div>
+          <div class="label">Oracle XE 21c</div>
+          <div class="sub">XEPDB1</div>
+          <div class="sub">tabla usuarios</div>
+        </div>
+      </div>
+
+      <div class="flow-steps">
+        <div class="flow-step"><span class="step-n">1</span><span>El usuario llena un formulario y hace clic en un botón.</span></div>
+        <div class="flow-step"><span class="step-n">2</span><span>JavaScript usa <code>fetch()</code> para enviar los datos al servidor Node.</span></div>
+        <div class="flow-step"><span class="step-n">3</span><span>Node recibe la petición, arma la consulta SQL y la envía a Oracle.</span></div>
+        <div class="flow-step"><span class="step-n">4</span><span>Oracle ejecuta el SQL y devuelve el resultado a Node.</span></div>
+        <div class="flow-step"><span class="step-n">5</span><span>Node convierte el resultado a JSON y lo envía al navegador.</span></div>
+        <div class="flow-step"><span class="step-n">6</span><span>JavaScript muestra el resultado en la página (mensaje o tabla).</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROLES -->
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px;">
+
+    <div class="card" style="margin-bottom:0">
+      <div class="card-header bg-primario">
+        <div class="num">N</div>
+        ¿Qué es Node.js?
+      </div>
+      <div class="card-body">
+        <p style="font-size:.85rem;color:var(--color-texto-medio);margin-bottom:10px">Entorno que permite ejecutar JavaScript fuera del navegador, en el servidor. Cumple el rol de <strong>SERVIDOR</strong>.</p>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div style="font-size:.82rem;display:flex;gap:6px"><span style="color:var(--color-exito);font-weight:700">✔</span> Usa JavaScript, el mismo lenguaje del navegador.</div>
+          <div style="font-size:.82rem;display:flex;gap:6px"><span style="color:var(--color-exito);font-weight:700">✔</span> Liviano y rápido para muchas peticiones.</div>
+          <div style="font-size:.82rem;display:flex;gap:6px"><span style="color:var(--color-exito);font-weight:700">✔</span> Ecosistema enorme de librerías (npm).</div>
+          <div style="font-size:.82rem;display:flex;gap:6px"><span style="color:var(--color-exito);font-weight:700">✔</span> Express crea un servidor con pocas líneas.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:0">
+      <div class="card-header bg-acento">
+        <div class="num">O</div>
+        ¿Qué es Oracle XE?
+      </div>
+      <div class="card-body">
+        <p style="font-size:.85rem;color:var(--color-texto-medio);margin-bottom:10px">Versión gratuita de Oracle Database. Motor relacional que cumple el rol de <strong>ALMACÉN DE DATOS</strong>.</p>
+        <div style="font-size:.82rem;background:var(--color-fondo-advertencia);border-radius:6px;padding:10px 12px;color:var(--color-advertencia)">
+          <strong>XEPDB1</strong> es el nombre de la base de datos (PDB = Pluggable DataBase) que viene creada por defecto en Oracle XE 21c.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ── ESTRUCTURA DE CARPETAS ── -->
+  <p class="section-label">Estructura del proyecto</p>
+
+  <div class="card">
+    <div class="card-header bg-primario-claro">
+      <div class="num">📁</div>
+      Estructura de Carpetas
+    </div>
+    <div class="card-body">
+
+      <div class="folder-grid" style="margin-bottom:18px">
+        <div class="folder-card fc-js">
+          <div class="fc-name">js/</div>
+          <div class="fc-desc">Código del servidor y configuración de conexión a Oracle.</div>
+        </div>
+        <div class="folder-card fc-routes">
+          <div class="fc-name">routes/</div>
+          <div class="fc-desc">Define las rutas del backend (login y CRUD).</div>
+        </div>
+        <div class="folder-card fc-public">
+          <div class="fc-name">public/</div>
+          <div class="fc-desc">Archivos que el navegador puede ver (HTML, CSS, JS).</div>
+        </div>
+        <div class="folder-card fc-docs">
+          <div class="fc-name">DOCs/</div>
+          <div class="fc-desc">Scripts SQL y documentación del curso.</div>
+        </div>
+        <div class="folder-card fc-img">
+          <div class="fc-name">img/</div>
+          <div class="fc-desc">Imágenes del sitio o del proyecto.</div>
+        </div>
+        <div class="folder-card fc-nm">
+          <div class="fc-name">node_modules/</div>
+          <div class="fc-desc">Librerías instaladas por npm. No se edita ni se sube a GitHub.</div>
+        </div>
+      </div>
+
+      <div class="tree">
+<span class="folder">miapp\</span><br>
+│<br>
+├── <span class="folder">js\</span>                     <span class="desc">← Código del servidor (Node.js)</span><br>
+│   ├── <span class="file">server.js</span>             <span class="desc">← Punto de entrada: arranca el servidor</span><br>
+│   ├── <span class="file">db.js</span>                 <span class="desc">← Configuración de conexión a Oracle</span><br>
+│   ├── <span class="file">package.json</span>          <span class="desc">← Info del proyecto y dependencias</span><br>
+│   └── <span class="folder">node_modules\</span>         <span class="desc">← Librerías instaladas (no tocar)</span><br>
+│<br>
+├── <span class="folder">routes\</span>                  <span class="desc">← Rutas HTTP</span><br>
+│   ├── <span class="file">login.js</span>              <span class="desc">← Ruta POST /api/login</span><br>
+│   └── <span class="file">usuarios.js</span>           <span class="desc">← Rutas GET/POST/PUT/DELETE /api/usuarios</span><br>
+│<br>
+├── <span class="folder">public\</span>                  <span class="desc">← Archivos HTML que ve el navegador</span><br>
+│   ├── <span class="file">login.html</span>            <span class="desc">← Pantalla de acceso</span><br>
+│   ├── <span class="file">menu.html</span>             <span class="desc">← Menú principal</span><br>
+│   ├── <span class="file">crear.html</span>            <span class="desc">← Formulario alta</span><br>
+│   ├── <span class="file">listar.html</span>           <span class="desc">← Tabla de usuarios</span><br>
+│   ├── <span class="file">actualizar.html</span>       <span class="desc">← Formulario modificar</span><br>
+│   └── <span class="file">eliminar.html</span>         <span class="desc">← Formulario eliminar</span><br>
+│<br>
+└── <span class="folder">css\</span>                     <span class="desc">← Estilos visuales</span><br>
+    └── <span class="file">styles.css</span>            <span class="desc">← Diseño de botones, tarjetas, colores</span>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── INSTALACIÓN ── -->
+  <p class="section-label">Instalación</p>
+
+  <div class="card">
+    <div class="card-header bg-acento">
+      <div class="num">4</div>
+      Instalación de Oracle XE 21c
+    </div>
+    <div class="card-body">
+      <div class="steps">
+        <div class="step">
+          <div class="step-badge">1</div>
+          <div class="step-content">
+            <div class="step-title">Descargar Oracle XE 21c</div>
+            <div class="step-detail">Ir a oracle.com/database/technologies/xe-downloads.html → descargar <strong>Oracle Database 21c Express Edition for Windows x64</strong> (≈1.5 GB, archivo <code>OracleXE213_Win64.zip</code>).</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-badge">2</div>
+          <div class="step-content">
+            <div class="step-title">Instalar</div>
+            <div class="step-detail">Descomprimir el ZIP → ejecutar <code>setup.exe</code> como Administrador → seguir el asistente → <strong>anotar la contraseña de SYS</strong>. Puede demorar 10-15 min.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-badge">3</div>
+          <div class="step-content">
+            <div class="step-title">Verificar que Oracle está corriendo</div>
+            <div class="step-detail">Inicio → Servicios → verificar que <code>OracleServiceXE</code> está en estado <strong>"En ejecución"</strong>. Si no, clic derecho → Iniciar.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-badge">4</div>
+          <div class="step-content">
+            <div class="step-title">Conectar con SQL Developer</div>
+            <div class="step-detail">
+              Usuario: <code>system</code> · Contraseña: la de la instalación · Host: <code>localhost</code> · Puerto: <code>1521</code> · SID: <code>XE</code> o Service Name: <code>XEPDB1</code>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header bg-primario">
+      <div class="num">5</div>
+      Instalación de Node.js
+    </div>
+    <div class="card-body">
+      <div class="steps">
+        <div class="step">
+          <div class="step-badge">1</div>
+          <div class="step-content">
+            <div class="step-title">Descargar</div>
+            <div class="step-detail">Ir a <code>nodejs.org</code> → descargar la versión <strong>LTS</strong> (Long Term Support). El instalador: <code>node-v##.##.#-x64.msi</code>.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-badge">2</div>
+          <div class="step-content">
+            <div class="step-title">Instalar</div>
+            <div class="step-detail">Ejecutar el <code>.msi</code> con todos los valores predeterminados. Asegurarse de que <strong>"Add to PATH"</strong> esté marcado (viene por defecto).</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-badge">3</div>
+          <div class="step-content">
+            <div class="step-title">Verificar</div>
+            <div class="step-detail">Abrir PowerShell o CMD:</div>
+          </div>
+        </div>
+      </div>
+      <pre><span class="fn">node</span> --version    <span class="cm"># debe mostrar: v20.11.0 (o similar)</span>
+<span class="fn">npm</span>  --version    <span class="cm"># debe mostrar: 10.2.4  (o similar)</span></pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header bg-primario-claro">
+      <div class="num">6</div>
+      Creación del Proyecto Node
+    </div>
+    <div class="card-body">
+      <div class="steps">
+        <div class="step">
+          <div class="step-badge">1</div>
+          <div class="step-content">
+            <div class="step-title">Crear la carpeta del proyecto</div>
+            <div class="step-detail">Por ejemplo: <code>C:\proyectos\miapp\</code></div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-badge">2</div>
+          <div class="step-content">
+            <div class="step-title">Crear la subcarpeta js\ dentro del proyecto</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-badge">3</div>
+          <div class="step-content">
+            <div class="step-title">Inicializar el proyecto Node</div>
+            <div class="step-detail">Abrir PowerShell, navegar a <code>js\</code> y ejecutar:</div>
+          </div>
+        </div>
+      </div>
+      <pre><span class="fn">cd</span> C:\proyectos\miapp\js
+<span class="fn">npm</span> init -y</pre>
+      <div class="note">El <code>-y</code> acepta todos los valores predeterminados y genera el archivo <strong>package.json</strong> automáticamente.</div>
+    </div>
+  </div>
+
+
+  <!-- ── DEPENDENCIAS ── -->
+  <p class="section-label">Configuración</p>
+
+  <div class="card">
+    <div class="card-header bg-primario">
+      <div class="num">7</div>
+      Instalación de Dependencias (paquetes)
+    </div>
+    <div class="card-body">
+      <pre><span class="fn">npm</span> install express body-parser oracledb</pre>
+      <div class="pkg-grid">
+        <div class="pkg-card pkg-express">
+          <div class="pkg-name">express</div>
+          <div class="pkg-desc">Framework para crear el servidor web y las rutas HTTP.</div>
+        </div>
+        <div class="pkg-card pkg-bp">
+          <div class="pkg-name">body-parser</div>
+          <div class="pkg-desc">Permite leer los datos que envían los formularios HTML.</div>
+        </div>
+        <div class="pkg-card pkg-oracle">
+          <div class="pkg-name">oracledb</div>
+          <div class="pkg-desc">Driver (conector) para comunicarse con Oracle Database.</div>
+        </div>
+      </div>
+      <div class="note" style="margin-top:12px"><strong>Nota:</strong> <code>node_modules\</code> puede tener cientos de MB. Nunca se copia ni se sube a GitHub. Solo se comparte el código fuente y se re-ejecuta <code>npm install</code>.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header bg-acento">
+      <div class="num">8</div>
+      Configuración de Conexión a Oracle (db.js)
+    </div>
+    <div class="card-body">
+      <pre><span class="kw">const</span> oracledb = <span class="fn">require</span>(<span class="str">'oracledb'</span>);
+
+<span class="kw">const</span> configuracion = {
+  user:          <span class="str">"prg2"</span>,             <span class="cm">// Usuario de Oracle</span>
+  password:      <span class="str">"curso2026"</span>,        <span class="cm">// Contraseña del usuario</span>
+  connectString: <span class="str">"localhost/XEPDB1"</span>  <span class="cm">// Host/Base de datos</span>
+};
+
+module.exports = configuracion;</pre>
+      <div style="margin-top:12px;font-size:.84rem;color:var(--color-texto-medio)">
+        <strong>connectString:</strong><br>
+        · <code>localhost</code> → la base de datos está en la misma computadora.<br>
+        · <code>XEPDB1</code> → nombre de la PDB de Oracle XE 21c.
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── TABLA USUARIOS ── -->
+  <div class="card">
+    <div class="card-header bg-texto-suave">
+      <div class="num">10</div>
+      Tabla de Usuarios en Oracle
+    </div>
+    <div class="card-body">
+      <pre><span class="kw">CREATE TABLE</span> usuarios (
+    id_usuario     NUMBER          <span class="kw">GENERATED ALWAYS AS IDENTITY PRIMARY KEY</span>,
+    nombre         VARCHAR2(100)   <span class="kw">NOT NULL</span>,
+    apellido       VARCHAR2(100)   <span class="kw">NOT NULL</span>,
+    email          VARCHAR2(150)   <span class="kw">NOT NULL</span>,
+    passw          VARCHAR2(100)   <span class="kw">NOT NULL</span>,
+    fecha_creacion DATE            <span class="kw">DEFAULT</span> SYSDATE,
+    estado         VARCHAR2(20)    <span class="kw">DEFAULT</span> <span class="str">'ACTIVO'</span>
+);</pre>
+      <div style="margin-top:12px">
+        <div style="font-size:.8rem;font-weight:700;color:var(--color-texto-suave);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Insertar usuario de prueba</div>
+        <pre><span class="kw">INSERT INTO</span> usuarios (nombre, apellido, email, passw)
+<span class="kw">VALUES</span> (<span class="str">'Richard'</span>, <span class="str">'Paredes'</span>, <span class="str">'richard@email.com'</span>, <span class="str">'1234'</span>);
+
+<span class="kw">COMMIT</span>;</pre>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── EJECUCIÓN ── -->
+  <div class="card">
+    <div class="card-header bg-primario-oscuro">
+      <div class="num">11</div>
+      Ejecución del Servidor
+    </div>
+    <div class="card-body">
+      <div class="steps">
+        <div class="step">
+          <div class="step-badge">1</div>
+          <div class="step-content"><div class="step-title">Verificar que Oracle XE está corriendo</div><div class="step-detail">Inicio → Servicios → <code>OracleServiceXE</code> en estado "En ejecución".</div></div>
+        </div>
+        <div class="step">
+          <div class="step-badge">2</div>
+          <div class="step-content"><div class="step-title">Navegar a la carpeta js del proyecto</div></div>
+        </div>
+        <div class="step">
+          <div class="step-badge">3</div>
+          <div class="step-content"><div class="step-title">Iniciar el servidor</div></div>
+        </div>
+      </div>
+      <pre><span class="fn">cd</span> C:\Información\proyectos\HTML2\js
+<span class="fn">node</span> server.js</pre>
+      <div class="note">El servidor queda activo mientras la terminal esté abierta. Para detenerlo: <strong>Ctrl + C</strong>. Acceder en: <code>http://localhost:3000/login.html</code></div>
+    </div>
+  </div>
+
+
+  <!-- ── RUTAS ── -->
+  <p class="section-label">Referencia rápida</p>
+
+  <div class="card">
+    <div class="card-header bg-primario-oscuro">
+      <div class="num">13</div>
+      Resumen de Rutas y Operaciones
+    </div>
+    <div class="card-body">
+      <table class="routes-table">
+        <thead>
+          <tr>
+            <th>Método</th>
+            <th>URL</th>
+            <th>Acción</th>
+            <th>Archivo origen</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="method m-post">POST</span></td>
+            <td><code>/api/login</code></td>
+            <td>Verificar acceso</td>
+            <td><code>login.html</code></td>
+          </tr>
+          <tr>
+            <td><span class="method m-get">GET</span></td>
+            <td><code>/api/usuarios</code></td>
+            <td>Listar usuarios</td>
+            <td><code>listar.html</code></td>
+          </tr>
+          <tr>
+            <td><span class="method m-post">POST</span></td>
+            <td><code>/api/usuarios</code></td>
+            <td>Crear usuario</td>
+            <td><code>crear.html</code></td>
+          </tr>
+          <tr>
+            <td><span class="method m-put">PUT</span></td>
+            <td><code>/api/usuarios/:nombre</code></td>
+            <td>Modificar contraseña</td>
+            <td><code>actualizar.html</code></td>
+          </tr>
+          <tr>
+            <td><span class="method m-delete">DELETE</span></td>
+            <td><code>/api/usuarios/:nombre</code></td>
+            <td>Eliminar usuario</td>
+            <td><code>eliminar.html</code></td>
+          </tr>
+        </tbody>
+      </table>
+      <!-- Leyenda de métodos HTTP con colores Columbia -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin-top:14px;font-size:.8rem">
+        <div style="background:#d6eeed;border-radius:6px;padding:8px 10px"><span class="method m-get">GET</span><br><span style="color:var(--color-texto-medio);margin-top:4px;display:block">Solo pide datos (no modifica).</span></div>
+        <div style="background:#fdefd8;border-radius:6px;padding:8px 10px"><span class="method m-post">POST</span><br><span style="color:var(--color-texto-medio);margin-top:4px;display:block">Crea un recurso nuevo.</span></div>
+        <div style="background:#c8e8e7;border-radius:6px;padding:8px 10px"><span class="method m-put">PUT</span><br><span style="color:var(--color-texto-medio);margin-top:4px;display:block">Actualiza un recurso existente.</span></div>
+        <div style="background:var(--color-fondo-error);border-radius:6px;padding:8px 10px"><span class="method m-delete">DELETE</span><br><span style="color:var(--color-texto-medio);margin-top:4px;display:block">Elimina un recurso existente.</span></div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── ERRORES ── -->
+  <div class="card">
+    <div class="card-header bg-error">
+      <div class="num">14</div>
+      Errores Frecuentes y Soluciones
+    </div>
+    <div class="card-body">
+      <div class="error-list">
+
+        <div class="error-item">
+          <div class="error-head">Cannot find module '../routes/login'</div>
+          <div class="error-body">
+            <span><strong>Causa</strong>Se ejecutó <code>node server.js</code> desde la carpeta raíz.</span>
+            <span><strong>Fix</strong><code>cd js</code> → <code>node server.js</code></span>
+          </div>
+        </div>
+
+        <div class="error-item">
+          <div class="error-head">ORA-12541: no listener</div>
+          <div class="error-body">
+            <span><strong>Causa</strong>Oracle no está corriendo.</span>
+            <span><strong>Fix</strong>Iniciar el servicio <code>OracleServiceXE</code> desde Servicios de Windows.</span>
+          </div>
+        </div>
+
+        <div class="error-item">
+          <div class="error-head">ORA-01017: invalid username/password</div>
+          <div class="error-body">
+            <span><strong>Causa</strong>El usuario o contraseña en <code>db.js</code> no coinciden con Oracle.</span>
+            <span><strong>Fix</strong>Verificar <code>user</code> y <code>password</code> en <code>js\db.js</code>.</span>
+          </div>
+        </div>
+
+        <div class="error-item">
+          <div class="error-head">ORA-00942: la tabla o vista no existe</div>
+          <div class="error-body">
+            <span><strong>Causa</strong>La tabla <code>usuarios</code> no fue creada en el esquema del usuario.</span>
+            <span><strong>Fix</strong>Ejecutar el <code>CREATE TABLE</code> de la sección 10 en SQL Developer.</span>
+          </div>
+        </div>
+
+        <div class="error-item">
+          <div class="error-head">EADDRINUSE: address already in use :::3000</div>
+          <div class="error-body">
+            <span><strong>Causa</strong>El puerto 3000 ya lo usa otro proceso (servidor anterior).</span>
+            <span><strong>Fix</strong>Cerrar la terminal anterior o cambiar el puerto en <code>server.js</code>.</span>
+          </div>
+        </div>
+
+        <div class="error-item">
+          <div class="error-head">ERR_CONNECTION_REFUSED (página no carga)</div>
+          <div class="error-body">
+            <span><strong>Causa</strong>El servidor Node no está corriendo.</span>
+            <span><strong>Fix</strong>Ir a la carpeta <code>js\</code> y ejecutar <code>node server.js</code>.</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ── CHECKLIST FINAL ── -->
+  <div class="card">
+    <div class="card-header bg-exito">
+      <div class="num">✓</div>
+      Checklist Final — Antes de ejecutar la aplicación
+    </div>
+    <div class="card-body">
+      <div class="checklist">
+        <div class="check-item"><div class="check-box"></div>Oracle XE 21c instalado y el servicio <code>OracleServiceXE</code> corriendo.</div>
+        <div class="check-item"><div class="check-box"></div>Usuario <code>prg2</code> creado en Oracle con permisos (CONNECT, RESOURCE, UNLIMITED TABLESPACE).</div>
+        <div class="check-item"><div class="check-box"></div>Tabla <code>usuarios</code> creada en el esquema de <code>prg2</code>.</div>
+        <div class="check-item"><div class="check-box"></div>Al menos un registro en la tabla para poder hacer login.</div>
+        <div class="check-item"><div class="check-box"></div>Node.js instalado (verificado con <code>node --version</code>).</div>
+        <div class="check-item"><div class="check-box"></div>Dependencias instaladas (<code>npm install</code> dentro de la carpeta <code>js\</code>).</div>
+        <div class="check-item"><div class="check-box"></div>Datos correctos en <code>js\db.js</code> (usuario, contraseña, connectString).</div>
+        <div class="check-item"><div class="check-box"></div>Terminal abierta en la carpeta <code>js\</code> con <code>node server.js</code> ejecutado.</div>
+        <div class="check-item"><div class="check-box"></div>Navegador abierto en <code>http://localhost:3000/login.html</code>.</div>
+      </div>
+      <div style="margin-top:14px;text-align:center;font-size:.85rem;color:var(--color-texto-suave);font-style:italic">
+        Si todos los puntos están marcados, la aplicación debe funcionar correctamente.
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

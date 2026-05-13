@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Node.js — Instalación, Configuración y Ejecución | PR2 Columbia</title>
+<style>
+
+  :root {
+    --p:    #0b6967;
+    --pd:   #094f4d;
+    --pl:   #0e8a87;
+    --acc:  #c47a28;
+    --accl: #e8a84e;
+    --bg:   #f2f8f8;
+    --surf: #ffffff;
+    --code: #0a2424;
+    --chl:  #133535;
+    --txt:  #172828;
+    --mid:  #3d5e5e;
+    --soft: #6e8f8f;
+    --bdr:  #bdd8d8;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--txt);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* ── ENCABEZADO ── */
+  header {
+    background: linear-gradient(135deg, var(--pd) 0%, var(--p) 60%, var(--pl) 100%);
+    color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 3px 12px rgba(9,79,77,0.45);
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 32px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+  }
+  .badge {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .htitle { flex: 1; }
+  .htitle h1 { font-size: 1.2rem; font-weight: 700; }
+  .htitle p  { font-size: 0.78rem; opacity: 0.78; margin-top: 2px; }
+  .hmeta { font-size: 0.72rem; opacity: 0.65; text-align: right; line-height: 1.5; }
+
+  /* ── NAV ── */
+  .nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 8px 32px;
+    background: var(--pd);
+    overflow-x: auto;
+  }
+  .nav a {
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+    font-size: 0.69rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.15);
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .nav a:hover { background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.4); }
+
+  /* ── MAIN ── */
+  main { max-width: 1020px; margin: 0 auto; padding: 28px 24px 60px; }
+
+  /* ── SECCIÓN ── */
+  section {
+    background: var(--surf);
+    border-radius: 12px;
+    margin-bottom: 24px;
+    border: 1px solid var(--bdr);
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(11,105,103,0.07);
+  }
+  .sec-head {
+    background: linear-gradient(90deg, var(--p) 0%, var(--pl) 100%);
+    color: #fff;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .sec-num {
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 6px;
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 0.8rem; flex-shrink: 0;
+  }
+  .sec-head h2 { font-size: 1rem; font-weight: 700; }
+  .sec-body { padding: 22px 24px; }
+
+  /* ── SUBSECCIÓN ── */
+  .sub { border-left: 3px solid var(--p); margin: 18px 0; padding-left: 16px; }
+  .sub h3 {
+    font-size: 0.87rem; font-weight: 700;
+    color: var(--p); text-transform: uppercase;
+    letter-spacing: 0.8px; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sub h3::before {
+    content: ''; display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--acc); border-radius: 50%;
+  }
+
+  /* ── CÓDIGO ── */
+  .code-wrap {
+    background: var(--code);
+    border-radius: 8px;
+    margin: 12px 0;
+    overflow: hidden;
+    border: 1px solid #1a4040;
+  }
+  .code-label {
+    background: var(--chl);
+    color: var(--accl);
+    font-size: 0.65rem; font-weight: 700;
+    letter-spacing: 1.2px; text-transform: uppercase;
+    padding: 5px 14px;
+    border-bottom: 1px solid #1a4040;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .code-label::before { content: '●'; color: var(--acc); font-size: 0.7rem; }
+  pre {
+    padding: 16px;
+    overflow-x: auto;
+    font-family: 'Cascadia Code', Consolas, 'Fira Code', monospace;
+    font-size: 0.82rem;
+    line-height: 1.65;
+    color: #d4efef;
+    tab-size: 2;
+  }
+  .kw  { color: #7dd8d6; font-weight: 600; }
+  .str { color: #a8d8a8; }
+  .cmt { color: #5a8888; font-style: italic; }
+  .num { color: var(--accl); }
+  .fn  { color: #9ecfcf; }
+  .ps  { color: #b8d4d4; }
+  .var { color: #d4b8ef; }
+
+  code {
+    background: rgba(11,105,103,0.12);
+    color: var(--pd);
+    border: 1px solid var(--bdr);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-family: Consolas, monospace;
+    font-size: 0.82em;
+  }
+
+  /* ── TABLAS ── */
+  .tbl { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 12px 0; }
+  .tbl th {
+    background: var(--p); color: #fff;
+    padding: 8px 14px; text-align: left;
+    font-size: 0.75rem; font-weight: 700;
+  }
+  .tbl td { padding: 8px 14px; border-bottom: 1px solid var(--bdr); vertical-align: top; }
+  .tbl tr:nth-child(even) td { background: #f5fbfb; }
+  .tbl tr:last-child td { border-bottom: none; }
+  .tbl td:first-child { font-weight: 600; color: var(--p); font-family: monospace; }
+
+  /* ── AVISOS ── */
+  .aviso {
+    background: rgba(196,122,40,0.08);
+    border: 1px solid rgba(196,122,40,0.3);
+    border-left: 4px solid var(--acc);
+    border-radius: 6px;
+    padding: 11px 16px; margin: 12px 0;
+    font-size: 0.85rem; color: #5a3a0a;
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .aviso::before { content: '⚠'; font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+
+  .tip {
+    background: rgba(11,105,103,0.07);
+    border: 1px solid rgba(11,105,103,0.25);
+    border-left: 4px solid var(--p);
+    border-radius: 6px;
+    padding: 11px 16px; margin: 12px 0;
+    font-size: 0.85rem; color: var(--pd);
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .tip::before { content: '💡'; font-size: 0.9rem; flex-shrink: 0; margin-top: 1px; }
+
+  .ok {
+    background: rgba(26,107,60,0.07);
+    border: 1px solid rgba(26,107,60,0.25);
+    border-left: 4px solid #1a6b3c;
+    border-radius: 6px;
+    padding: 11px 16px; margin: 12px 0;
+    font-size: 0.85rem; color: #1a3a28;
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .ok::before { content: '✓'; font-size: 1rem; font-weight: 900; flex-shrink: 0; color: #1a6b3c; margin-top: 1px; }
+
+  /* ── TEXTO ── */
+  p  { color: var(--mid); margin-bottom: 10px; font-size: 0.9rem; }
+  ul, ol { padding-left: 22px; margin-bottom: 10px; }
+  li { color: var(--mid); font-size: 0.9rem; margin-bottom: 4px; }
+  li strong { color: var(--txt); }
+
+  /* ── PASOS ── */
+  .steps { counter-reset: step; list-style: none; padding: 0; margin: 12px 0; }
+  .steps li {
+    counter-increment: step;
+    display: flex; gap: 14px; align-items: flex-start;
+    margin-bottom: 12px;
+  }
+  .steps li::before {
+    content: counter(step);
+    background: var(--p); color: #fff;
+    border-radius: 50%;
+    width: 24px; height: 24px; min-width: 24px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.72rem; font-weight: 800; margin-top: 2px;
+  }
+  .steps li span { color: var(--mid); font-size: 0.88rem; }
+
+  /* ── CHECKLIST ── */
+  .check-list { list-style: none; padding: 0; margin: 10px 0; }
+  .check-list li { padding: 5px 0; color: var(--mid); font-size: 0.9rem; }
+  .check-list li::before { content: '✓ '; color: var(--p); font-weight: 700; }
+
+  /* ── ÁRBOL DE CARPETAS ── */
+  .tree {
+    background: var(--code);
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-family: Consolas, monospace;
+    font-size: 0.83rem;
+    line-height: 1.8;
+    color: #d4efef;
+    border: 1px solid #1a4040;
+    margin: 12px 0;
+  }
+  .tree .folder { color: #7dd8d6; font-weight: 700; }
+  .tree .file   { color: #a8d8a8; }
+  .tree .desc   { color: #5a8888; font-style: italic; }
+
+  /* ── RESULTADO ESPERADO ── */
+  .result {
+    background: #f0faf0;
+    border: 1px solid #b0ddb0;
+    border-left: 4px solid #4caf50;
+    border-radius: 6px;
+    padding: 10px 14px; margin: 10px 0;
+    font-size: 0.83rem; color: #1a4a1a;
+    font-family: Consolas, monospace;
+  }
+
+  /* ── COMPARATIVA THIN / THICK ── */
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 12px 0; }
+  .cbox { border-radius: 8px; overflow: hidden; border: 1px solid var(--bdr); }
+  .cbox .chead { background: var(--p); color: #fff; padding: 8px 14px; font-size: 0.78rem; font-weight: 700; }
+  .cbox:last-child .chead { background: var(--acc); }
+  .cbox ul { padding: 12px 12px 12px 28px; background: #f5fbfb; }
+  .cbox ul li { font-size: 0.83rem; }
+
+  /* ── RUBRICA ── */
+  .rubrica { border-collapse: collapse; width: 100%; font-size: 0.83rem; margin: 12px 0; }
+  .rubrica th { background: var(--pd); color: #fff; padding: 8px 12px; text-align: left; }
+  .rubrica td { padding: 7px 12px; border-bottom: 1px solid var(--bdr); vertical-align: top; }
+  .rubrica td:last-child { font-weight: 700; color: var(--p); text-align: center; }
+  .rubrica tr:nth-child(even) td { background: #f5fbfb; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--pd); color: rgba(255,255,255,0.7);
+    text-align: center; padding: 20px;
+    font-size: 0.78rem; line-height: 1.8;
+  }
+  footer strong { color: #fff; }
+
+  @media (max-width: 680px) {
+    .header-top { padding: 12px 16px; flex-wrap: wrap; }
+    .nav { padding: 8px 16px; }
+    main { padding: 16px 12px 40px; }
+    .sec-body { padding: 16px; }
+    .compare { grid-template-columns: 1fr; }
+    .hmeta { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ ENCABEZADO -->
+<header>
+  <div class="header-top">
+    <div class="badge">PR2 · Node.js</div>
+    <div class="htitle">
+      <h1>Node.js — Instalación, Configuración y Ejecución</h1>
+      <p>Guía para Windows: desde la descarga hasta el primer servidor funcionando · Proyecto WEB</p>
+    </div>
+    <div class="hmeta">
+      Universidad Columbia del Paraguay<br>
+      Prof. Richard Steven<br>
+      Programación 2 · 2025
+    </div>
+  </div>
+  <nav class="nav">
+    <a href="#s1">1. Qué es Node.js</a>
+    <a href="#s2">2. Requisitos</a>
+    <a href="#s3">3. Descarga</a>
+    <a href="#s4">4. Instalación</a>
+    <a href="#s5">5. Verificación</a>
+    <a href="#s6">6. Primer servidor</a>
+    <a href="#s7">7. Estructura del proyecto</a>
+    <a href="#s8">8. npm y dependencias</a>
+    <a href="#s9">9. Iniciar y detener</a>
+    <a href="#s10">10. Modo Thin vs Thick</a>
+    <a href="#s11">11. Errores frecuentes</a>
+    <a href="#s12">12. Checklist final</a>
+  </nav>
+</header>
+
+<main>
+
+<!-- ══════════════════════════════ SECCIÓN 1 -->
+<section id="s1">
+  <div class="sec-head"><div class="sec-num">1</div><h2>¿Qué es Node.js y por qué lo usamos?</h2></div>
+  <div class="sec-body">
+    <p>Node.js es un <strong>entorno de ejecución de JavaScript</strong> que funciona fuera del navegador, directamente sobre el sistema operativo. Permite construir servidores web, APIs y aplicaciones de red usando el mismo lenguaje que se usa en el frontend.</p>
+
+    <table class="tbl">
+      <tr><th>Concepto</th><th>Explicación sencilla</th><th>Analogía</th></tr>
+      <tr><td>Node.js</td><td>Motor que ejecuta JavaScript en Windows, Linux o Mac sin un navegador.</td><td>Como Java pero para JavaScript</td></tr>
+      <tr><td>npm</td><td>Node Package Manager — el gestor de paquetes incluido con Node.js.</td><td>Como pip en Python o NuGet en .NET</td></tr>
+      <tr><td>package.json</td><td>Archivo de configuración del proyecto: nombre, versión y dependencias.</td><td>Como un manifiesto del proyecto</td></tr>
+      <tr><td>node_modules</td><td>Carpeta donde se guardan los paquetes instalados con npm.</td><td>Como la carpeta vendor en PHP</td></tr>
+      <tr><td>Express</td><td>Framework web minimalista que facilita crear rutas y un servidor HTTP.</td><td>Como Flask en Python</td></tr>
+      <tr><td>oracledb</td><td>Driver oficial de Oracle para Node.js. Permite conectar la app con Oracle XE.</td><td>Como un conector JDBC pero para JS</td></tr>
+    </table>
+
+    <div class="tip">En este proyecto, Node.js actúa como el <strong>servidor web</strong>: recibe las peticiones del navegador, las procesa, consulta Oracle XE y devuelve los resultados en formato JSON o HTML.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ SECCIÓN 2 -->
+<section id="s2">
+  <div class="sec-head"><div class="sec-num">2</div><h2>Requisitos previos</h2></div>
+  <div class="sec-body">
+    <ul>
+      <li><strong>Windows 10 u 11 de 64 bits</strong> (versiones de 32 bits no son compatibles con oracledb).</li>
+      <li>Conexión a Internet para descargar Node.js y los paquetes npm.</li>
+      <li>Cuenta con permisos de <strong>administrador</strong> para ejecutar el instalador MSI.</li>
+      <li>Oracle XE 21c instalado y con el servicio <code>XEPDB1</code> activo (requerido en la Fase 1).</li>
+      <li>Un editor de texto o IDE: se recomienda <strong>Visual Studio Code</strong>.</li>
+    </ul>
+    <div class="aviso">Instale Node.js <strong>antes</strong> de intentar conectarlo con Oracle. Confirmar que Node.js funciona solo simplifica enormemente la resolución de problemas.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ SECCIÓN 3 -->
+<section id="s3">
+  <div class="sec-head"><div class="sec-num">3</div><h2>Descarga de Node.js LTS para Windows</h2></div>
+  <div class="sec-body">
+    <div class="sub"><h3>3.1 Elegir la versión correcta</h3>
+      <p>Siempre descargar la versión <strong>LTS (Long Term Support)</strong>, no la "Current". La versión LTS es la más estable y la recomendada para proyectos académicos y productivos.</p>
+      <div class="tip">Sitio oficial: <strong>nodejs.org</strong> → botón verde grande que dice "LTS — Recommended For Most Users".</div>
+    </div>
+
+    <div class="sub"><h3>3.2 Archivo a descargar</h3>
+      <table class="tbl">
+        <tr><th>Archivo</th><th>Cuándo usarlo</th></tr>
+        <tr><td>node-v##.##.#-x64.msi</td><td>Instalador estándar para Windows 64 bits. <strong>Usar este.</strong></td></tr>
+        <tr><td>node-v##.##.#-x86.msi</td><td>Solo para Windows 32 bits. No compatible con oracledb.</td></tr>
+        <tr><td>node-v##.##.#-win-x64.zip</td><td>Versión portable sin instalador. No recomendada para clase.</td></tr>
+      </table>
+    </div>
+
+    <div class="sub"><h3>3.3 Verificar si ya está instalado</h3>
+      <p>Antes de descargar, verificar si Node.js ya está instalado en el equipo del laboratorio:</p>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell — Verificar instalación existente</div>
+        <pre><span class="cmt"># Verificar versión de Node.js</span>
+node --version
+
+<span class="cmt"># Verificar versión de npm</span>
+npm --version
+
+<span class="cmt"># Ver ruta del ejecutable</span>
+where.exe node
+where.exe npm</pre>
+      </div>
+      <p>Si ambos comandos devuelven una versión (ej. <code>v20.11.0</code> y <code>10.2.4</code>), Node.js ya está instalado y puede saltear a la sección 5.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ SECCIÓN 4 -->
+<section id="s4">
+  <div class="sec-head"><div class="sec-num">4</div><h2>Instalación de Node.js en Windows</h2></div>
+  <div class="sec-body">
+    <ol class="steps">
+      <li><span>Ejecutar el archivo <code>.msi</code> descargado. Si Windows solicita permisos de administrador, <strong>aceptar</strong>.</span></li>
+      <li><span>En la pantalla de bienvenida, hacer clic en <strong>Next</strong>.</span></li>
+      <li><span>Aceptar el acuerdo de licencia y hacer clic en <strong>Next</strong>.</span></li>
+      <li><span>Mantener la <strong>ruta de instalación predeterminada</strong> (generalmente <code>C:\Program Files\nodejs\</code>).</span></li>
+      <li><span>En la pantalla de componentes, dejar todas las opciones marcadas. <strong>No desmarcar nada.</strong> El instalador incluye Node.js, npm y la configuración automática del PATH.</span></li>
+      <li><span>En la pantalla <em>"Tools for Native Modules"</em>, <strong>NO marcar</strong> la casilla si no tiene Visual Studio instalado. Esta opción no es necesaria para este proyecto.</span></li>
+      <li><span>Hacer clic en <strong>Install</strong> y esperar a que finalice.</span></li>
+      <li><span>Hacer clic en <strong>Finish</strong>. <strong>Cerrar y volver a abrir PowerShell</strong> para que el PATH se actualice.</span></li>
+    </ol>
+
+    <div class="tip">El instalador MSI configura automáticamente la variable de entorno <code>PATH</code> para que <code>node</code> y <code>npm</code> sean reconocidos desde cualquier carpeta en PowerShell.</div>
+    <div class="aviso">Si abrió PowerShell antes de instalar Node.js, debe <strong>cerrar esa ventana y abrir una nueva</strong>. Las sesiones abiertas no detectan cambios en el PATH.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ SECCIÓN 5 -->
+<section id="s5">
+  <div class="sec-head"><div class="sec-num">5</div><h2>Verificación de la instalación desde PowerShell</h2></div>
+  <div class="sec-body">
+    <p>Abrir una ventana <strong>nueva</strong> de PowerShell y ejecutar los siguientes comandos de verificación:</p>
+
+    <div class="code-wrap">
+      <div class="code-label">PowerShell — Verificación completa del entorno Node.js</div>
+      <pre><span class="cmt"># 1. Versión de Node.js instalada</span>
+node --version
+
+<span class="cmt"># 2. Versión de npm instalada</span>
+npm --version
+
+<span class="cmt"># 3. Ruta del ejecutable de Node.js (debe mostrar la carpeta de Program Files)</span>
+where.exe node
+
+<span class="cmt"># 4. Ver variables de entorno relacionadas a Node</span>
+[Environment]::<span class="fn">GetEnvironmentVariable</span>(<span class="str">"PATH"</span>, <span class="str">"Machine"</span>) -split <span class="str">";"</span> | <span class="ps">Where-Object</span> { <span class="var">$_</span> -like <span class="str">"*node*"</span> }</pre>
+    </div>
+
+    <p>Resultados esperados:</p>
+    <div class="result">
+      v20.11.0<br>
+      10.2.4<br>
+      C:\Program Files\nodejs\node.exe
+    </div>
+
+    <div class="ok">Si los tres comandos devuelven resultados similares, Node.js está correctamente instalado y listo para usarse.</div>
+
+    <div class="sub"><h3>5.1 Verificar que npm funciona</h3>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell — Listar paquetes globales instalados</div>
+        <pre><span class="cmt"># Ver paquetes instalados globalmente</span>
+npm list -g --depth=<span class="num">0</span>
+
+<span class="cmt"># Ver configuración de npm</span>
+npm config list</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ SECCIÓN 6 -->
+<section id="s6">
+  <div class="sec-head"><div class="sec-num">6</div><h2>Primer servidor "Hola Mundo" — sin Oracle</h2></div>
+  <div class="sec-body">
+    <p>Antes de conectar con Oracle, verificar que Node.js puede levantar un servidor HTTP por sí solo. Este paso confirma que el entorno funciona correctamente.</p>
+
+    <div class="sub"><h3>6.1 Crear la carpeta y el archivo</h3>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell — Crear proyecto de prueba</div>
+        <pre><span class="cmt"># Crear una carpeta de prueba</span>
+<span class="ps">New-Item</span> -ItemType Directory -Path <span class="str">C:\prueba_node</span> -Force
+<span class="ps">cd</span> <span class="str">C:\prueba_node</span>
+
+<span class="cmt"># Inicializar el proyecto (crea package.json)</span>
+npm init -y
+
+<span class="cmt"># Crear el archivo del servidor</span>
+notepad hola.js</pre>
+      </div>
+    </div>
+
+    <div class="sub"><h3>6.2 Contenido de hola.js</h3>
+      <div class="code-wrap">
+        <div class="code-label">JavaScript — hola.js · Servidor HTTP mínimo</div>
+        <pre><span class="cmt">// Módulo http incluido en Node.js (no requiere npm install)</span>
+<span class="kw">const</span> http = <span class="fn">require</span>(<span class="str">'http'</span>);
+
+<span class="cmt">// Definir el puerto donde escuchará el servidor</span>
+<span class="kw">const</span> PUERTO = <span class="num">3000</span>;
+
+<span class="cmt">// Crear el servidor: recibe una petición y devuelve una respuesta</span>
+<span class="kw">const</span> servidor = http.<span class="fn">createServer</span>(<span class="kw">function</span>(peticion, respuesta) {
+    respuesta.<span class="fn">writeHead</span>(<span class="num">200</span>, { <span class="str">'Content-Type'</span>: <span class="str">'text/html; charset=utf-8'</span> });
+    respuesta.<span class="fn">end</span>(<span class="str">'&lt;h1&gt;Hola Mundo desde Node.js&lt;/h1&gt;&lt;p&gt;El servidor está funcionando.&lt;/p&gt;'</span>);
+});
+
+<span class="cmt">// Poner el servidor a escuchar en el puerto definido</span>
+servidor.<span class="fn">listen</span>(PUERTO, <span class="kw">function</span>() {
+    console.<span class="fn">log</span>(<span class="str">'Servidor iniciado en http://localhost:'</span> + PUERTO);
+    console.<span class="fn">log</span>(<span class="str">'Presionar Ctrl + C para detener.'</span>);
+});</pre>
+      </div>
+    </div>
+
+    <div class="sub"><h3>6.3 Ejecutar y probar</h3>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell — Ejecutar el servidor de prueba</div>
+        <pre><span class="cmt"># Desde la carpeta C:\prueba_node</span>
+node hola.js</pre>
+      </div>
+      <div class="result">Servidor iniciado en http://localhost:3000<br>Presionar Ctrl + C para detener.</div>
+      <p>Abrir el navegador y visitar <code>http://localhost:3000</code>. Debe aparecer el mensaje "Hola Mundo desde Node.js".</p>
+      <div class="ok">Si el mensaje aparece en el navegador, Node.js está instalado y funciona correctamente. Puede pasar a configurar el proyecto real.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ SECCIÓN 7 -->
+<section id="s7">
+  <div class="sec-head"><div class="sec-num">7</div><h2>Estructura del proyecto WEB</h2></div>
+  <div class="sec-body">
+    <p>La estructura de carpetas organiza el código del proyecto. Seguir esta convención facilita el trabajo en equipo y la corrección del docente.</p>
+
+    <div class="code-wrap">
+      <div class="code-label">PowerShell — Crear la estructura de carpetas del proyecto</div>
+      <pre><span class="cmt"># Crear la carpeta raíz del proyecto</span>
+<span class="ps">New-Item</span> -ItemType Directory -Path <span class="str">C:\proyecto_web</span> -Force
+<span class="ps">cd</span> <span class="str">C:\proyecto_web</span>
+
+<span class="cmt"># Crear subcarpetas</span>
+<span class="ps">New-Item</span> -ItemType Directory -Path <span class="str">js</span>     -Force  <span class="cmt"># Código del servidor Node.js</span>
+<span class="ps">New-Item</span> -ItemType Directory -Path <span class="str">public</span> -Force  <span class="cmt"># Archivos HTML del cliente</span>
+
+<span class="cmt"># Inicializar npm dentro de la carpeta js</span>
+<span class="ps">cd</span> js
+npm init -y</pre>
+    </div>
+
+    <p>El resultado debe tener esta estructura:</p>
+    <div class="tree">
+<span class="folder">C:\proyecto_web\</span><br>
+├── <span class="folder">js\</span>                   <span class="desc">← Código del servidor (Node.js)</span><br>
+│   ├── <span class="file">server.js</span>           <span class="desc">← Punto de entrada: arranca el servidor Express</span><br>
+│   ├── <span class="file">package.json</span>        <span class="desc">← Dependencias y scripts (generado por npm init)</span><br>
+│   ├── <span class="file">.env</span>                <span class="desc">← Credenciales Oracle (NO subir a Git)</span><br>
+│   └── <span class="folder">node_modules\</span>       <span class="desc">← Paquetes instalados (NO subir a Git)</span><br>
+├── <span class="folder">public\</span>                <span class="desc">← Archivos HTML que ve el usuario</span><br>
+│   ├── <span class="file">login.html</span>          <span class="desc">← Pantalla de acceso</span><br>
+│   ├── <span class="file">menu.html</span>           <span class="desc">← Panel de navegación</span><br>
+│   ├── <span class="file">listar.html</span>         <span class="desc">← Listado de registros</span><br>
+│   ├── <span class="file">crear.html</span>          <span class="desc">← Formulario de alta</span><br>
+│   ├── <span class="file">actualizar.html</span>     <span class="desc">← Formulario de modificación</span><br>
+│   ├── <span class="file">eliminar.html</span>       <span class="desc">← Confirmación de baja</span><br>
+│   └── <span class="file">reporte.html</span>        <span class="desc">← Informe de datos</span><br>
+└── <span class="file">.gitignore</span>             <span class="desc">← Excluye node_modules y .env del repositorio</span>
+    </div>
+
+    <div class="sub"><h3>7.1 Contenido de .gitignore</h3>
+      <div class="code-wrap">
+        <div class="code-label">Archivo — .gitignore</div>
+        <pre><span class="cmt"># Carpeta de paquetes — se regenera con npm install</span>
+node_modules/
+
+<span class="cmt"># Credenciales Oracle — nunca exponer contraseñas en el repositorio</span>
+.env
+
+<span class="cmt"># Archivos temporales del sistema</span>
+*.log
+.DS_Store</pre>
+      </div>
+    </div>
+
+    <div class="aviso">La carpeta <code>node_modules</code> puede tener cientos de MB. <strong>Nunca</strong> se copia ni se sube a GitHub. Solo se sube el código fuente y el compañero ejecuta <code>npm install</code> para regenerarla.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ SECCIÓN 8 -->
+<section id="s8">
+  <div class="sec-head"><div class="sec-num">8</div><h2>Instalación de dependencias con npm</h2></div>
+  <div class="sec-body">
+    <p>Una vez creada la estructura, instalar los paquetes necesarios para el proyecto WEB.</p>
+
+    <div class="sub"><h3>8.1 Instalar paquetes del proyecto</h3>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell — Instalar dependencias (ejecutar dentro de js\)</div>
+        <pre><span class="cmt"># Ir a la carpeta js del proyecto</span>
+<span class="ps">cd</span> <span class="str">C:\proyecto_web\js</span>
+
+<span class="cmt"># Instalar las 4 dependencias del proyecto</span>
+npm install express    <span class="cmt"># Servidor web y manejo de rutas</span>
+npm install oracledb   <span class="cmt"># Driver Oracle para Node.js</span>
+npm install dotenv     <span class="cmt"># Leer variables de entorno desde .env</span>
+npm install cors       <span class="cmt"># Permitir peticiones entre dominios distintos</span>
+
+<span class="cmt"># Instalar nodemon solo en desarrollo (reinicio automático al guardar)</span>
+npm install nodemon --save-dev</pre>
+      </div>
+    </div>
+
+    <div class="sub"><h3>8.2 Qué hace cada paquete</h3>
+      <table class="tbl">
+        <tr><th>Paquete</th><th>Función en el proyecto</th><th>Dónde se usa</th></tr>
+        <tr><td>express</td><td>Crea el servidor HTTP y define las rutas de la API (GET, POST, PUT, DELETE).</td><td>server.js</td></tr>
+        <tr><td>oracledb</td><td>Conecta Node.js con Oracle XE. Ejecuta SELECT, INSERT, UPDATE, DELETE.</td><td>server.js</td></tr>
+        <tr><td>dotenv</td><td>Lee el archivo <code>.env</code> y carga las credenciales Oracle como variables del proceso.</td><td>server.js (al inicio)</td></tr>
+        <tr><td>cors</td><td>Permite que el HTML del navegador haga peticiones al servidor Node.js.</td><td>server.js</td></tr>
+        <tr><td>nodemon</td><td>Reinicia el servidor automáticamente cada vez que se guarda un cambio en el código.</td><td>Solo en desarrollo</td></tr>
+      </table>
+    </div>
+
+    <div class="sub"><h3>8.3 Configurar scripts en package.json</h3>
+      <div class="code-wrap">
+        <div class="code-label">JSON — package.json · Agregar scripts de inicio</div>
+        <pre>{
+  <span class="str">"name"</span>: <span class="str">"proyecto_web"</span>,
+  <span class="str">"version"</span>: <span class="str">"1.0.0"</span>,
+  <span class="str">"description"</span>: <span class="str">"Proyecto WEB — Programación 2 — Columbia"</span>,
+  <span class="str">"main"</span>: <span class="str">"server.js"</span>,
+  <span class="str">"scripts"</span>: {
+    <span class="str">"start"</span>: <span class="str">"node server.js"</span>,      <span class="cmt">// Producción: node server.js</span>
+    <span class="str">"dev"</span>:   <span class="str">"nodemon server.js"</span>    <span class="cmt">// Desarrollo: reinicio automático</span>
+  },
+  <span class="str">"dependencies"</span>: {
+    <span class="str">"cors"</span>:     <span class="str">"^2.x.x"</span>,
+    <span class="str">"dotenv"</span>:   <span class="str">"^16.x.x"</span>,
+    <span class="str">"express"</span>:  <span class="str">"^4.x.x"</span>,
+    <span class="str">"oracledb"</span>: <span class="str">"^6.x.x"</span>
+  },
+  <span class="str">"devDependencies"</span>: {
+    <span class="str">"nodemon"</span>: <span class="str">"^3.x.x"</span>
+  }
+}</pre>
+      </div>
+    </div>
+
+    <div class="sub"><h3>8.4 Crear el archivo .env con las credenciales</h3>
+      <div class="code-wrap">
+        <div class="code-label">Archivo — .env (dentro de js\) · Nunca subir a Git</div>
+        <pre><span class="cmt"># Puerto en que correrá el servidor Node.js</span>
+PORT=3000
+
+<span class="cmt"># Credenciales de conexión a Oracle XE 21c</span>
+DB_USER=alumno_prg2
+DB_PASSWORD=Alumno2026#
+DB_CONNECT=localhost:1521/XEPDB1</pre>
+      </div>
+      <div class="aviso">El archivo <code>.env</code> contiene contraseñas. <strong>Nunca</strong> subirlo a GitHub ni compartirlo. Asegurarse de que esté en el <code>.gitignore</code>.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ SECCIÓN 9 -->
+<section id="s9">
+  <div class="sec-head"><div class="sec-num">9</div><h2>Iniciar, reiniciar y detener el servidor</h2></div>
+  <div class="sec-body">
+
+    <div class="sub"><h3>9.1 Iniciar el servidor</h3>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell — Formas de iniciar el servidor</div>
+        <pre><span class="cmt"># IMPORTANTE: siempre ejecutar desde dentro de la carpeta js\</span>
+<span class="ps">cd</span> <span class="str">C:\proyecto_web\js</span>
+
+<span class="cmt"># Opción 1 — Inicio directo con Node.js (producción)</span>
+node server.js
+
+<span class="cmt"># Opción 2 — Con el script definido en package.json</span>
+npm start
+
+<span class="cmt"># Opción 3 — Con nodemon (desarrollo, reinicio automático al guardar)</span>
+npm run dev</pre>
+      </div>
+      <div class="result">Servidor iniciado en http://localhost:3000<br>Conectado a Oracle XE — XEPDB1</div>
+    </div>
+
+    <div class="sub"><h3>9.2 Detener el servidor</h3>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell — Detener el servidor</div>
+        <pre><span class="cmt"># Detener el servidor desde la terminal donde está corriendo:</span>
+<span class="ps">Ctrl + C</span>
+
+<span class="cmt"># Si el proceso quedó colgado y no responde al Ctrl+C,
+# buscar qué proceso usa el puerto 3000:</span>
+netstat -ano | findstr :3000
+
+<span class="cmt"># Terminar el proceso por su PID (reemplazar 12345 por el PID real):</span>
+<span class="ps">Stop-Process</span> -Id 12345 -Force</pre>
+      </div>
+    </div>
+
+    <div class="sub"><h3>9.3 Verificar que el servidor está corriendo</h3>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell — Verificar proceso Node.js activo</div>
+        <pre><span class="cmt"># Ver si hay un proceso node.js corriendo</span>
+<span class="ps">Get-Process</span> -Name node -ErrorAction SilentlyContinue
+
+<span class="cmt"># Verificar si el puerto 3000 está en uso</span>
+<span class="ps">Test-NetConnection</span> localhost -Port 3000</pre>
+      </div>
+    </div>
+
+    <div class="tip">Mientras trabaja, deje el servidor corriendo con <code>npm run dev</code> (nodemon). Cada vez que guarde <code>server.js</code>, nodemon reiniciará el servidor automáticamente.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ SECCIÓN 10 -->
+<section id="s10">
+  <div class="sec-head"><div class="sec-num">10</div><h2>Modo Thin vs Modo Thick en oracledb</h2></div>
+  <div class="sec-body">
+    <p>El driver <code>oracledb</code> para Node.js puede conectarse a Oracle en dos modos. Es importante entender cuál usar en el laboratorio:</p>
+
+    <div class="compare">
+      <div class="cbox">
+        <div class="chead">Modo Thin (v6+) — Recomendado</div>
+        <ul>
+          <li>No requiere instalar Oracle Client por separado.</li>
+          <li>Funciona con oracledb v6 o superior.</li>
+          <li>Se activa por defecto al no llamar <code>initOracleClient()</code>.</li>
+          <li>Suficiente para todas las prácticas de PR2.</li>
+          <li>Más sencillo de configurar en el laboratorio.</li>
+        </ul>
+      </div>
+      <div class="cbox">
+        <div class="chead">Modo Thick — Avanzado</div>
+        <ul>
+          <li>Requiere Oracle Instant Client o Oracle XE instalado.</li>
+          <li>Necesita llamar a <code>oracledb.initOracleClient()</code>.</li>
+          <li>Habilita funciones avanzadas (Advanced Queuing, SODA).</li>
+          <li>Útil si Oracle XE ya está instalado en el mismo equipo.</li>
+          <li>Puede activarse automáticamente si detecta Oracle en el PATH.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="sub"><h3>10.1 Cómo usar el Modo Thin (sin configuración extra)</h3>
+      <div class="code-wrap">
+        <div class="code-label">JavaScript — server.js · Conexión en Modo Thin</div>
+        <pre><span class="cmt">// Modo Thin: no llamar initOracleClient()</span>
+<span class="cmt">// oracledb v6+ lo activa automáticamente</span>
+<span class="kw">const</span> oracledb = <span class="fn">require</span>(<span class="str">'oracledb'</span>);
+<span class="fn">require</span>(<span class="str">'dotenv'</span>).<span class="fn">config</span>();
+
+<span class="kw">const</span> config = {
+    user:          process.env.DB_USER,
+    password:      process.env.DB_PASSWORD,
+    connectString: process.env.DB_CONNECT   <span class="cmt">// localhost:1521/XEPDB1</span>
+};
+
+<span class="kw">async function</span> <span class="fn">probarConexion</span>() {
+    <span class="kw">let</span> conn;
+    <span class="kw">try</span> {
+        conn = <span class="kw">await</span> oracledb.<span class="fn">getConnection</span>(config);
+        <span class="kw">const</span> result = <span class="kw">await</span> conn.<span class="fn">execute</span>(<span class="str">'SELECT USER FROM dual'</span>);
+        console.<span class="fn">log</span>(<span class="str">'Conectado como:'</span>, result.rows[<span class="num">0</span>][<span class="num">0</span>]);
+    } <span class="kw">catch</span> (err) {
+        console.<span class="fn">error</span>(<span class="str">'Error de conexión:'</span>, err.message);
+    } <span class="kw">finally</span> {
+        <span class="kw">if</span> (conn) <span class="kw">await</span> conn.<span class="fn">close</span>();
+    }
+}
+
+<span class="fn">probarConexion</span>();</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ SECCIÓN 11 -->
+<section id="s11">
+  <div class="sec-head"><div class="sec-num">11</div><h2>Errores frecuentes y soluciones</h2></div>
+  <div class="sec-body">
+    <table class="tbl">
+      <tr><th>Error o síntoma</th><th>Causa probable</th><th>Solución</th></tr>
+      <tr><td>node no se reconoce</td><td>Node.js no está instalado o el PATH no se actualizó.</td><td>Cerrar y reabrir PowerShell. Reinstalar si persiste.</td></tr>
+      <tr><td>npm no se reconoce</td><td>npm no está en el PATH (raro si se usó el MSI).</td><td>Reinstalar Node.js con el instalador MSI oficial.</td></tr>
+      <tr><td>Cannot find module 'express'</td><td>No se ejecutó <code>npm install</code> en la carpeta correcta.</td><td>Entrar a <code>js\</code> y ejecutar <code>npm install</code>.</td></tr>
+      <tr><td>EADDRINUSE :::3000</td><td>El puerto 3000 ya está ocupado por otra instancia del servidor.</td><td>Ejecutar <code>netstat -ano | findstr :3000</code> y terminar el proceso.</td></tr>
+      <tr><td>ORA-12541: no listener</td><td>Oracle XE no está iniciado o el listener está detenido.</td><td>Iniciar <code>OracleServiceXE</code> y el listener desde PowerShell.</td></tr>
+      <tr><td>ORA-01017: invalid credentials</td><td>Usuario, contraseña o servicio incorrecto en el <code>.env</code>.</td><td>Verificar <code>DB_USER</code>, <code>DB_PASSWORD</code> y <code>DB_CONNECT</code> en el <code>.env</code>.</td></tr>
+      <tr><td>Error: .env no carga</td><td>Se llama <code>require('dotenv').config()</code> después de usar <code>process.env</code>.</td><td>Poner <code>require('dotenv').config()</code> en la primera línea de <code>server.js</code>.</td></tr>
+      <tr><td>Module not found: oracledb</td><td>Paquete no instalado o instalado en otra carpeta.</td><td>Confirmar que está dentro de <code>js\</code> y ejecutar <code>npm install oracledb</code>.</td></tr>
+      <tr><td>nodemon no se reconoce</td><td>Se instaló como dependencia local, no global.</td><td>Usar <code>npm run dev</code> (definido en package.json) en lugar de <code>nodemon</code> directo.</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ SECCIÓN 12 -->
+<section id="s12">
+  <div class="sec-head"><div class="sec-num">12</div><h2>Checklist final — antes de continuar con Oracle</h2></div>
+  <div class="sec-body">
+    <p>Verificar cada punto antes de pasar a conectar Node.js con Oracle XE:</p>
+    <ul class="check-list">
+      <li>Node.js LTS instalado y verificado con <code>node --version</code>.</li>
+      <li>npm instalado y verificado con <code>npm --version</code>.</li>
+      <li>Servidor "Hola Mundo" ejecutado correctamente en <code>http://localhost:3000</code>.</li>
+      <li>Carpeta del proyecto creada con subcarpetas <code>js\</code> y <code>public\</code>.</li>
+      <li><code>npm init -y</code> ejecutado dentro de <code>js\</code>.</li>
+      <li>Paquetes instalados: <code>express</code>, <code>oracledb</code>, <code>dotenv</code>, <code>cors</code>, <code>nodemon</code>.</li>
+      <li>Archivo <code>.env</code> creado con las credenciales de Oracle XE.</li>
+      <li>Archivo <code>.gitignore</code> creado con <code>node_modules/</code> y <code>.env</code>.</li>
+      <li>Scripts <code>start</code> y <code>dev</code> definidos en <code>package.json</code>.</li>
+      <li>Oracle XE iniciado y XEPDB1 disponible (verificado en Fase 1).</li>
+    </ul>
+
+    <table class="rubrica">
+      <tr><th>Criterio de evaluación</th><th>Puntaje sugerido</th></tr>
+      <tr><td>Node.js instalado y <code>node --version</code> muestra resultado correcto</td><td>10 pts</td></tr>
+      <tr><td>Estructura de carpetas creada correctamente</td><td>10 pts</td></tr>
+      <tr><td>Servidor "Hola Mundo" ejecutado y verificado en el navegador</td><td>20 pts</td></tr>
+      <tr><td>Paquetes instalados y visibles en <code>package.json</code></td><td>20 pts</td></tr>
+      <tr><td>Archivo <code>.env</code> configurado con credenciales Oracle</td><td>20 pts</td></tr>
+      <tr><td>Scripts <code>start</code> y <code>dev</code> funcionando con <code>npm start</code> / <code>npm run dev</code></td><td>20 pts</td></tr>
+    </table>
+  </div>
+</section>
+
+</main>
+
+<!-- ═══════════════════════════════ PIE DE PÁGINA -->
+<footer>
+  <strong>Node.js — Instalación, Configuración y Ejecución</strong><br>
+  Programación 2 (PR2) · Universidad Columbia del Paraguay · Prof. Richard Steven · 2025<br>
+  Node.js LTS · npm · Express · oracledb · dotenv · nodemon · Oracle XE 21c
+</footer>
+
+</body>
+</html>

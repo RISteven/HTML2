@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reporte de Usuarios — Sistema de Gestión</title>
+
+  <!--
+    ══════════════════════════════════════════════════════════════
+    LIBRERÍAS EXTERNAS (cargadas desde CDN — requiere internet)
+
+    jQuery:     requerido por DataTables (manipulación del DOM)
+    DataTables: convierte una tabla HTML en tabla interactiva
+                con búsqueda, paginación, ordenamiento y exportación
+    JSZip:      necesario para exportar a Excel
+    pdfMake:    necesario para exportar a PDF
+    ══════════════════════════════════════════════════════════════
+  -->
+  <!-- DataTables CSS — estilos de la tabla interactiva -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+  <!-- Botones de exportación CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+
+  <!-- jQuery (requerido por DataTables) -->
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+  <!-- DataTables core -->
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <!-- Extensión de botones -->
+  <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+  <!-- JSZip: para exportar a Excel -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <!-- pdfMake: para exportar a PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+  <!-- Botones de exportación HTML5 (Excel, PDF, Copiar) -->
+  <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+  <!-- Botón de impresión -->
+  <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+
+  <style>
+    /* ══════════════════════════════════════════════════════════
+       VARIABLES — PALETA UNIVERSIDAD COLUMBIA DEL PARAGUAY
+    ══════════════════════════════════════════════════════════ */
+    :root {
+      --color-primario:        #0b6967;  /* Teal institucional */
+      --color-primario-oscuro: #094f4d;  /* Header y footer */
+      --color-primario-claro:  #0e8a87;  /* Hover y acentos */
+      --color-acento:          #c47a28;  /* Ámbar complementario */
+      --color-acento-claro:    #e8a84e;  /* Ámbar suave */
+      --color-fondo:           #f2f8f8;  /* Fondo de página */
+      --color-superficie:      #ffffff;  /* Tarjetas */
+      --color-texto:           #172828;  /* Texto principal */
+      --color-texto-medio:     #3d5e5e;  /* Texto secundario */
+      --color-borde:           #bdd8d8;  /* Bordes suaves */
+    }
+
+    /* ── RESET ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background:  var(--color-fondo);
+      color:       var(--color-texto);
+      min-height:  100vh;
+      padding-bottom: 48px;
+    }
+
+    /* ── HEADER ── */
+    .encabezado-pagina {
+      background: linear-gradient(135deg,
+        var(--color-primario-oscuro) 0%,
+        var(--color-primario)        60%,
+        var(--color-primario-claro)  100%);
+      color: #fff;
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 3px 12px rgba(9,79,77,0.35);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .encabezado-pagina h1 { font-size: 1.15rem; font-weight: 700; }
+    .encabezado-pagina p  { font-size: 0.75rem; opacity: 0.75; margin-top: 2px; }
+
+    .boton-volver-menu {
+      background:    rgba(255,255,255,0.15);
+      color:         #fff;
+      border:        1px solid rgba(255,255,255,0.4);
+      border-radius: 8px;
+      padding:       8px 18px;
+      font-size:     0.85rem;
+      font-weight:   600;
+      cursor:        pointer;
+      text-decoration: none;
+      transition:    background 0.2s;
+    }
+    .boton-volver-menu:hover { background: rgba(255,255,255,0.25); }
+
+    /* ── CONTENEDOR ── */
+    .contenedor-principal {
+      max-width: 1100px;
+      margin:    0 auto;
+      padding:   28px 20px;
+    }
+
+    /* ── GRILLA DE ESTADÍSTICAS ── */
+    .grilla-estadisticas {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap:           12px;
+      margin-bottom: 24px;
+    }
+
+    /* ── TARJETA DE ESTADÍSTICA ── */
+    .tarjeta-estadistica {
+      background:    var(--color-superficie);
+      border:        1px solid var(--color-borde);
+      border-radius: 10px;
+      padding:       18px 14px;
+      text-align:    center;
+      border-top:    3px solid var(--color-primario);
+      box-shadow:    0 2px 8px rgba(11,105,103,0.07);
+    }
+    .tarjeta-estadistica.acento { border-top-color: var(--color-acento); }
+
+    /* Número grande de la estadística */
+    .numero-estadistica {
+      font-size:   2rem;
+      font-weight: 800;
+      color:       var(--color-primario);
+      line-height: 1;
+    }
+    .tarjeta-estadistica.acento .numero-estadistica { color: var(--color-acento); }
+
+    .etiqueta-estadistica {
+      font-size:  0.75rem;
+      color:      var(--color-texto-medio);
+      margin-top: 6px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── TARJETA DEL REPORTE ── */
+    .tarjeta-reporte {
+      background:    var(--color-superficie);
+      border-radius: 12px;
+      padding:       24px;
+      border:        1px solid var(--color-borde);
+      box-shadow:    0 2px 12px rgba(11,105,103,0.07);
+    }
+    .titulo-reporte {
+      font-size:     0.72rem;
+      font-weight:   700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color:         var(--color-texto-medio);
+      margin-bottom: 16px;
+    }
+
+    /* ── PERSONALIZACIÓN DE DATATABLES ──────────────────────
+       Sobrescribimos los estilos por defecto de DataTables
+       para que coincidan con la paleta Columbia.
+    ─────────────────────────────────────────────────────── */
+
+    /* Encabezado de la tabla */
+    table.dataTable thead th,
+    table.dataTable thead td {
+      background:    var(--color-primario) !important;
+      color:         #fff !important;
+      border-bottom: 2px solid var(--color-primario-oscuro) !important;
+      padding:       10px 16px !important;
+      font-size:     0.78rem;
+      font-weight:   700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    /* Flecha de ordenamiento */
+    table.dataTable thead th.sorting::after,
+    table.dataTable thead th.sorting_asc::after,
+    table.dataTable thead th.sorting_desc::after {
+      color: rgba(255,255,255,0.7) !important;
+    }
+
+    /* Celdas de datos */
+    table.dataTable tbody td {
+      padding:   10px 16px !important;
+      font-size: 0.88rem;
+      color:     var(--color-texto-medio);
+    }
+
+    /* Filas hover */
+    table.dataTable tbody tr:hover { background: rgba(11,105,103,0.05) !important; }
+
+    /* Filas alternadas */
+    table.dataTable tbody tr:nth-child(even) { background: #f5fbfb; }
+    table.dataTable tbody tr:nth-child(even):hover { background: rgba(11,105,103,0.07) !important; }
+
+    /* ── BOTONES DE EXPORTACIÓN ── */
+    .dt-buttons { margin-bottom: 14px; }
+    .dt-buttons .dt-button {
+      background:    var(--color-primario) !important;
+      color:         #fff !important;
+      border:        none !important;
+      border-radius: 6px !important;
+      padding:       7px 16px !important;
+      font-size:     0.82rem !important;
+      font-family:   inherit !important;
+      font-weight:   600 !important;
+      cursor:        pointer !important;
+      margin-right:  6px !important;
+      margin-bottom: 6px !important;
+      box-shadow:    none !important;
+      transition:    background 0.2s !important;
+    }
+    .dt-buttons .dt-button:hover {
+      background: var(--color-primario-oscuro) !important;
+    }
+    /* Botón Excel → acento ámbar */
+    .dt-buttons .dt-button:nth-child(1) {
+      background: var(--color-acento) !important;
+    }
+    .dt-buttons .dt-button:nth-child(1):hover {
+      background: #a86622 !important;
+    }
+
+    /* ── INPUT DE BÚSQUEDA ── */
+    .dataTables_filter input {
+      border:        1.5px solid var(--color-borde) !important;
+      border-radius: 6px !important;
+      padding:       6px 10px !important;
+      font-size:     0.85rem !important;
+      outline:       none !important;
+      font-family:   inherit !important;
+    }
+    .dataTables_filter input:focus {
+      border-color: var(--color-primario) !important;
+    }
+
+    /* ── BADGE DE ESTADO ── */
+    .badge-activo {
+      background:    rgba(11,105,103,0.12);
+      color:         var(--color-primario-oscuro);
+      padding:       3px 12px;
+      border-radius: 20px;
+      font-size:     0.75rem;
+      font-weight:   700;
+      display:       inline-block;
+    }
+    .badge-inactivo {
+      background: #f8d7da;
+      color:      #842029;
+      padding:    3px 12px;
+      border-radius: 20px;
+      font-size:  0.75rem;
+      font-weight: 700;
+      display:    inline-block;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .encabezado-pagina { flex-direction: column; }
+      .grilla-estadisticas { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── HEADER ── -->
+  <div class="encabezado-pagina">
+    <div>
+      <h1>Reporte de Usuarios</h1>
+      <p>Datos en tiempo real desde Oracle XE 21c · XEPDB1 · Tabla: usuarios</p>
+    </div>
+    <a href="menu.html" class="boton-volver-menu">← Volver al Menú</a>
+  </div>
+
+  <!-- ── CONTENEDOR PRINCIPAL ── -->
+  <div class="contenedor-principal">
+
+    <!-- ── ESTADÍSTICAS RÁPIDAS ── -->
+    <!-- Los valores se cargan desde JavaScript después de obtener la lista -->
+    <div class="grilla-estadisticas">
+      <div class="tarjeta-estadistica">
+        <div class="numero-estadistica" id="stat-total">—</div>
+        <div class="etiqueta-estadistica">Total usuarios</div>
+      </div>
+      <div class="tarjeta-estadistica">
+        <div class="numero-estadistica" id="stat-activos">—</div>
+        <div class="etiqueta-estadistica">Activos</div>
+      </div>
+      <div class="tarjeta-estadistica acento">
+        <div class="numero-estadistica" id="stat-inactivos">—</div>
+        <div class="etiqueta-estadistica">Inactivos</div>
+      </div>
+    </div>
+
+    <!-- ── TARJETA DEL REPORTE ── -->
+    <div class="tarjeta-reporte">
+      <p class="titulo-reporte">Listado interactivo — búsqueda, paginación y exportación</p>
+
+      <!--
+        id="tabla-usuarios-reporte" → jQuery y DataTables lo identifican con #tabla-usuarios-reporte
+        class="display"             → clase que DataTables espera para aplicar sus estilos
+      -->
+      <table id="tabla-usuarios-reporte" class="display" style="width:100%">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Email</th>
+            <th>Fecha Registro</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <!-- tbody se llena dinámicamente desde JavaScript -->
+        <tbody id="cuerpo-tabla-reporte"></tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       JAVASCRIPT — LÓGICA DEL REPORTE CON DATATABLES
+
+       Flujo de ejecución:
+       1. Al cargar la página, fetch() pide GET /api/usuarios
+       2. Se calculan estadísticas (total, activos, inactivos)
+       3. Se construyen las filas <tr> de la tabla
+       4. DataTables convierte la tabla en interactiva (búsqueda,
+          paginación, ordenamiento, exportación Excel/PDF/Print)
+  ══════════════════════════════════════════════════════════ -->
+  <script>
+
+    // ── FUNCIÓN: Formatear fecha ISO → dd/mm/aaaa ─────────────
+    // Oracle devuelve fechas en formato ISO (ej: "2024-03-15T00:00:00.000Z").
+    // Las convertimos a formato legible para Paraguay/Argentina: "15/03/2024".
+    function formatearFechaADDMMAAAA(fechaISO) {
+      if (!fechaISO) return '—';
+
+      const fecha = new Date(fechaISO);
+      const dia   = String(fecha.getDate()).padStart(2, '0');
+      const mes   = String(fecha.getMonth() + 1).padStart(2, '0'); // getMonth() empieza en 0
+      const anio  = fecha.getFullYear();
+
+      return `${dia}/${mes}/${anio}`;
+    }
+
+    // ── FUNCIÓN: Crear badge HTML según estado del usuario ────
+    // Devuelve un <span> con clase de color según si está activo o no.
+    function crearBadgeDeEstado(estadoEnBD) {
+      const esActivo = (estadoEnBD === 'A' || estadoEnBD === '1' || estadoEnBD === 1);
+
+      if (esActivo) {
+        return '<span class="badge-activo">Activo</span>';
+      } else {
+        return '<span class="badge-inactivo">Inactivo</span>';
+      }
+    }
+
+    // ── FUNCIÓN: Actualizar los contadores de estadísticas ────
+    // Recibe el array completo de usuarios y calcula los totales.
+    function actualizarPanelDeEstadisticas(listaDeUsuarios) {
+      const totalDeUsuarios     = listaDeUsuarios.length;
+      const cantidadDeActivos   = listaDeUsuarios.filter(u =>
+        u.ESTADO === 'A' || u.ESTADO === '1' || u.ESTADO === 1
+      ).length;
+      const cantidadDeInactivos = totalDeUsuarios - cantidadDeActivos;
+
+      // Actualizamos el texto de cada contador en el DOM.
+      document.getElementById('stat-total').textContent     = totalDeUsuarios;
+      document.getElementById('stat-activos').textContent   = cantidadDeActivos;
+      document.getElementById('stat-inactivos').textContent = cantidadDeInactivos;
+    }
+
+    // ── FUNCIÓN: Construir las filas HTML de la tabla ─────────
+    // Recorre el array de usuarios y agrega una <tr> por cada uno al <tbody>.
+    function construirFilasDeTabla(listaDeUsuarios) {
+      const cuerpoTabla = document.getElementById('cuerpo-tabla-reporte');
+      cuerpoTabla.innerHTML = ''; // Limpiamos antes de llenar
+
+      listaDeUsuarios.forEach(function(usuario) {
+        const fila = document.createElement('tr');
+
+        // Oracle devuelve los nombres de columna en MAYÚSCULAS.
+        fila.innerHTML = `
+          <td>${usuario.ID_USUARIO}</td>
+          <td><strong>${usuario.NOMBRE}</strong></td>
+          <td>${usuario.APELLIDO}</td>
+          <td>${usuario.EMAIL}</td>
+          <td>${formatearFechaADDMMAAAA(usuario.FECHA_CREACION)}</td>
+          <td>${crearBadgeDeEstado(usuario.ESTADO)}</td>
+        `;
+
+        cuerpoTabla.appendChild(fila);
+      });
+    }
+
+    // ── FUNCIÓN: Inicializar DataTables ────────────────────────
+    // DataTables transforma la tabla HTML estática en una tabla interactiva.
+    // Debe llamarse DESPUÉS de que las filas ya estén en el DOM.
+    function inicializarDataTables() {
+
+      // $('#tabla-usuarios-reporte') → jQuery selecciona la tabla por su id
+      // .DataTable({ ... }) → inicializa DataTables con la configuración indicada
+      $('#tabla-usuarios-reporte').DataTable({
+
+        // ── Traducción completa al español ──
+        language: {
+          search:      'Buscar:',
+          lengthMenu:  'Mostrar _MENU_ registros por página',
+          info:        'Mostrando _START_ a _END_ de _TOTAL_ usuarios',
+          infoEmpty:   'No hay usuarios para mostrar',
+          zeroRecords: 'No se encontraron coincidencias',
+          paginate: {
+            first:    'Primera',
+            last:     'Última',
+            next:     'Siguiente »',
+            previous: '« Anterior'
+          }
+        },
+
+        // ── Configuración de botones y layout ──
+        // 'B' → Buttons (botones), 'f' → filtro, 'r' → processing, 't' → tabla,
+        // 'i' → info, 'p' → paginación
+        dom: 'Bfrtip',
+
+        // ── Botones de exportación ──
+        buttons: [
+          {
+            extend:    'excelHtml5',           // Exporta a Excel usando JSZip
+            text:      '⬇ Excel',
+            title:     'Reporte de Usuarios — Sistema de Gestión',
+            className: 'boton-excel'
+          },
+          {
+            extend:      'pdfHtml5',           // Exporta a PDF usando pdfMake
+            text:        '⬇ PDF',
+            title:       'Reporte de Usuarios — Sistema de Gestión',
+            orientation: 'landscape',          // Horizontal para que entren todas las columnas
+            pageSize:    'A4'
+          },
+          {
+            extend: 'copy',                    // Copia los datos al portapapeles
+            text:   '📋 Copiar'
+          },
+          {
+            extend: 'print',                   // Abre el diálogo de impresión
+            text:   '🖨 Imprimir',
+            title:  'Reporte de Usuarios'
+          }
+        ],
+
+        // ── Ordenamiento inicial ──
+        order: [[0, 'asc']],  // Ordena por la columna 0 (ID) de menor a mayor
+
+        // ── Paginación ──
+        pageLength: 10,        // 10 registros por página por defecto
+        lengthMenu: [5, 10, 25, 50, 100] // Opciones del selector de cantidad
+      });
+    }
+
+    // ── FUNCIÓN PRINCIPAL: Cargar datos y activar el reporte ──
+    async function cargarReporteDeUsuarios() {
+      try {
+        // PASO 1: Pedimos los datos a la API del servidor (GET /api/usuarios).
+        const respuestaDelServidor = await fetch('/api/usuarios');
+        const datosRecibidos       = await respuestaDelServidor.json();
+
+        if (!datosRecibidos.exito) {
+          console.error('[REPORTE] Error del servidor:', datosRecibidos.mensaje);
+          return;
+        }
+
+        const listaDeUsuarios = datosRecibidos.usuarios;
+
+        // PASO 2: Calculamos y mostramos las estadísticas.
+        actualizarPanelDeEstadisticas(listaDeUsuarios);
+
+        // PASO 3: Construimos las filas de la tabla en el HTML.
+        construirFilasDeTabla(listaDeUsuarios);
+
+        // PASO 4: Inicializamos DataTables (DESPUÉS de que las filas están en el DOM).
+        // DataTables lee las filas existentes para hacer búsqueda/paginación sobre ellas.
+        inicializarDataTables();
+
+      } catch (errorDeRed) {
+        console.error('[REPORTE] No se pudo conectar al servidor:', errorDeRed.message);
+        document.getElementById('cuerpo-tabla-reporte').innerHTML =
+          '<tr><td colspan="6" style="text-align:center;color:#842029;padding:20px">No se pudo conectar con el servidor. ¿Está corriendo Node.js?</td></tr>';
+      }
+    }
+
+    // ── INICIO ────────────────────────────────────────────────
+    // DOMContentLoaded se dispara cuando el HTML terminó de cargarse (sin esperar imágenes).
+    // Aquí es seguro llamar a cargarReporteDeUsuarios() porque la tabla ya existe en el DOM.
+    document.addEventListener('DOMContentLoaded', cargarReporteDeUsuarios);
+
+  </script>
+
+</body>
+</html>

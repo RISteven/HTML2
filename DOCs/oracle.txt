@@ -1,0 +1,896 @@
+================================================================================
+    GUÍA COMPLETA: ORACLE EXPRESS 21c DESDE WINDOWS POWERSHELL + DBEAVER
+    Complemento didáctico para proyecto WEB — Clase de Bases de Datos
+    Programación 2 (PR2) — Universidad Columbia del Paraguay
+================================================================================
+Fecha: 2026-05-06
+Motor: Oracle Database Express Edition 21c (XE)
+
+================================================================================
+Titulo "Instalación, configuración y creación de usuarios, esquemas, base de datos y tablas en Oracle Database 21c Express Edition desde PowerShell Windows y DBeaver"
+Índice
+1. Propósito de la guía
+2. Conceptos mínimos antes de instalar
+3. Requisitos previos
+4. Descarga e instalación de Oracle 21c XE
+5. Verificación inicial desde PowerShell
+6. Conexión a Oracle desde PowerShell con SQL*Plus
+7. Creación de usuarios y esquemas
+8. Creación de tablas del caso académico
+9. Inserción y consulta de datos
+10. Administración básica de usuarios
+11. Ejecución de scripts .sql desde PowerShell
+12. Evidencias que debe entregar el alumno
+13. Errores frecuentes y soluciones
+14. Práctica integradora final
+15. Referencias oficiales
+Anexo A. Scripts completos para copiar y ejecutar
+Anexo B. Instalación y configuración de DBeaver para Oracle 21c XE
+ 
+1. Propósito de la guía
+Esta guía tiene como objetivo acompañar al alumno, paso a paso, en la instalación y uso básico de Oracle Database 21c Express Edition en Windows, utilizando PowerShell como consola principal de trabajo.
+Al finalizar, el alumno será capaz de:
+•	Instalar Oracle Database 21c XE en Windows.
+•	Verificar que los servicios de Oracle estén activos.
+•	Conectarse a Oracle desde PowerShell mediante SQL*Plus.
+•	Comprender la diferencia entre base de datos, usuario y esquema en Oracle.
+•	Crear usuarios académicos con permisos controlados.
+•	Crear tablas relacionales con claves primarias y foráneas.
+•	Insertar, consultar, actualizar y eliminar datos.
+•	Configurar DBeaver como cliente gráfico para conectarse a Oracle XE.
+•	Ejecutar scripts .sql desde PowerShell para automatizar prácticas.
+Advertencia: El enfoque es académico. Las contraseñas usadas son ejemplos para laboratorio y no deben utilizarse en ambientes reales de producción.
+
+2. Conceptos mínimos antes de instalar
+Antes de ejecutar comandos, es importante entender cómo organiza Oracle sus componentes. Muchos errores de alumnos ocurren porque intentan trabajar Oracle como si fuera MySQL, SQL Server o Access.
+Concepto	Explicación sencilla	Ejemplo en Oracle XE
+Base de datos	Conjunto de archivos, memoria y procesos donde se guardan y administran los datos.	XE
+Instancia	Procesos y memoria que permiten abrir y operar la base de datos.	Instancia XE
+CDB	Container Database. Es el contenedor principal de Oracle multitenant.	CDB$ROOT, servicio XE
+PDB	Pluggable Database. Es la base de trabajo donde conviene crear usuarios de práctica.	XEPDB1
+Servicio	Nombre usado para conectarse a una base o PDB por red.	//localhost:1521/XEPDB1
+Listener	Servicio que escucha conexiones externas o locales por TCP/IP.	Puerto 1521
+Usuario	Cuenta que permite iniciar sesión en Oracle.	alumno_prg2
+Esquema	Conjunto de objetos que pertenecen a un usuario: tablas, vistas, secuencias, procedimientos.	Tablas creadas por alumno_prg2
+Tablespace	Espacio lógico donde Oracle almacena los objetos de los usuarios.	USERS
+
+Nota: En Oracle, cuando se crea un usuario, también se crea su esquema. Por eso, para una práctica universitaria normalmente se crea un usuario por alumno o por grupo. Ese usuario será dueño de sus tablas.
+
+3. Requisitos previos
+Antes de instalar, revise los siguientes puntos:
+•	Usar Windows de 64 bits en una edición compatible con Oracle XE.
+•	Ingresar con una cuenta que sea miembro directo del grupo Administradores de Windows.
+•	No tener instalada otra versión de Oracle XE con el mismo SID XE.
+•	Eliminar o desactivar temporalmente variables de entorno antiguas ORACLE_HOME o TNS_ADMIN si existen.
+•	Tener espacio suficiente en disco. El instalador ocupa varios GB y la base puede crecer durante las prácticas.
+•	Tener permisos para iniciar, detener y consultar servicios de Windows.
+Comandos previos de diagnóstico en PowerShell
+# Abrir PowerShell y verificar la versión de Windows
+Get-ComputerInfo | Select-Object WindowsProductName, WindowsVersion, OsArchitecture
+
+# Verificar si existen variables de entorno Oracle antiguas
+[Environment]::GetEnvironmentVariable("ORACLE_HOME", "Machine")
+[Environment]::GetEnvironmentVariable("TNS_ADMIN", "Machine")
+
+# Verificar si ya existen servicios Oracle instalados
+Get-Service *Oracle* | Select-Object Name, Status, StartType
+Advertencia: Si aparecen servicios Oracle antiguos y el laboratorio requiere una instalación limpia, no elimine carpetas manualmente sin indicación del docente. Primero se debe desinstalar correctamente desde Windows.
+
+4. Descarga e instalación de Oracle 21c XE
+4.1 Descargar Oracle Database 21c Express Edition
+Ingrese al sitio oficial de Oracle y descargue la versión para Microsoft Windows de 64 bits. El archivo suele llamarse OracleXE213_Win64.zip.
+Página oficial de descarga: Oracle Database XE Downloads
+4.2 Extraer el archivo ZIP
+Una vez descargado el archivo ZIP:
+1.	Cree una carpeta temporal, por ejemplo C:\oracle_instalador.
+2.	Copie el archivo ZIP a esa carpeta.
+3.	Haga clic derecho sobre el ZIP y seleccione Extraer todo.
+4.	Verifique que dentro de la carpeta extraída exista el archivo setup.exe.
+Opcional: preparar carpeta desde PowerShell
+# Crear carpeta temporal para el instalador
+New-Item -ItemType Directory -Path C:\oracle_instalador -Force
+
+# Abrir la carpeta desde PowerShell
+explorer C:\oracle_instalador
+4.3 Ejecutar el instalador
+5.	Ubique el archivo setup.exe dentro de la carpeta extraída.
+6.	Ejecute setup.exe. Si Windows solicita permisos, acepte la elevación de permisos.
+7.	En la pantalla de bienvenida, seleccione Next.
+8.	Acepte el acuerdo de licencia si corresponde al uso académico indicado.
+9.	Use una carpeta de instalación sin espacios en la ruta. Se recomienda aceptar la ruta propuesta por Oracle.
+10.	Defina la contraseña para las cuentas administrativas SYS, SYSTEM y PDBADMIN.
+11.	Anote la contraseña en un lugar seguro. Sin ella, no podrá administrar la base.
+12.	Finalice la instalación y registre las cadenas de conexión mostradas al final.
+Nota: Use una contraseña de laboratorio con mayúscula, minúscula, número y símbolo. Ejemplo didáctico: AdminWeb2026#. Cada alumno debe reemplazarla por una propia.
+
+5. Verificación inicial desde PowerShell
+Después de instalar, no se debe comenzar a crear tablas inmediatamente. Primero se verifica que Oracle esté activo.
+5.1 Abrir PowerShell
+Presione Inicio, escriba PowerShell y abra Windows PowerShell. Para administrar servicios, conviene ejecutarlo como administrador.
+5.2 Verificar servicios de Oracle
+# Listar servicios Oracle instalados en Windows
+Get-Service *Oracle* | Select-Object Name, Status, StartType
+
+# Verificar el servicio principal de la base XE
+Get-Service OracleServiceXE
+
+# Buscar el servicio listener, cuyo nombre puede variar
+Get-Service *TNSListener*
+Resultado esperado:
+•	OracleServiceXE debe estar en estado Running.
+•	El servicio listener debe estar en estado Running.
+•	Si están detenidos, se deben iniciar antes de conectarse.
+Comandos de inicio y parada de servicios
+# Iniciar servicio principal de Oracle XE
+Start-Service OracleServiceXE
+
+# Iniciar listener. El nombre puede variar; primero búsquelo con Get-Service *TNSListener*
+Start-Service OracleOraDB21Home1TNSListener
+
+# Detener servicio principal, solo si el docente lo solicita
+Stop-Service OracleServiceXE
+Nota: No todos los equipos tendrán exactamente el mismo nombre de listener. Por eso primero se usa Get-Service *TNSListener* y luego se copia el nombre real del servicio.
+
+6. Conexión a Oracle desde PowerShell con SQL*Plus
+SQL*Plus es una herramienta de línea de comandos incluida con Oracle. Permite conectarse a la base de datos y ejecutar sentencias SQL.
+6.1 Ubicar SQL*Plus
+# Buscar sqlplus.exe dentro de C:\app
+Get-ChildItem "C:\app" -Recurse -Filter sqlplus.exe -ErrorAction SilentlyContinue |
+Select-Object -First 1 -ExpandProperty FullName
+Una ruta típica puede ser similar a:
+C:\app\<usuario_windows>\product\21.0.0\dbhomeXE\bin\sqlplus.exe
+6.2 Entrar a la carpeta bin de Oracle
+# Reemplace <usuario_windows> por el nombre de su usuario real de Windows
+cd C:\app\<usuario_windows>\product\21.0.0\dbhomeXE\bin
+
+# Probar SQL*Plus
+.\sqlplus -V
+Nota: Si sqlplus no se reconoce, no significa necesariamente que Oracle esté mal instalado. Puede ser solo un problema de PATH. En ese caso, entre a la carpeta bin y ejecute .\sqlplus.
+
+6.3 Verificar el listener
+# Desde la carpeta bin de Oracle
+.\lsnrctl status
+En la salida deben aparecer servicios como XE y XEPDB1. El servicio XEPDB1 es el que se usará para crear usuarios y tablas de laboratorio.
+6.4 Conectarse como administrador
+Forma recomendada para trabajar con usuarios de laboratorio: conectarse a la PDB XEPDB1 usando SYSTEM.
+.\sqlplus system/SuPassword@//localhost:1521/XEPDB1
+También puede conectarse como SYSDBA al contenedor principal, pero debe usarse con cuidado:
+.\sqlplus sys/SuPassword@//localhost:1521/XE as sysdba
+Advertencia: Para crear usuarios normales de clase, se recomienda conectarse a XEPDB1, no al contenedor raíz XE/CDB$ROOT. Si se conecta al lugar incorrecto, puede aparecer el error ORA-65096.
+
+6.5 Comandos básicos dentro de SQL*Plus
+-- Ver con qué usuario está conectado
+SHOW USER;
+
+-- Ver en qué contenedor está conectado
+SHOW CON_NAME;
+
+-- Ver PDB disponibles, si está conectado como SYSDBA al CDB
+SHOW PDBS;
+
+-- Salir de SQL*Plus
+EXIT;
+7. Creación de usuarios y esquemas
+En Oracle, un usuario puede iniciar sesión y también puede ser propietario de objetos. El esquema es el conjunto de objetos que pertenecen a ese usuario. Por ejemplo, si el usuario alumno_prg2 crea una tabla llamada alumnos, esa tabla pertenece al esquema alumno_prg2.
+7.1 Conectarse a XEPDB1 como SYSTEM
+cd C:\app\<usuario_windows>\product\21.0.0\dbhomeXE\bin
+.\sqlplus system/SuPassword@//localhost:1521/XEPDB1
+7.2 Crear un usuario académico
+CREATE USER alumno_prg2
+IDENTIFIED BY Alumno2026#
+DEFAULT TABLESPACE users
+TEMPORARY TABLESPACE temp
+QUOTA 100M ON users;
+7.3 Explicación línea por línea
+Línea	Qué significa
+CREATE USER alumno_prg2	Crea una nueva cuenta de usuario llamada alumno_prg2.
+IDENTIFIED BY Alumno2026#	Define la contraseña del usuario.
+DEFAULT TABLESPACE users	Indica que sus objetos se guardarán por defecto en el tablespace USERS.
+TEMPORARY TABLESPACE temp	Indica el espacio temporal que Oracle usará para operaciones internas como ordenamientos.
+QUOTA 100M ON users	Permite que el usuario use hasta 100 MB en el tablespace USERS.
+
+7.4 Otorgar permisos mínimos de laboratorio
+GRANT CREATE SESSION TO alumno_prg2;
+GRANT CREATE TABLE TO alumno_prg2;
+GRANT CREATE VIEW TO alumno_prg2;
+GRANT CREATE SEQUENCE TO alumno_prg2;
+GRANT CREATE PROCEDURE TO alumno_prg2;
+Advertencia: No otorgue DBA a usuarios de alumnos. DBA es un permiso administrativo amplio y no corresponde a prácticas iniciales. Para clase basta con CREATE SESSION, CREATE TABLE y otros permisos específicos según la actividad.
+
+7.5 Probar conexión con el nuevo usuario
+EXIT;
+
+.\sqlplus alumno_prg2/Alumno2026#@//localhost:1521/XEPDB1
+
+SHOW USER;
+SHOW CON_NAME;
+Resultado esperado:
+USER is "ALUMNO_PRG2"
+CON_NAME
+------------------------------
+XEPDB1
+8. Creación de tablas del caso académico
+Para practicar diseño relacional, se usará un caso sencillo: gestión académica básica con carreras, alumnos, materias, inscripciones y evaluaciones.
+Tabla	Qué representa	Clave principal
+carreras	Carreras habilitadas en la institución.	id_carrera
+alumnos	Datos básicos de alumnos.	id_alumno
+materias	Materias disponibles.	id_materia
+inscripciones	Relación entre alumnos y materias.	id_inscripcion
+evaluaciones	Puntajes obtenidos por inscripción.	id_evaluacion
+
+8.1 Tabla carreras
+CREATE TABLE carreras (
+    id_carrera NUMBER GENERATED BY DEFAULT AS IDENTITY,
+    nombre     VARCHAR2(100) NOT NULL,
+    estado     CHAR(1) DEFAULT 'A' NOT NULL,
+    CONSTRAINT pk_carreras PRIMARY KEY (id_carrera),
+    CONSTRAINT ck_carreras_estado CHECK (estado IN ('A','I'))
+);
+8.2 Tabla alumnos
+CREATE TABLE alumnos (
+    id_alumno      NUMBER GENERATED BY DEFAULT AS IDENTITY,
+    cedula         VARCHAR2(20) NOT NULL,
+    nombre         VARCHAR2(80) NOT NULL,
+    apellido       VARCHAR2(80) NOT NULL,
+    email          VARCHAR2(120),
+    fecha_registro DATE DEFAULT SYSDATE NOT NULL,
+    id_carrera     NUMBER NOT NULL,
+    CONSTRAINT pk_alumnos PRIMARY KEY (id_alumno),
+    CONSTRAINT uk_alumnos_cedula UNIQUE (cedula),
+    CONSTRAINT fk_alumnos_carreras FOREIGN KEY (id_carrera)
+        REFERENCES carreras(id_carrera)
+);
+8.3 Tabla materias
+CREATE TABLE materias (
+    id_materia NUMBER GENERATED BY DEFAULT AS IDENTITY,
+    nombre     VARCHAR2(100) NOT NULL,
+    semestre   NUMBER(2) NOT NULL,
+    creditos   NUMBER(2) DEFAULT 4 NOT NULL,
+    CONSTRAINT pk_materias PRIMARY KEY (id_materia),
+    CONSTRAINT ck_materias_semestre CHECK (semestre BETWEEN 1 AND 10),
+    CONSTRAINT ck_materias_creditos CHECK (creditos BETWEEN 1 AND 10)
+);
+8.4 Tabla inscripciones
+CREATE TABLE inscripciones (
+    id_inscripcion   NUMBER GENERATED BY DEFAULT AS IDENTITY,
+    id_alumno        NUMBER NOT NULL,
+    id_materia       NUMBER NOT NULL,
+    fecha_inscripcion DATE DEFAULT SYSDATE NOT NULL,
+    estado           VARCHAR2(20) DEFAULT 'INSCRIPTO' NOT NULL,
+    CONSTRAINT pk_inscripciones PRIMARY KEY (id_inscripcion),
+    CONSTRAINT fk_ins_alumno FOREIGN KEY (id_alumno)
+        REFERENCES alumnos(id_alumno),
+    CONSTRAINT fk_ins_materia FOREIGN KEY (id_materia)
+        REFERENCES materias(id_materia),
+    CONSTRAINT uk_ins_alumno_materia UNIQUE (id_alumno, id_materia),
+    CONSTRAINT ck_ins_estado CHECK (estado IN ('INSCRIPTO','APROBADO','REPROBADO','RETIRADO'))
+);
+8.5 Tabla evaluaciones
+CREATE TABLE evaluaciones (
+    id_evaluacion    NUMBER GENERATED BY DEFAULT AS IDENTITY,
+    id_inscripcion   NUMBER NOT NULL,
+    tipo             VARCHAR2(30) NOT NULL,
+    puntaje          NUMBER(5,2) NOT NULL,
+    fecha_evaluacion DATE DEFAULT SYSDATE NOT NULL,
+    CONSTRAINT pk_evaluaciones PRIMARY KEY (id_evaluacion),
+    CONSTRAINT fk_eval_inscripcion FOREIGN KEY (id_inscripcion)
+        REFERENCES inscripciones(id_inscripcion),
+    CONSTRAINT ck_eval_tipo CHECK (tipo IN ('PARCIAL','FINAL','RECUPERATORIO','TRABAJO')),
+    CONSTRAINT ck_eval_puntaje CHECK (puntaje BETWEEN 0 AND 100)
+);
+8.6 Verificar tablas creadas
+SELECT table_name
+FROM user_tables
+ORDER BY table_name;
+
+DESCRIBE alumnos;
+DESCRIBE inscripciones;
+9. Inserción y consulta de datos
+9.1 Insertar datos iniciales
+INSERT INTO carreras (nombre) VALUES ('Ingeniería en Informática');
+INSERT INTO carreras (nombre) VALUES ('Ingeniería Comercial');
+
+INSERT INTO materias (nombre, semestre, creditos) VALUES ('Programación 2', 3, 5);
+INSERT INTO materias (nombre, semestre, creditos) VALUES ('Base de Datos 1', 4, 5);
+
+INSERT INTO alumnos (cedula, nombre, apellido, email, id_carrera)
+VALUES ('1234567', 'Ana', 'Gómez', 'ana.gomez@correo.com', 1);
+
+INSERT INTO alumnos (cedula, nombre, apellido, email, id_carrera)
+VALUES ('2345678', 'Carlos', 'Pérez', 'carlos.perez@correo.com', 1);
+
+INSERT INTO inscripciones (id_alumno, id_materia) VALUES (1, 1);
+INSERT INTO inscripciones (id_alumno, id_materia) VALUES (2, 1);
+
+INSERT INTO evaluaciones (id_inscripcion, tipo, puntaje) VALUES (1, 'PARCIAL', 85);
+INSERT INTO evaluaciones (id_inscripcion, tipo, puntaje) VALUES (2, 'PARCIAL', 72);
+
+COMMIT;
+9.2 Consultas básicas
+SELECT * FROM carreras;
+SELECT * FROM alumnos;
+SELECT * FROM materias;
+SELECT * FROM inscripciones;
+SELECT * FROM evaluaciones;
+9.3 Consulta con JOIN
+SELECT
+    a.nombre || ' ' || a.apellido AS alumno,
+    c.nombre AS carrera,
+    m.nombre AS materia,
+    i.estado AS estado_inscripcion,
+    e.tipo AS evaluacion,
+    e.puntaje
+FROM alumnos a
+JOIN carreras c ON c.id_carrera = a.id_carrera
+JOIN inscripciones i ON i.id_alumno = a.id_alumno
+JOIN materias m ON m.id_materia = i.id_materia
+LEFT JOIN evaluaciones e ON e.id_inscripcion = i.id_inscripcion
+ORDER BY a.apellido, a.nombre;
+9.4 Actualizar y eliminar datos
+-- Actualizar un puntaje
+UPDATE evaluaciones
+SET puntaje = 90
+WHERE id_evaluacion = 1;
+
+COMMIT;
+
+-- Eliminar una evaluación específica
+DELETE FROM evaluaciones
+WHERE id_evaluacion = 2;
+
+COMMIT;
+Nota: No elimine registros padres si existen registros hijos relacionados. Por ejemplo, no podrá eliminar un alumno que ya tiene inscripciones si antes no elimina o modifica las inscripciones correspondientes.
+
+10. Administración básica de usuarios
+Estos comandos deben ejecutarse conectado como SYSTEM en XEPDB1.
+-- Cambiar contraseña
+ALTER USER alumno_prg2 IDENTIFIED BY NuevaClave2026#;
+
+-- Bloquear cuenta
+ALTER USER alumno_prg2 ACCOUNT LOCK;
+
+-- Desbloquear cuenta
+ALTER USER alumno_prg2 ACCOUNT UNLOCK;
+
+-- Aumentar cuota de almacenamiento
+ALTER USER alumno_prg2 QUOTA 200M ON users;
+
+-- Ver usuarios creados en la PDB
+SELECT username, account_status, default_tablespace
+FROM dba_users
+WHERE username LIKE 'ALUMNO%'
+ORDER BY username;
+Advertencia: Para eliminar un usuario y todos sus objetos se usa DROP USER usuario CASCADE. Este comando borra tablas, datos y objetos del esquema, por lo tanto debe usarse solo con autorización del docente.
+
+-- Ejemplo: eliminar usuario de laboratorio y todos sus objetos
+DROP USER alumno_prg2 CASCADE;
+11. Ejecución de scripts .sql desde PowerShell
+En lugar de escribir todo manualmente dentro de SQL*Plus, se pueden crear archivos .sql y ejecutarlos desde PowerShell. Esto es más ordenado y reduce errores.
+11.1 Crear carpeta de laboratorio
+New-Item -ItemType Directory -Path C:\oracle_lab -Force
+notepad C:\oracle_lab\01_crear_usuario.sql
+11.2 Contenido del script 01_crear_usuario.sql
+CREATE USER grupo01
+IDENTIFIED BY Grupo012026#
+DEFAULT TABLESPACE users
+TEMPORARY TABLESPACE temp
+QUOTA 100M ON users;
+
+GRANT CREATE SESSION TO grupo01;
+GRANT CREATE TABLE TO grupo01;
+GRANT CREATE VIEW TO grupo01;
+GRANT CREATE SEQUENCE TO grupo01;
+
+EXIT;
+11.3 Ejecutar el script desde PowerShell
+cd C:\app\<usuario_windows>\product\21.0.0\dbhomeXE\bin
+.\sqlplus system/SuPassword@//localhost:1521/XEPDB1 @C:\oracle_lab\01_crear_usuario.sql
+11.4 Guardar evidencia con SPOOL
+SPOOL C:\oracle_lab\evidencia_alumno_prg2.txt
+
+SHOW USER;
+SHOW CON_NAME;
+
+SELECT table_name
+FROM user_tables
+ORDER BY table_name;
+
+SELECT COUNT(*) AS cantidad_alumnos FROM alumnos;
+
+SPOOL OFF;
+EXIT;
+Nota: SPOOL crea un archivo de texto con la salida de SQL*Plus. Es útil para entregar evidencia de la práctica sin depender únicamente de capturas de pantalla.
+
+12. Evidencias que debe entregar el alumno
+N.º	Evidencia	Comando sugerido
+1	Servicios Oracle activos	Get-Service *Oracle*
+2	Listener funcionando	.\lsnrctl status
+3	Conexión a XEPDB1	SHOW CON_NAME;
+4	Usuario conectado	SHOW USER;
+5	Tablas creadas	SELECT table_name FROM user_tables;
+6	Datos insertados	SELECT * FROM alumnos;
+7	Consulta JOIN funcionando	Consulta del punto 9.3
+8	Archivo de evidencia	SPOOL evidencia.txt
+
+13. Errores frecuentes y soluciones
+Error o síntoma	Causa probable	Solución didáctica
+sqlplus no se reconoce	La carpeta bin de Oracle no está en el PATH.	Entrar con cd a dbhomeXE\bin y ejecutar .\sqlplus.
+ORA-01017: invalid username/password	Usuario, contraseña o servicio incorrecto.	Verificar credenciales y usar //localhost:1521/XEPDB1.
+ORA-12541: TNS:no listener	El listener no está iniciado.	Ejecutar Get-Service *TNSListener* y Start-Service.
+ORA-65096	Se intentó crear usuario común en CDB$ROOT.	Conectarse a XEPDB1 y crear allí el usuario académico.
+ORA-01950	El usuario no tiene cuota en el tablespace USERS.	ALTER USER usuario QUOTA 100M ON users;
+ORA-00942	La tabla no existe o pertenece a otro esquema.	Verificar SHOW USER y SELECT table_name FROM user_tables.
+ORA-28000	Cuenta bloqueada.	ALTER USER usuario ACCOUNT UNLOCK;
+ORA-01031	Permisos insuficientes.	Conceder el privilegio necesario con GRANT.
+
+14. Práctica integradora final
+El alumno debe realizar la siguiente práctica en su equipo o laboratorio:
+13.	Instalar o verificar Oracle Database 21c XE.
+14.	Comprobar servicios de Oracle desde PowerShell.
+15.	Conectarse a XEPDB1 con SQL*Plus.
+16.	Crear un usuario llamado practica_apellido, reemplazando apellido por el suyo.
+17.	Otorgar permisos mínimos: CREATE SESSION, CREATE TABLE, CREATE VIEW y CREATE SEQUENCE.
+18.	Conectarse con el usuario creado.
+19.	Crear las tablas carreras, alumnos, materias, inscripciones y evaluaciones.
+20.	Insertar al menos 3 carreras, 5 alumnos, 4 materias, 5 inscripciones y 5 evaluaciones.
+21.	Ejecutar una consulta JOIN que muestre alumno, carrera, materia y puntaje.
+22.	Guardar evidencia con SPOOL y entregar el archivo resultante.
+Criterio	Puntaje sugerido
+Instalación/verificación de servicios	15 puntos
+Conexión correcta a XEPDB1	10 puntos
+Creación correcta de usuario/esquema	15 puntos
+Diseño de tablas con PK, FK y restricciones	25 puntos
+Inserción y consulta de datos	20 puntos
+Evidencia ordenada con SPOOL/capturas	15 puntos
+
+15. Referencias oficiales
+Material utilizado como base técnica para esta guía:
+•	Oracle Database Express Edition Installation Guide, 21c for Microsoft Windows
+•	Oracle Database XE Quick Start
+•	Oracle Database XE Downloads
+•	Oracle Database XE Licensing Restrictions
+•	Oracle Database XE - Connecting to Oracle Database XE
+ 
+Anexo A. Scripts completos para copiar y ejecutar
+A.1 Script 01_crear_usuario_alumno.sql
+CREATE USER alumno_prg2
+IDENTIFIED BY Alumno2026#
+DEFAULT TABLESPACE users
+TEMPORARY TABLESPACE temp
+QUOTA 100M ON users;
+
+GRANT CREATE SESSION TO alumno_prg2;
+GRANT CREATE TABLE TO alumno_prg2;
+GRANT CREATE VIEW TO alumno_prg2;
+GRANT CREATE SEQUENCE TO alumno_prg2;
+GRANT CREATE PROCEDURE TO alumno_prg2;
+
+EXIT;
+A.2 Script 02_crear_tablas_academicas.sql
+CREATE TABLE carreras (
+    id_carrera NUMBER GENERATED BY DEFAULT AS IDENTITY,
+    nombre     VARCHAR2(100) NOT NULL,
+    estado     CHAR(1) DEFAULT 'A' NOT NULL,
+    CONSTRAINT pk_carreras PRIMARY KEY (id_carrera),
+    CONSTRAINT ck_carreras_estado CHECK (estado IN ('A','I'))
+);
+
+CREATE TABLE alumnos (
+    id_alumno      NUMBER GENERATED BY DEFAULT AS IDENTITY,
+    cedula         VARCHAR2(20) NOT NULL,
+    nombre         VARCHAR2(80) NOT NULL,
+    apellido       VARCHAR2(80) NOT NULL,
+    email          VARCHAR2(120),
+    fecha_registro DATE DEFAULT SYSDATE NOT NULL,
+    id_carrera     NUMBER NOT NULL,
+    CONSTRAINT pk_alumnos PRIMARY KEY (id_alumno),
+    CONSTRAINT uk_alumnos_cedula UNIQUE (cedula),
+    CONSTRAINT fk_alumnos_carreras FOREIGN KEY (id_carrera)
+        REFERENCES carreras(id_carrera)
+);
+
+CREATE TABLE materias (
+    id_materia NUMBER GENERATED BY DEFAULT AS IDENTITY,
+    nombre     VARCHAR2(100) NOT NULL,
+    semestre   NUMBER(2) NOT NULL,
+    creditos   NUMBER(2) DEFAULT 4 NOT NULL,
+    CONSTRAINT pk_materias PRIMARY KEY (id_materia),
+    CONSTRAINT ck_materias_semestre CHECK (semestre BETWEEN 1 AND 10),
+    CONSTRAINT ck_materias_creditos CHECK (creditos BETWEEN 1 AND 10)
+);
+
+CREATE TABLE inscripciones (
+    id_inscripcion    NUMBER GENERATED BY DEFAULT AS IDENTITY,
+    id_alumno         NUMBER NOT NULL,
+    id_materia        NUMBER NOT NULL,
+    fecha_inscripcion DATE DEFAULT SYSDATE NOT NULL,
+    estado            VARCHAR2(20) DEFAULT 'INSCRIPTO' NOT NULL,
+    CONSTRAINT pk_inscripciones PRIMARY KEY (id_inscripcion),
+    CONSTRAINT fk_ins_alumno FOREIGN KEY (id_alumno)
+        REFERENCES alumnos(id_alumno),
+    CONSTRAINT fk_ins_materia FOREIGN KEY (id_materia)
+        REFERENCES materias(id_materia),
+    CONSTRAINT uk_ins_alumno_materia UNIQUE (id_alumno, id_materia),
+    CONSTRAINT ck_ins_estado CHECK (estado IN ('INSCRIPTO','APROBADO','REPROBADO','RETIRADO'))
+);
+
+CREATE TABLE evaluaciones (
+    id_evaluacion    NUMBER GENERATED BY DEFAULT AS IDENTITY,
+    id_inscripcion   NUMBER NOT NULL,
+    tipo             VARCHAR2(30) NOT NULL,
+    puntaje          NUMBER(5,2) NOT NULL,
+    fecha_evaluacion DATE DEFAULT SYSDATE NOT NULL,
+    CONSTRAINT pk_evaluaciones PRIMARY KEY (id_evaluacion),
+    CONSTRAINT fk_eval_inscripcion FOREIGN KEY (id_inscripcion)
+        REFERENCES inscripciones(id_inscripcion),
+    CONSTRAINT ck_eval_tipo CHECK (tipo IN ('PARCIAL','FINAL','RECUPERATORIO','TRABAJO')),
+    CONSTRAINT ck_eval_puntaje CHECK (puntaje BETWEEN 0 AND 100)
+);
+
+EXIT;
+A.3 Script 03_insertar_datos.sql
+INSERT INTO carreras (nombre) VALUES ('Ingeniería en Informática');
+INSERT INTO carreras (nombre) VALUES ('Ingeniería Comercial');
+INSERT INTO carreras (nombre) VALUES ('Administración de Empresas');
+
+INSERT INTO materias (nombre, semestre, creditos) VALUES ('Programación 2', 3, 5);
+INSERT INTO materias (nombre, semestre, creditos) VALUES ('Base de Datos 1', 4, 5);
+INSERT INTO materias (nombre, semestre, creditos) VALUES ('Estructura de Datos', 3, 4);
+INSERT INTO materias (nombre, semestre, creditos) VALUES ('Sistemas de Información', 2, 4);
+
+INSERT INTO alumnos (cedula, nombre, apellido, email, id_carrera)
+VALUES ('1234567', 'Ana', 'Gómez', 'ana.gomez@correo.com', 1);
+
+INSERT INTO alumnos (cedula, nombre, apellido, email, id_carrera)
+VALUES ('2345678', 'Carlos', 'Pérez', 'carlos.perez@correo.com', 1);
+
+INSERT INTO alumnos (cedula, nombre, apellido, email, id_carrera)
+VALUES ('3456789', 'María', 'López', 'maria.lopez@correo.com', 2);
+
+INSERT INTO inscripciones (id_alumno, id_materia) VALUES (1, 1);
+INSERT INTO inscripciones (id_alumno, id_materia) VALUES (1, 2);
+INSERT INTO inscripciones (id_alumno, id_materia) VALUES (2, 1);
+INSERT INTO inscripciones (id_alumno, id_materia) VALUES (3, 4);
+
+INSERT INTO evaluaciones (id_inscripcion, tipo, puntaje) VALUES (1, 'PARCIAL', 85);
+INSERT INTO evaluaciones (id_inscripcion, tipo, puntaje) VALUES (2, 'PARCIAL', 78);
+INSERT INTO evaluaciones (id_inscripcion, tipo, puntaje) VALUES (3, 'PARCIAL', 72);
+INSERT INTO evaluaciones (id_inscripcion, tipo, puntaje) VALUES (4, 'TRABAJO', 95);
+
+COMMIT;
+EXIT;
+A.4 Script 04_consultas_evidencia.sql
+SPOOL C:\oracle_lab\evidencia_oracle_prg2.txt
+
+SHOW USER;
+SHOW CON_NAME;
+
+SELECT table_name
+FROM user_tables
+ORDER BY table_name;
+
+SELECT
+    a.nombre || ' ' || a.apellido AS alumno,
+    c.nombre AS carrera,
+    m.nombre AS materia,
+    i.estado AS estado_inscripcion,
+    e.tipo AS evaluacion,
+    e.puntaje
+FROM alumnos a
+JOIN carreras c ON c.id_carrera = a.id_carrera
+JOIN inscripciones i ON i.id_alumno = a.id_alumno
+JOIN materias m ON m.id_materia = i.id_materia
+LEFT JOIN evaluaciones e ON e.id_inscripcion = i.id_inscripcion
+ORDER BY a.apellido, a.nombre;
+
+SPOOL OFF;
+EXIT;
+ 
+Anexo B. Instalación y configuración de DBeaver para Oracle 21c XE
+Este complemento muestra cómo instalar DBeaver en Windows y cómo configurarlo para trabajar con Oracle Database 21c Express Edition. La finalidad es que el alumno pueda ejecutar consultas SQL, revisar sus tablas y validar los datos desde una interfaz gráfica, además del uso de PowerShell y SQL*Plus explicado en la guía principal.
+Nota: DBeaver no reemplaza a Oracle. Oracle es el motor de base de datos; DBeaver es una herramienta cliente que se conecta a Oracle mediante JDBC para facilitar la administración y la ejecución de SQL.
+
+B.1 Objetivo del complemento
+Al finalizar esta parte, el alumno será capaz de:
+•	Instalar DBeaver Community en Windows.
+•	Crear una conexión gráfica hacia Oracle XE usando el servicio XEPDB1.
+•	Conectarse con el usuario/esquema creado en la guía principal.
+•	Ejecutar scripts SQL desde el editor de DBeaver.
+•	Crear tablas, insertar datos, consultar registros y verificar errores frecuentes.
+•	Diferenciar entre conexión administrativa del docente y conexión académica del alumno.
+B.2 Requisitos previos antes de abrir DBeaver
+Antes de configurar DBeaver, primero debe estar funcionando Oracle XE. Si Oracle no responde, DBeaver tampoco podrá conectarse.
+Elemento	Verificación esperada	Comando o acción sugerida
+Oracle XE instalado	Debe existir el servicio OracleServiceXE.	Get-Service *Oracle*
+Listener activo	Debe aceptar conexiones por el puerto 1521.	Test-NetConnection localhost -Port 1521
+PDB de trabajo	El servicio XEPDB1 debe estar disponible para los usuarios académicos.	Conectarse a //localhost:1521/XEPDB1
+Usuario del alumno	Debe existir un usuario local en XEPDB1, por ejemplo ALUMNO01.	SELECT username FROM all_users WHERE username = 'ALUMNO01';
+Contraseña conocida	El alumno debe usar la contraseña asignada en laboratorio.	Ejemplo: Alumno2026#
+
+Comandos de diagnóstico antes de configurar DBeaver
+# Verificar servicios de Oracle desde PowerShell
+Get-Service *Oracle* | Select-Object Name, Status, StartType
+
+# Verificar si el puerto 1521 responde en la máquina local
+Test-NetConnection localhost -Port 1521
+
+# Probar conexión directa con SQL*Plus antes de usar DBeaver
+sqlplus alumno01/Alumno2026#@//localhost:1521/XEPDB1
+Advertencia: Si Test-NetConnection indica TcpTestSucceeded: False, revise que el listener esté iniciado. Si SQL*Plus no conecta, corrija primero Oracle antes de abrir DBeaver.
+
+B.3 Descargar e instalar DBeaver Community en Windows
+DBeaver Community es suficiente para las prácticas académicas de Programación 2 y laboratorio de base de datos. No es necesario instalar una versión paga para crear conexiones, ejecutar SQL, visualizar tablas o revisar datos.
+23.	Ingresar al sitio oficial de DBeaver y descargar la edición Community para Windows.
+24.	Seleccionar el instalador para Windows. En equipos de laboratorio, usar preferentemente el instalador estándar y no una versión portable, salvo indicación del docente.
+25.	Ejecutar el archivo descargado. Si Windows solicita permisos de administrador, aceptarlos.
+26.	Avanzar con Next o Siguiente en el asistente de instalación.
+27.	Aceptar la licencia del software.
+28.	Mantener las opciones predeterminadas de instalación, salvo que el laboratorio indique otra carpeta.
+29.	Finalizar la instalación y abrir DBeaver desde el menú Inicio.
+Nota: Las versiones actuales de DBeaver para Windows incluyen un entorno Java/OpenJDK, por lo que normalmente el alumno no necesita instalar Java manualmente para usar DBeaver.
+
+B.4 Primer inicio de DBeaver
+30.	Abrir DBeaver desde el menú Inicio de Windows.
+31.	Cuando pregunte por el workspace o espacio de trabajo, aceptar la ubicación predeterminada.
+32.	Si aparece una pantalla de bienvenida, cerrarla para ver el panel Database Navigator.
+33.	Ubicar el menú superior Database o Base de datos.
+34.	Seleccionar New Database Connection o Nueva conexión de base de datos.
+Nota: El workspace es la carpeta donde DBeaver guarda configuraciones locales, conexiones y preferencias del usuario de Windows. No es la base de datos.
+
+B.5 Crear la conexión de alumno hacia Oracle XE
+Esta es la conexión normal que debe usar el estudiante. Cada alumno debería conectarse con su propio usuario/esquema, por ejemplo ALUMNO01, ALUMNO02 o ADMIN_WEB, según la práctica definida por el docente.
+35.	En DBeaver, seleccionar Database > New Database Connection.
+36.	En la lista de motores de base de datos, buscar Oracle.
+37.	Seleccionar Oracle y presionar Next.
+38.	Si DBeaver solicita descargar archivos del driver JDBC de Oracle, aceptar la descarga.
+39.	Completar los datos de conexión según la tabla siguiente.
+40.	Presionar Test Connection para probar la conexión.
+41.	Si la prueba fue exitosa, presionar Finish.
+42.	En el panel Database Navigator, abrir la conexión creada y verificar que se vean los objetos del usuario.
+Campo en DBeaver	Valor para laboratorio local	Explicación
+Host	localhost	Indica que Oracle está instalado en la misma computadora.
+Port	1521	Puerto estándar del listener Oracle.
+Database	XEPDB1	Servicio de la Pluggable Database de trabajo en Oracle XE.
+Connection identifier	Service name	Para Oracle XE 21c se recomienda usar el servicio XEPDB1, no el SID.
+Authentication	Database / Username and Password	Autenticación con usuario y contraseña de Oracle.
+Username	ALUMNO01	Usuario/esquema creado para la práctica. Escribirlo sin comillas.
+Password	Alumno2026#	Contraseña asignada por el docente o creada en PowerShell.
+Role	Normal	Los alumnos no deben conectarse como SYSDBA.
+
+Datos técnicos equivalentes de conexión
+# Equivalente conceptual de la conexión en DBeaver:
+Host: localhost
+Puerto: 1521
+Servicio: XEPDB1
+Usuario: ALUMNO01
+Rol: Normal
+
+# Cadena JDBC equivalente:
+jdbc:oracle:thin:@//localhost:1521/XEPDB1
+Nota: En Oracle, el esquema del alumno normalmente tiene el mismo nombre que el usuario. Si el alumno se conecta como ALUMNO01, sus tablas se crearán dentro del esquema ALUMNO01.
+
+B.6 Configurar el driver Oracle si DBeaver no lo descarga automáticamente
+En la mayoría de los casos, DBeaver descarga el driver JDBC automáticamente al crear la primera conexión Oracle. Si el laboratorio no tiene Internet o el firewall bloquea la descarga, se puede configurar el driver manualmente.
+43.	Ir al menú Window > Preferences.
+44.	Entrar a Connections > Drivers.
+45.	Buscar Oracle en la lista de drivers.
+46.	Seleccionar Oracle y presionar Edit o Driver Settings.
+47.	En la pestaña Libraries, revisar si existen archivos JDBC asociados al driver.
+48.	Si no existen, presionar Download/Update para que DBeaver intente descargarlos.
+49.	Si no hay Internet, presionar Add File y seleccionar manualmente el archivo ojdbc correspondiente provisto por el docente.
+50.	Guardar los cambios y volver a probar la conexión.
+Situación	Causa probable	Solución
+DBeaver pide descargar driver	Primera conexión Oracle en ese equipo.	Aceptar la descarga si hay Internet.
+No descarga driver	Proxy, firewall o red bloqueada.	Configurar proxy o cargar el driver manualmente.
+Driver cargado pero no conecta	Error de host, puerto, servicio, usuario o contraseña.	Revisar XEPDB1, puerto 1521 y credenciales.
+Se usa driver Legacy	Selección incorrecta del driver.	Para Oracle 21c usar Oracle, no Oracle Legacy.
+
+B.7 Configuración recomendada del navegador de objetos
+Oracle contiene muchos objetos internos. Para alumnos principiantes, conviene mostrar solo el esquema conectado y evitar que se confundan con objetos de sistema.
+51.	Clic derecho sobre la conexión creada.
+52.	Seleccionar Edit Connection o Editar conexión.
+53.	Abrir la sección Oracle o Oracle Properties.
+54.	Activar Show only connected user schema si está disponible.
+55.	Desactivar opciones que muestren objetos DBA si no son necesarias.
+56.	Guardar y reconectar la conexión.
+57.	Presionar Refresh o Actualizar en el Database Navigator para ver los cambios.
+Nota: Esta configuración no cambia la base de datos. Solo cambia lo que DBeaver muestra en pantalla para que el estudiante trabaje con menos ruido visual.
+
+B.8 Ejecutar SQL desde DBeaver
+58.	Abrir la conexión del alumno en Database Navigator.
+59.	Clic derecho sobre la conexión y seleccionar SQL Editor > New SQL Script.
+60.	Escribir una consulta SQL sencilla.
+61.	Ejecutar la sentencia con el botón de ejecutar del editor.
+62.	Revisar la grilla de resultados en la parte inferior.
+63.	Si se modifica información, confirmar los cambios con Commit cuando corresponda.
+Primeras consultas para ejecutar en DBeaver
+-- Verificar con qué usuario está conectado el alumno
+SELECT USER FROM dual;
+
+-- Ver fecha y hora del servidor Oracle
+SELECT SYSDATE FROM dual;
+
+-- Ver tablas propias del usuario conectado
+SELECT table_name
+FROM user_tables
+ORDER BY table_name;
+Nota: Cada sentencia SQL debe finalizar con punto y coma. Si se ejecuta un script completo, DBeaver enviará las instrucciones al motor Oracle en orden.
+
+B.9 Crear tablas desde DBeaver usando el esquema del alumno
+El siguiente ejemplo crea un pequeño modelo académico para practicar claves primarias, claves foráneas e inserción de datos. Debe ejecutarse conectado como el usuario del alumno, no como SYS.
+Script de creación de tablas desde DBeaver
+-- Crear tabla de departamentos académicos
+CREATE TABLE departamentos (
+    id_departamento NUMBER GENERATED BY DEFAULT AS IDENTITY,
+    nombre          VARCHAR2(80) NOT NULL,
+    estado          VARCHAR2(20) DEFAULT 'ACTIVO' NOT NULL,
+    CONSTRAINT pk_departamentos PRIMARY KEY (id_departamento),
+    CONSTRAINT uk_departamentos_nombre UNIQUE (nombre)
+);
+
+-- Crear tabla de alumnos
+CREATE TABLE alumnos (
+    id_alumno       NUMBER GENERATED BY DEFAULT AS IDENTITY,
+    nombre          VARCHAR2(80) NOT NULL,
+    apellido        VARCHAR2(80) NOT NULL,
+    correo          VARCHAR2(120) NOT NULL,
+    id_departamento NUMBER NOT NULL,
+    fecha_registro  DATE DEFAULT SYSDATE NOT NULL,
+    CONSTRAINT pk_alumnos PRIMARY KEY (id_alumno),
+    CONSTRAINT uk_alumnos_correo UNIQUE (correo),
+    CONSTRAINT fk_alumnos_departamento FOREIGN KEY (id_departamento)
+        REFERENCES departamentos (id_departamento)
+);
+
+-- Crear tabla de cursos
+CREATE TABLE cursos (
+    id_curso NUMBER GENERATED BY DEFAULT AS IDENTITY,
+    nombre   VARCHAR2(100) NOT NULL,
+    creditos NUMBER(2) NOT NULL,
+    CONSTRAINT pk_cursos PRIMARY KEY (id_curso),
+    CONSTRAINT ck_cursos_creditos CHECK (creditos BETWEEN 1 AND 10)
+);
+
+-- Crear tabla de inscripciones
+CREATE TABLE inscripciones (
+    id_inscripcion NUMBER GENERATED BY DEFAULT AS IDENTITY,
+    id_alumno      NUMBER NOT NULL,
+    id_curso       NUMBER NOT NULL,
+    fecha          DATE DEFAULT SYSDATE NOT NULL,
+    estado         VARCHAR2(20) DEFAULT 'INSCRIPTO' NOT NULL,
+    CONSTRAINT pk_inscripciones PRIMARY KEY (id_inscripcion),
+    CONSTRAINT fk_inscripciones_alumno FOREIGN KEY (id_alumno)
+        REFERENCES alumnos (id_alumno),
+    CONSTRAINT fk_inscripciones_curso FOREIGN KEY (id_curso)
+        REFERENCES cursos (id_curso),
+    CONSTRAINT uk_inscripcion_unica UNIQUE (id_alumno, id_curso)
+);
+Advertencia: Si aparece ORA-00955, significa que el nombre del objeto ya existe. En ese caso, revisar si la tabla ya fue creada o eliminarla correctamente antes de volver a ejecutar el script.
+
+B.10 Insertar y consultar datos desde DBeaver
+Script de carga y consulta de datos
+-- Insertar datos de ejemplo
+INSERT INTO departamentos (nombre) VALUES ('Informática');
+INSERT INTO departamentos (nombre) VALUES ('Administración');
+
+INSERT INTO alumnos (nombre, apellido, correo, id_departamento)
+VALUES ('Ana', 'Gómez', 'ana.gomez@universidad.edu.py', 1);
+
+INSERT INTO alumnos (nombre, apellido, correo, id_departamento)
+VALUES ('Carlos', 'Pereira', 'carlos.pereira@universidad.edu.py', 1);
+
+INSERT INTO cursos (nombre, creditos) VALUES ('Programación 2', 5);
+INSERT INTO cursos (nombre, creditos) VALUES ('Base de Datos', 4);
+
+INSERT INTO inscripciones (id_alumno, id_curso) VALUES (1, 1);
+INSERT INTO inscripciones (id_alumno, id_curso) VALUES (2, 1);
+
+COMMIT;
+
+-- Consulta con JOIN para comprobar relaciones
+SELECT a.id_alumno,
+       a.nombre || ' ' || a.apellido AS alumno,
+       d.nombre AS departamento,
+       c.nombre AS curso,
+       i.estado,
+       i.fecha
+FROM inscripciones i
+JOIN alumnos a ON a.id_alumno = i.id_alumno
+JOIN cursos c ON c.id_curso = i.id_curso
+JOIN departamentos d ON d.id_departamento = a.id_departamento
+ORDER BY a.apellido, a.nombre;
+Nota: El comando COMMIT confirma los cambios. Si Auto-Commit está desactivado, los INSERT quedan pendientes hasta confirmar. Si el alumno cierra sin confirmar, puede perder los cambios de la sesión.
+
+B.11 Uso básico del editor y de la grilla de datos
+Acción en DBeaver	Uso didáctico	Cuidado académico
+SQL Editor	Escribir y ejecutar consultas SQL.	Ejecutar una sentencia a la vez al iniciar.
+Result Set / grilla	Ver resultados de SELECT.	No confundir ver datos con modificar datos.
+Data Editor	Abrir una tabla y revisar registros.	Si se editan celdas, confirmar o cancelar cambios.
+Refresh	Actualizar el árbol de objetos.	Después de crear tablas, refrescar el esquema.
+Commit	Confirmar INSERT, UPDATE o DELETE.	Explicar transacciones antes de modificar datos.
+Rollback	Deshacer cambios no confirmados.	Solo funciona antes del COMMIT.
+Export Data	Exportar resultados a CSV o Excel para reportes.	No usar como sustituto del modelo relacional.
+
+B.12 Crear usuarios desde DBeaver: uso exclusivo del docente o administrador
+DBeaver también permite ejecutar comandos administrativos, pero esta práctica debe estar reservada al docente o al responsable del laboratorio. El alumno no debe recibir la contraseña SYS ni conectarse con rol SYSDBA.
+64.	Crear una conexión administrativa separada en DBeaver.
+65.	Usar Host localhost, Port 1521 y Service name XEPDB1.
+66.	Ingresar usuario SYS o SYSTEM según la política del laboratorio.
+67.	Si se usa SYS, seleccionar Role: SYSDBA.
+68.	Probar la conexión y abrir un SQL Script administrativo.
+69.	Crear usuarios locales dentro de XEPDB1, no dentro del contenedor raíz CDB$ROOT.
+Creación controlada de un usuario académico desde DBeaver
+-- Script administrativo para crear un usuario académico en XEPDB1
+-- Ejecutar solo como docente/administrador.
+
+CREATE USER alumno02
+IDENTIFIED BY Alumno2026#
+DEFAULT TABLESPACE users
+TEMPORARY TABLESPACE temp
+QUOTA 50M ON users;
+
+GRANT CREATE SESSION TO alumno02;
+GRANT CREATE TABLE TO alumno02;
+GRANT CREATE VIEW TO alumno02;
+GRANT CREATE SEQUENCE TO alumno02;
+GRANT CREATE PROCEDURE TO alumno02;
+
+ALTER USER alumno02 ACCOUNT UNLOCK;
+Advertencia: No otorgar DBA a los alumnos. Para una práctica académica básica bastan CREATE SESSION, CREATE TABLE, CREATE VIEW, CREATE SEQUENCE y, si se requiere, CREATE PROCEDURE.
+
+B.13 Diferencia entre trabajar con el usuario propio y cambiar de esquema
+La forma correcta para estudiantes es que cada uno se conecte con su propio usuario. En Oracle, el usuario y el esquema tienen una relación directa: si el usuario ALUMNO01 crea una tabla, la tabla queda dentro del esquema ALUMNO01.
+Caso	Ejemplo	Recomendación
+Alumno trabaja en su práctica	Conectarse como ALUMNO01.	Recomendado. Sus tablas quedan en su propio esquema.
+Docente revisa otro esquema	Conectarse como ADMIN_WEB y consultar ALUMNO01.ALUMNOS.	Útil para corrección, si tiene permisos.
+Cambiar esquema de sesión	ALTER SESSION SET CURRENT_SCHEMA = ALUMNO01;	Usar solo para revisión avanzada. No crea permisos nuevos.
+
+Consulta con prefijo de esquema y cambio de esquema de sesión
+-- Consultar una tabla de otro esquema usando prefijo de esquema
+SELECT * FROM alumno01.alumnos;
+
+-- Cambiar el esquema por defecto de la sesión actual
+-- Esto no cambia el usuario conectado ni otorga permisos nuevos.
+ALTER SESSION SET CURRENT_SCHEMA = alumno01;
+
+SELECT * FROM alumnos;
+B.14 Errores frecuentes al conectar DBeaver con Oracle XE
+Error o síntoma	Causa probable	Solución didáctica
+ORA-01017: invalid username/password	Usuario, contraseña o servicio incorrecto.	Reescribir credenciales. Verificar que la conexión use XEPDB1.
+ORA-12541: no listener	Listener detenido o puerto 1521 no disponible.	Revisar servicios Oracle y ejecutar Test-NetConnection localhost -Port 1521.
+ORA-12514 o servicio desconocido	Se escribió mal el servicio o se usó XE en vez de XEPDB1.	Usar Service name: XEPDB1 para usuarios académicos.
+ORA-65096: invalid common user or role name	Se intentó crear usuario local en CDB$ROOT.	Conectarse a XEPDB1 antes de crear usuarios de práctica.
+ORA-01950: no privileges on tablespace USERS	El usuario no tiene cuota en la tablespace USERS.	Ejecutar ALTER USER alumno01 QUOTA 50M ON users; como administrador.
+DBeaver no muestra la tabla recién creada	El navegador no fue actualizado.	Presionar Refresh sobre el esquema o reconectar.
+Driver files are missing	El driver JDBC de Oracle no está descargado.	Aceptar descarga del driver o agregar ojdbc manualmente.
+Connection timeout	Firewall, antivirus, servicio detenido o host incorrecto.	Validar localhost, puerto 1521 y estado de servicios.
+
+B.15 Práctica guiada para el alumno
+Actividad: configurar DBeaver y demostrar conexión funcional con Oracle XE.
+Fase	Tarea	Evidencia que debe entregar el alumno
+1	Instalar DBeaver Community.	Captura de DBeaver abierto.
+2	Crear conexión Oracle hacia localhost:1521/XEPDB1.	Captura de Test Connection exitoso.
+3	Conectarse como usuario asignado.	Resultado de SELECT USER FROM dual.
+4	Crear las tablas departamentos, alumnos, cursos e inscripciones.	Captura del esquema con las tablas creadas.
+5	Insertar datos y ejecutar consulta con JOIN.	Captura de la grilla de resultados.
+6	Exportar el resultado de la consulta a CSV.	Archivo CSV o captura del asistente de exportación.
+
+B.16 Rúbrica breve de evaluación del uso de DBeaver
+Criterio	Excelente	Aceptable	Insuficiente	Puntaje sugerido
+Instalación	Instala DBeaver y reconoce su función como cliente.	Instala con ayuda.	No logra abrir la herramienta.	10
+Conexión Oracle	Configura correctamente host, puerto, servicio, usuario y rol.	Conecta con correcciones menores.	No distingue XE de XEPDB1.	20
+Uso del esquema	Trabaja con su usuario y comprende usuario/esquema.	Crea objetos con ayuda.	Crea o intenta crear objetos en el lugar incorrecto.	20
+Ejecución SQL	Ejecuta CREATE, INSERT, SELECT y COMMIT correctamente.	Ejecuta consultas simples.	No interpreta errores SQL.	25
+Verificación y evidencias	Entrega capturas claras y resultados consistentes.	Entrega evidencias parciales.	No demuestra funcionamiento.	15
+Buenas prácticas	No usa SYSDBA como alumno y evita permisos excesivos.	Requiere recordatorios.	Usa credenciales administrativas sin control.	10
+
+B.17 Checklist rápido para laboratorio
+Antes de iniciar la clase práctica, el docente puede verificar lo siguiente:
+•	OracleServiceXE está iniciado.
+•	OracleOraDB21Home1TNSListener está iniciado o el listener equivalente responde.
+•	El puerto 1521 responde localmente.
+•	La PDB XEPDB1 está disponible.
+•	Existen usuarios de práctica o existe script para crearlos.
+•	DBeaver abre correctamente en cada equipo.
+•	DBeaver puede descargar el driver Oracle o el docente dispone del archivo JDBC para carga manual.
+•	Los alumnos no tienen acceso a la contraseña SYS.

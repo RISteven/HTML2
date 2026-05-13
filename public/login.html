@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<!-- Declaración HTML5 — le indica al navegador qué versión de HTML usar -->
+<html lang="es">
+<!-- lang="es" → importante para lectores de pantalla y corrector ortográfico -->
+
+<head>
+  <meta charset="UTF-8">
+  <!-- UTF-8 soporta tildes, ñ y todos los caracteres del español -->
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- viewport → hace que la página se vea bien en celulares y tablets -->
+
+  <title>Acceso — Sistema de Gestión</title>
+
+  <style>
+    /* ══════════════════════════════════════════════════════════
+       VARIABLES DE COLOR — UNIVERSIDAD COLUMBIA DEL PARAGUAY
+       Definidas en :root para reutilizarlas en toda la página.
+       Cambiando solo estas variables se puede cambiar todo el diseño.
+    ══════════════════════════════════════════════════════════ */
+    :root {
+      --color-primario:        #0b6967;  /* Teal institucional — color del logo Columbia */
+      --color-primario-oscuro: #094f4d;  /* Versión oscura — para degradados de header */
+      --color-primario-claro:  #0e8a87;  /* Versión clara — para hover de botones */
+      --color-acento:          #c47a28;  /* Ámbar — color complementario del teal */
+      --color-fondo:           #f2f8f8;  /* Fondo de página — teal muy suave */
+      --color-superficie:      #ffffff;  /* Tarjetas y formularios — blanco */
+      --color-texto:           #172828;  /* Texto principal — casi negro con tinte teal */
+      --color-texto-medio:     #3d5e5e;  /* Texto secundario */
+      --color-borde:           #bdd8d8;  /* Bordes suaves */
+      --color-exito:           #0d6b4f;  /* Verde para mensajes de éxito */
+      --color-fondo-exito:     #d4edda;  /* Fondo verde claro */
+      --color-error:           #842029;  /* Rojo para mensajes de error */
+      --color-fondo-error:     #f8d7da;  /* Fondo rojo claro */
+    }
+
+    /* ── RESET BÁSICO ── */
+    /* Eliminamos el margen y padding por defecto que los navegadores asignan a todos los elementos */
+    *, *::before, *::after {
+      box-sizing: border-box;  /* El padding y border quedan DENTRO del ancho declarado */
+      margin:  0;
+      padding: 0;
+    }
+
+    /* ── CUERPO DE LA PÁGINA ── */
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;  /* Tipografía del sistema */
+      background:  var(--color-fondo);
+      color:       var(--color-texto);
+      min-height:  100vh;          /* Al menos el alto completo de la pantalla */
+      display:     flex;
+      flex-direction: column;      /* Header arriba, formulario en el centro */
+      align-items: center;
+    }
+
+    /* ── ENCABEZADO DE LA PÁGINA ── */
+    .encabezado-pagina {
+      width: 100%;
+      background: linear-gradient(135deg,
+        var(--color-primario-oscuro) 0%,
+        var(--color-primario)        60%,
+        var(--color-primario-claro)  100%);
+      color: #fff;
+      text-align: center;
+      padding: 28px 20px 22px;
+      box-shadow: 0 3px 12px rgba(9,79,77,0.35);
+    }
+    .encabezado-pagina h1 {
+      font-size:   1.4rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+    .encabezado-pagina p {
+      font-size: 0.82rem;
+      opacity:   0.78;
+      margin-top: 4px;
+    }
+
+    /* ── CONTENEDOR DEL FORMULARIO ── */
+    /* flex-grow: 1 → ocupa el espacio restante y centra el card verticalmente */
+    .contenedor-central {
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+      width: 100%;
+    }
+
+    /* ── TARJETA DEL FORMULARIO ── */
+    .tarjeta-formulario {
+      background:    var(--color-superficie);
+      border-radius: 14px;
+      border:        1px solid var(--color-borde);
+      box-shadow:    0 4px 20px rgba(11,105,103,0.1);
+      padding:       36px 32px;
+      width:         100%;
+      max-width:     420px;  /* Máximo 420px — ideal para formularios de login */
+    }
+    .tarjeta-formulario h2 {
+      font-size:     1.2rem;
+      color:         var(--color-primario);
+      margin-bottom: 24px;
+      text-align:    center;
+      font-weight:   700;
+    }
+
+    /* ── CAMPOS DE ENTRADA ── */
+    .campo-formulario {
+      width:         100%;
+      padding:       11px 14px;
+      margin-bottom: 14px;
+      border:        1.5px solid var(--color-borde);
+      border-radius: 8px;
+      font-size:     0.95rem;
+      font-family:   inherit;         /* Hereda la tipografía del body */
+      color:         var(--color-texto);
+      background:    var(--color-fondo);
+      transition:    border-color 0.2s; /* Animación suave al enfocar */
+      display:       block;            /* Ocupa toda la línea */
+    }
+    .campo-formulario:focus {
+      outline:       none;              /* Quitamos el borde azul por defecto del navegador */
+      border-color:  var(--color-primario);
+      background:    var(--color-superficie);
+    }
+
+    /* ── BOTÓN PRINCIPAL ── */
+    .boton-principal {
+      width:         100%;
+      padding:       12px;
+      background:    var(--color-primario);
+      color:         #fff;
+      border:        none;
+      border-radius: 8px;
+      font-size:     1rem;
+      font-weight:   700;
+      cursor:        pointer;
+      transition:    background 0.2s;
+      margin-top:    6px;
+    }
+    .boton-principal:hover {
+      background: var(--color-primario-claro);
+    }
+    .boton-principal:active {
+      background: var(--color-primario-oscuro);
+    }
+
+    /* ── ÁREA DE MENSAJES (éxito / error) ── */
+    .area-mensaje {
+      margin-top:    14px;
+      padding:       10px 14px;
+      border-radius: 8px;
+      font-size:     0.88rem;
+      text-align:    center;
+      display:       none;  /* Oculto por defecto — JavaScript lo muestra cuando hay algo */
+    }
+    .area-mensaje.exito {
+      display:    block;
+      background: var(--color-fondo-exito);
+      color:      var(--color-exito);
+      border:     1px solid #a3d9b8;
+    }
+    .area-mensaje.error {
+      display:    block;
+      background: var(--color-fondo-error);
+      color:      var(--color-error);
+      border:     1px solid #f5c2c7;
+    }
+
+    /* ── RESPONSIVE: pantallas pequeñas ── */
+    @media (max-width: 480px) {
+      .tarjeta-formulario { padding: 24px 18px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── ENCABEZADO CON NOMBRE DE LA INSTITUCIÓN ── -->
+  <div class="encabezado-pagina">
+    <h1>Sistema de Gestión — Universidad Columbia</h1>
+    <p>Programación 2 (PR2) · Ingeniería en Informática</p>
+  </div>
+
+  <!-- ── CONTENEDOR CENTRAL (centra la tarjeta vertical y horizontalmente) ── -->
+  <div class="contenedor-central">
+
+    <!-- ── TARJETA DEL FORMULARIO DE LOGIN ── -->
+    <div class="tarjeta-formulario">
+
+      <h2>Acceso al Sistema</h2>
+
+      <!-- El id="formularioLogin" lo usa JavaScript para escuchar el evento submit -->
+      <form id="formularioLogin">
+
+        <input
+          type="text"
+          id="campoUsuario"
+          class="campo-formulario"
+          placeholder="Nombre de usuario"
+          required
+          autocomplete="username">
+        <!--
+          type="text"      → acepta cualquier texto
+          required         → el navegador impide enviar si está vacío
+          autocomplete     → sugiere usuarios guardados previamente
+        -->
+
+        <input
+          type="password"
+          id="campoClave"
+          class="campo-formulario"
+          placeholder="Contraseña"
+          required
+          autocomplete="current-password">
+        <!--
+          type="password"  → oculta los caracteres con puntos
+        -->
+
+        <button type="submit" class="boton-principal">Ingresar al Sistema</button>
+
+      </form>
+
+      <!-- Área donde JavaScript mostrará mensajes de éxito o error -->
+      <div id="areaDeResultado" class="area-mensaje"></div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       JAVASCRIPT — LÓGICA DE INICIO DE SESIÓN
+  ══════════════════════════════════════════════════════════ -->
+  <script>
+    // ── REFERENCIAS A ELEMENTOS DEL DOM ──────────────────────
+    // Guardamos referencias a los elementos que usaremos frecuentemente.
+    const formularioLogin   = document.getElementById('formularioLogin');
+    const campoUsuario      = document.getElementById('campoUsuario');
+    const campoClave        = document.getElementById('campoClave');
+    const areaDeResultado   = document.getElementById('areaDeResultado');
+
+    // ── FUNCIÓN: Mostrar mensaje en la pantalla ───────────────
+    // Parámetros:
+    //   texto → el mensaje a mostrar
+    //   tipo  → 'exito' (verde) o 'error' (rojo)
+    function mostrarMensaje(texto, tipo) {
+      areaDeResultado.textContent = texto;
+      areaDeResultado.className   = 'area-mensaje ' + tipo; // Activa los estilos de color
+    }
+
+    // ── FUNCIÓN: Enviar credenciales al servidor ──────────────
+    // Se llama cuando el usuario hace clic en "Ingresar al Sistema".
+    // "async" permite usar "await" para esperar la respuesta del servidor.
+    async function iniciarSesion(evento) {
+
+      // PASO 1: Cancelamos el comportamiento por defecto del formulario.
+      // Sin esto, el formulario recargaría la página completa al enviarse.
+      evento.preventDefault();
+
+      // PASO 2: Armamos el objeto con las credenciales del formulario.
+      const credenciales = {
+        usuario: campoUsuario.value.trim(), // .trim() elimina espacios al inicio y al final
+        clave:   campoClave.value
+      };
+
+      // PASO 3: Enviamos las credenciales al servidor con fetch().
+      // fetch() hace una petición HTTP — aquí usamos POST porque enviamos datos.
+      try {
+        const respuestaDelServidor = await fetch('/api/login', {
+          method:  'POST',                                  // POST → enviamos datos
+          headers: { 'Content-Type': 'application/json' }, // Le avisamos que mandamos JSON
+          body:    JSON.stringify(credenciales)             // Convertimos el objeto a texto JSON
+        });
+
+        // PASO 4: Convertimos la respuesta de texto JSON a objeto JavaScript.
+        const datosRecibidos = await respuestaDelServidor.json();
+
+        // PASO 5: Analizamos la respuesta del servidor.
+        if (datosRecibidos.success) {
+          // Login exitoso: guardamos el nombre del usuario en sessionStorage.
+          // sessionStorage dura mientras el navegador esté abierto (no persiste).
+          sessionStorage.setItem('usuarioActivo', datosRecibidos.usuario);
+
+          mostrarMensaje('Acceso correcto. Redirigiendo...', 'exito');
+
+          // Pequeña pausa antes de redirigir para que el usuario vea el mensaje.
+          setTimeout(() => {
+            window.location.href = 'menu.html'; // Ir al menú principal
+          }, 800);
+
+        } else {
+          // Error de autenticación: credenciales incorrectas.
+          mostrarMensaje(datosRecibidos.message, 'error');
+          campoClave.value = ''; // Limpiamos solo la contraseña, no el usuario
+          campoClave.focus();    // Enfocamos el campo de contraseña para reintentar
+        }
+
+      } catch (errorDeRed) {
+        // Error de red: el servidor no está corriendo o no hay conexión.
+        mostrarMensaje('No se pudo conectar con el servidor. ¿Está corriendo Node.js?', 'error');
+        console.error('[LOGIN] Error de red:', errorDeRed.message);
+      }
+    }
+
+    // ── EVENTO: Escuchamos el submit del formulario ───────────
+    // Cuando el usuario hace clic en "Ingresar", llamamos a iniciarSesion().
+    formularioLogin.addEventListener('submit', iniciarSesion);
+  </script>
+
+</body>
+</html>

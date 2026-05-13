@@ -1,0 +1,7 @@
+
+js/	Contiene el código del servidor y la conexión a Oracle.
+routes/	Define las rutas del backend (login y CRUD).
+public/	Contiene los archivos que el navegador puede ver (HTML, CSS, JS).
+DOCs/	Guarda tus scripts SQL y documentación del curso.
+img/	Guarda imágenes del sitio o del proyecto.
+node_modules/	Librerías instaladas por npm (Express, OracleDB, etc.).
