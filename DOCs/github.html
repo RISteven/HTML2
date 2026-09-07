@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitHub — Instalación y Uso Básico | PR2 Columbia</title>
+<style>
+
+  :root {
+    --p:    #0b6967;
+    --pd:   #094f4d;
+    --pl:   #0e8a87;
+    --acc:  #c47a28;
+    --accl: #e8a84e;
+    --bg:   #f2f8f8;
+    --surf: #ffffff;
+    --code: #0a2424;
+    --chl:  #133535;
+    --txt:  #172828;
+    --mid:  #3d5e5e;
+    --soft: #6e8f8f;
+    --bdr:  #bdd8d8;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--txt);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* ── ENCABEZADO ── */
+  header {
+    background: linear-gradient(135deg, var(--pd) 0%, var(--p) 60%, var(--pl) 100%);
+    color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 3px 12px rgba(9,79,77,0.45);
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 32px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+  }
+  .badge {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .htitle { flex: 1; }
+  .htitle h1 { font-size: 1.2rem; font-weight: 700; }
+  .htitle p  { font-size: 0.78rem; opacity: 0.78; margin-top: 2px; }
+  .hmeta { font-size: 0.72rem; opacity: 0.65; text-align: right; line-height: 1.5; }
+
+  /* ── NAV ── */
+  .nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 8px 32px;
+    background: var(--pd);
+    overflow-x: auto;
+  }
+  .nav a {
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+    font-size: 0.69rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.15);
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .nav a:hover { background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.4); }
+
+  /* ── MAIN ── */
+  main { max-width: 1020px; margin: 0 auto; padding: 28px 24px 60px; }
+
+  /* ── SECCIÓN ── */
+  section {
+    background: var(--surf);
+    border-radius: 12px;
+    margin-bottom: 24px;
+    border: 1px solid var(--bdr);
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(11,105,103,0.07);
+  }
+  .sec-head {
+    background: linear-gradient(90deg, var(--p) 0%, var(--pl) 100%);
+    color: #fff;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .sec-num {
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 6px;
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 0.8rem; flex-shrink: 0;
+  }
+  .sec-head h2 { font-size: 1rem; font-weight: 700; }
+  .sec-body { padding: 22px 24px; }
+
+  /* ── SUBSECCIÓN ── */
+  .sub { border-left: 3px solid var(--p); margin: 18px 0; padding-left: 16px; }
+  .sub h3 {
+    font-size: 0.87rem; font-weight: 700;
+    color: var(--p); text-transform: uppercase;
+    letter-spacing: 0.8px; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sub h3::before {
+    content: ''; display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--acc); border-radius: 50%;
+  }
+
+  /* ── CÓDIGO ── */
+  .code-wrap {
+    background: var(--code);
+    border-radius: 8px;
+    margin: 12px 0;
+    overflow: hidden;
+    border: 1px solid #1a4040;
+  }
+  .code-label {
+    background: var(--chl);
+    color: var(--accl);
+    font-size: 0.65rem; font-weight: 700;
+    letter-spacing: 1.2px; text-transform: uppercase;
+    padding: 5px 14px;
+    border-bottom: 1px solid #1a4040;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .code-label::before { content: '●'; color: var(--acc); font-size: 0.7rem; }
+  pre {
+    padding: 16px;
+    overflow-x: auto;
+    font-family: 'Cascadia Code', Consolas, 'Fira Code', monospace;
+    font-size: 0.82rem;
+    line-height: 1.65;
+    color: #d4efef;
+    tab-size: 2;
+  }
+  .kw  { color: #7dd8d6; font-weight: 600; }
+  .str { color: #a8d8a8; }
+  .cmt { color: #5a8888; font-style: italic; }
+  .num { color: var(--accl); }
+  .fn  { color: #9ecfcf; }
+  .ps  { color: #b8d4d4; }
+  .var { color: #d4b8ef; }
+
+  code {
+    background: rgba(11,105,103,0.12);
+    color: var(--pd);
+    border: 1px solid var(--bdr);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-family: Consolas, monospace;
+    font-size: 0.82em;
+  }
+
+  /* ── TABLAS ── */
+  .tbl { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 12px 0; }
+  .tbl th {
+    background: var(--p); color: #fff;
+    padding: 8px 14px; text-align: left;
+    font-size: 0.75rem; font-weight: 700;
+  }
+  .tbl td { padding: 8px 14px; border-bottom: 1px solid var(--bdr); vertical-align: top; }
+  .tbl tr:nth-child(even) td { background: #f5fbfb; }
+  .tbl tr:last-child td { border-bottom: none; }
+  .tbl td:first-child { font-weight: 600; color: var(--p); font-family: monospace; }
+
+  /* ── AVISOS ── */
+  .aviso {
+    background: rgba(196,122,40,0.08);
+    border: 1px solid rgba(196,122,40,0.3);
+    border-left: 4px solid var(--acc);
+    border-radius: 6px;
+    padding: 11px 16px; margin: 12px 0;
+    font-size: 0.85rem; color: #5a3a0a;
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .aviso::before { content: '⚠'; font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+
+  .tip {
+    background: rgba(11,105,103,0.07);
+    border: 1px solid rgba(11,105,103,0.25);
+    border-left: 4px solid var(--p);
+    border-radius: 6px;
+    padding: 11px 16px; margin: 12px 0;
+    font-size: 0.85rem; color: var(--pd);
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .tip::before { content: '💡'; font-size: 0.9rem; flex-shrink: 0; margin-top: 1px; }
+
+  .ok {
+    background: rgba(26,107,60,0.07);
+    border: 1px solid rgba(26,107,60,0.25);
+    border-left: 4px solid #1a6b3c;
+    border-radius: 6px;
+    padding: 11px 16px; margin: 12px 0;
+    font-size: 0.85rem; color: #1a3a28;
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .ok::before { content: '✓'; font-size: 1rem; font-weight: 900; flex-shrink: 0; color: #1a6b3c; margin-top: 1px; }
+
+  /* ── TEXTO ── */
+  p  { color: var(--mid); margin-bottom: 10px; font-size: 0.9rem; }
+  ul, ol { padding-left: 22px; margin-bottom: 10px; }
+  li { color: var(--mid); font-size: 0.9rem; margin-bottom: 4px; }
+  li strong { color: var(--txt); }
+
+  /* ── PASOS ── */
+  .steps { counter-reset: step; list-style: none; padding: 0; margin: 12px 0; }
+  .steps li {
+    counter-increment: step;
+    display: flex; gap: 14px; align-items: flex-start;
+    margin-bottom: 12px;
+  }
+  .steps li::before {
+    content: counter(step);
+    background: var(--p); color: #fff;
+    border-radius: 50%;
+    width: 24px; height: 24px; min-width: 24px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.72rem; font-weight: 800; margin-top: 2px;
+  }
+  .steps li span { color: var(--mid); font-size: 0.88rem; }
+
+  /* ── CHECKLIST ── */
+  .check-list { list-style: none; padding: 0; margin: 10px 0; }
+  .check-list li { padding: 5px 0; color: var(--mid); font-size: 0.9rem; }
+  .check-list li::before { content: '✓ '; color: var(--p); font-weight: 700; }
+
+  /* ── ÁRBOL DE CARPETAS ── */
+  .tree {
+    background: var(--code);
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-family: Consolas, monospace;
+    font-size: 0.83rem;
+    line-height: 1.8;
+    color: #d4efef;
+    border: 1px solid #1a4040;
+    margin: 12px 0;
+  }
+  .tree .folder { color: #7dd8d6; font-weight: 700; }
+  .tree .file   { color: #a8d8a8; }
+  .tree .desc   { color: #5a8888; font-style: italic; }
+
+  /* ── RESULTADO ESPERADO ── */
+  .result {
+    background: #f0faf0;
+    border: 1px solid #b0ddb0;
+    border-left: 4px solid #4caf50;
+    border-radius: 6px;
+    padding: 10px 14px; margin: 10px 0;
+    font-size: 0.83rem; color: #1a4a1a;
+    font-family: Consolas, monospace;
+  }
+
+  /* ── COMPARATIVAS ── */
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 12px 0; }
+  .cbox { border-radius: 8px; overflow: hidden; border: 1px solid var(--bdr); }
+  .cbox .chead { background: var(--p); color: #fff; padding: 8px 14px; font-size: 0.78rem; font-weight: 700; }
+  .cbox:last-child .chead { background: var(--acc); }
+  .cbox ul { padding: 12px 12px 12px 28px; background: #f5fbfb; }
+  .cbox ul li { font-size: 0.83rem; }
+
+  /* ── RUBRICA / RESUMEN ── */
+  .rubrica { border-collapse: collapse; width: 100%; font-size: 0.83rem; margin: 12px 0; }
+  .rubrica th { background: var(--pd); color: #fff; padding: 8px 12px; text-align: left; }
+  .rubrica td { padding: 7px 12px; border-bottom: 1px solid var(--bdr); vertical-align: top; }
+  .rubrica td:last-child { font-weight: 700; color: var(--p); }
+  .rubrica tr:nth-child(even) td { background: #f5fbfb; }
+  .rubrica td:first-child { font-family: Consolas, monospace; color: var(--p); font-weight: 700; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--pd); color: rgba(255,255,255,0.7);
+    text-align: center; padding: 20px;
+    font-size: 0.78rem; line-height: 1.8;
+  }
+  footer strong { color: #fff; }
+
+  @media (max-width: 680px) {
+    .header-top { padding: 12px 16px; flex-wrap: wrap; }
+    .nav { padding: 8px 16px; }
+    main { padding: 16px 12px 40px; }
+    .sec-body { padding: 16px; }
+    .compare { grid-template-columns: 1fr; }
+    .hmeta { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ ENCABEZADO -->
+<header>
+  <div class="header-top">
+    <div class="badge">Herramientas · GitHub</div>
+    <div class="htitle">
+      <h1>GitHub — Instalación y Uso Básico para el Trabajo en Equipo</h1>
+      <p>Guía paso a paso: instalar Git, bajar, subir, comparar y actualizar el código del proyecto</p>
+    </div>
+    <div class="hmeta">
+      Universidad Columbia del Paraguay<br>
+      Prof. Richard Steven<br>
+      Programación 2 · 2026
+    </div>
+  </div>
+  <nav class="nav">
+    <a href="#s1">1. Qué es Git y GitHub</a>
+    <a href="#s2">2. Requisitos</a>
+    <a href="#s3">3. Instalar Git</a>
+    <a href="#s4">4. Configuración inicial</a>
+    <a href="#s5">5. Cuenta y repositorio</a>
+    <a href="#s6">6. Bajar código (clone)</a>
+    <a href="#s7">7. Ver y comparar cambios</a>
+    <a href="#s8">8. Subir código (push)</a>
+    <a href="#s9">9. Actualizar (pull)</a>
+    <a href="#s10">10. Trabajar con ramas</a>
+    <a href="#s11">11. Errores frecuentes</a>
+    <a href="#s12">12. Resumen de comandos</a>
+  </nav>
+</header>
+
+<main>
+
+<!-- ══════════════════════════════ SECCIÓN 1 -->
+<section id="s1">
+  <div class="sec-head"><div class="sec-num">1</div><h2>¿Qué es Git y qué es GitHub?</h2></div>
+  <div class="sec-body">
+    <p>Cuando se trabaja en un proyecto de programación —solo o en grupo— tarde o temprano aparece la misma pregunta: <em>"¿cuál es la versión buena del código?"</em>. Carpetas llamadas <code>proyecto_final</code>, <code>proyecto_final2</code> o <code>proyecto_final_v3_AHORA_SI</code> son la señal de que hace falta una herramienta de <strong>control de versiones</strong>. Para eso existe Git.</p>
+    <p><strong>Git</strong> es un programa que se instala en la computadora y guarda el historial completo de los cambios de un proyecto: quién cambió qué, cuándo y por qué. <strong>GitHub</strong> es un sitio web que aloja esos proyectos en la nube, permite compartirlos con otras personas y sirve como copia de respaldo centralizada. Git es la herramienta; GitHub es el lugar donde el trabajo hecho con Git se guarda y se comparte.</p>
+
+    <table class="tbl">
+      <tr><th>Concepto</th><th>Explicación sencilla</th><th>Analogía</th></tr>
+      <tr><td>Git</td><td>Programa instalado en la PC que registra el historial de cambios de un proyecto.</td><td>El motor: hace el trabajo de guardar versiones</td></tr>
+      <tr><td>GitHub</td><td>Plataforma web que aloja los proyectos (repositorios) en internet.</td><td>El garaje/concesionario: donde se muestra y comparte el auto</td></tr>
+      <tr><td>Repositorio (repo)</td><td>La carpeta del proyecto, ya controlada por Git, con todo su historial.</td><td>Una carpeta con "memoria"</td></tr>
+      <tr><td>Commit</td><td>Una "foto" guardada del proyecto en un momento dado, con un mensaje explicativo.</td><td>Un punto de guardado en un videojuego</td></tr>
+      <tr><td>Clone</td><td>Descargar una copia completa de un repositorio remoto a la PC.</td><td>Sacar una fotocopia del expediente completo</td></tr>
+      <tr><td>Remote (origin)</td><td>La dirección del repositorio en GitHub asociada a la copia local.</td><td>La dirección postal donde se envían los cambios</td></tr>
+      <tr><td>Push</td><td>Subir los commits guardados localmente hacia GitHub.</td><td>Enviar la carta al destinatario</td></tr>
+      <tr><td>Pull</td><td>Bajar a la PC los cambios que otros subieron a GitHub.</td><td>Recibir la correspondencia nueva</td></tr>
+      <tr><td>Branch (rama)</td><td>Una línea de trabajo independiente dentro del mismo proyecto.</td><td>Un borrador aparte que no afecta la versión final hasta fusionarlo</td></tr>
+    </table>
+
+    <div class="tip">No hace falta memorizar todo de una vez. Con <strong>clonar, agregar, confirmar, subir y actualizar</strong> (secciones 6 a 9) ya se puede trabajar en el 90% de los casos de este curso.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ SECCIÓN 2 -->
+<section id="s2">
+  <div class="sec-head"><div class="sec-num">2</div><h2>Requisitos previos</h2></div>
+  <div class="sec-body">
+    <ul>
+      <li><strong>Windows 10 u 11</strong> (esta guía usa PowerShell, pero los comandos son los mismos en Git Bash, Linux o Mac).</li>
+      <li>Conexión a Internet para instalar Git y comunicarse con GitHub.</li>
+      <li>Una <strong>cuenta gratuita en GitHub</strong> (se crea en <strong>github.com</strong>).</li>
+      <li>Un editor de código: se recomienda <strong>Visual Studio Code</strong>, que integra Git en su interfaz.</li>
+      <li>Permisos de <strong>administrador</strong> para ejecutar el instalador de Git.</li>
+    </ul>
+    <div class="aviso">Anotar el <strong>usuario y la contraseña</strong> de GitHub en un lugar seguro. GitHub ya no acepta la contraseña para subir código desde la terminal: para eso se usa un <em>Personal Access Token</em> o el inicio de sesión del Git Credential Manager, que se explica en la sección 5.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ SECCIÓN 3 -->
+<section id="s3">
+  <div class="sec-head"><div class="sec-num">3</div><h2>Instalación de Git en Windows</h2></div>
+  <div class="sec-body">
+
+    <div class="sub"><h3>3.1 Verificar si Git ya está instalado</h3>
+      <p>Antes de descargar nada, conviene revisar si el equipo del laboratorio ya tiene Git instalado:</p>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell — Verificar instalación existente</div>
+        <pre><span class="cmt"># Verificar versión de Git</span>
+git --version</pre>
+      </div>
+      <p>Si devuelve algo como <code>git version 2.44.0.windows.1</code>, Git ya está instalado y se puede pasar directo a la sección 4.</p>
+    </div>
+
+    <div class="sub"><h3>3.2 Descargar el instalador</h3>
+      <p>Sitio oficial: <strong>git-scm.com</strong> → botón <strong>"Download for Windows"</strong>. El sitio detecta automáticamente si la PC es de 64 o 32 bits y descarga el instalador correcto (<code>Git-#.##.#-64-bit.exe</code>).</p>
+    </div>
+
+    <div class="sub"><h3>3.3 Pasos del instalador</h3>
+      <ol class="steps">
+        <li><span>Ejecutar el archivo <code>.exe</code> descargado y aceptar los permisos de administrador.</span></li>
+        <li><span>Aceptar la licencia (GNU GPL) y hacer clic en <strong>Next</strong>.</span></li>
+        <li><span>Mantener la <strong>carpeta de instalación predeterminada</strong>.</span></li>
+        <li><span>En "Select Components", dejar las opciones marcadas por defecto. No es necesario cambiar nada.</span></li>
+        <li><span>En "Choosing the default editor", se puede dejar <strong>Vim</strong> o cambiar a <strong>"Use Visual Studio Code as Git's default editor"</strong> si ya está instalado. Esta segunda opción es más cómoda para principiantes.</span></li>
+        <li><span>En "Adjusting the name of the initial branch", elegir <strong>"Override the default branch name" → main</strong>, que es el estándar actual de GitHub.</span></li>
+        <li><span>En "Adjusting your PATH environment", dejar la opción recomendada: <strong>"Git from the command line and also from 3rd-party software"</strong>. Esto permite usar <code>git</code> desde PowerShell.</span></li>
+        <li><span>En el resto de las pantallas (HTTPS, saltos de línea, terminal, etc.) se pueden dejar todas las <strong>opciones por defecto</strong> sin problema.</span></li>
+        <li><span>Hacer clic en <strong>Install</strong> y esperar a que finalice. Luego <strong>Finish</strong>.</span></li>
+        <li><span><strong>Cerrar y volver a abrir PowerShell</strong> para que reconozca el comando <code>git</code>.</span></li>
+      </ol>
+      <div class="aviso">Si PowerShell ya estaba abierto durante la instalación, <strong>debe cerrarse y abrirse de nuevo</strong>. Las ventanas abiertas no detectan los cambios en el PATH.</div>
+    </div>
+
+    <div class="sub"><h3>3.4 Confirmar la instalación</h3>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell — Confirmar Git instalado</div>
+        <pre><span class="cmt"># Debe mostrar un número de versión</span>
+git --version
+
+<span class="cmt"># Muestra la ruta del ejecutable</span>
+where.exe git</pre>
+      </div>
+      <div class="result">git version 2.44.0.windows.1</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ SECCIÓN 4 -->
+<section id="s4">
+  <div class="sec-head"><div class="sec-num">4</div><h2>Configuración inicial de Git</h2></div>
+  <div class="sec-body">
+    <p>Antes del primer commit, Git necesita saber <strong>quién sos</strong>. Este nombre y correo quedan grabados en cada commit que se haga, así que conviene usar los mismos datos que la cuenta de GitHub.</p>
+
+    <div class="code-wrap">
+      <div class="code-label">PowerShell — Configuración global (una sola vez por PC)</div>
+      <pre><span class="cmt"># Nombre que aparecerá en los commits</span>
+git config --global user.name "Nombre Apellido"
+
+<span class="cmt"># Correo asociado a la cuenta de GitHub</span>
+git config --global user.email "correo@ejemplo.com"
+
+<span class="cmt"># Verificar que quedó configurado</span>
+git config --list</pre>
+    </div>
+
+    <div class="ok">Esta configuración se hace <strong>una sola vez por computadora</strong>. Si se trabaja en varios equipos (casa, laboratorio, notebook), hay que repetirla en cada uno.</div>
+    <div class="aviso">En una PC del laboratorio compartida con otros estudiantes, revisar con <code>git config --list</code> que el nombre y correo sean los propios antes de hacer un commit, para que el trabajo quede atribuido correctamente.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ SECCIÓN 5 -->
+<section id="s5">
+  <div class="sec-head"><div class="sec-num">5</div><h2>Crear una cuenta y un repositorio en GitHub</h2></div>
+  <div class="sec-body">
+
+    <div class="sub"><h3>5.1 Crear la cuenta</h3>
+      <ol class="steps">
+        <li><span>Ingresar a <strong>github.com</strong> y hacer clic en <strong>Sign up</strong>.</span></li>
+        <li><span>Completar correo, contraseña y un nombre de usuario (será parte de la URL del perfil, ej. <code>github.com/tu-usuario</code>).</span></li>
+        <li><span>Verificar el correo con el código que envía GitHub.</span></li>
+      </ol>
+    </div>
+
+    <div class="sub"><h3>5.2 Crear un repositorio nuevo</h3>
+      <ol class="steps">
+        <li><span>Hacer clic en el botón <strong>"+"</strong> arriba a la derecha → <strong>New repository</strong>.</span></li>
+        <li><span>Escribir un nombre corto y sin espacios (ej. <code>proyecto-web-pr2</code>).</span></li>
+        <li><span>Elegir si el repositorio será <strong>Public</strong> (cualquiera lo ve) o <strong>Private</strong> (solo invitados).</span></li>
+        <li><span>Marcar <strong>"Add a README file"</strong> para que el repositorio no quede vacío.</span></li>
+        <li><span>Hacer clic en <strong>Create repository</strong>.</span></li>
+      </ol>
+    </div>
+
+    <div class="sub"><h3>5.3 Copiar la URL del repositorio</h3>
+      <p>En la página del repositorio, hacer clic en el botón verde <strong>"Code"</strong> y copiar la dirección. Hay dos formas de conectarse:</p>
+      <table class="tbl">
+        <tr><th>Método</th><th>Formato de la URL</th><th>Cuándo usarlo</th></tr>
+        <tr><td>HTTPS</td><td><code>https://github.com/usuario/repo.git</code></td><td>Más simple para empezar. Pide usuario y token la primera vez. <strong>Recomendado para este curso.</strong></td></tr>
+        <tr><td>SSH</td><td><code>git@github.com:usuario/repo.git</code></td><td>Requiere generar una llave SSH previamente. Cómodo a largo plazo, más pasos iniciales.</td></tr>
+      </table>
+      <div class="tip">Si al hacer <code>git push</code> Windows pide iniciar sesión, va a abrir una ventana del navegador para autenticarse con la cuenta de GitHub (Git Credential Manager). Después de la primera vez, queda recordado.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ SECCIÓN 6 -->
+<section id="s6">
+  <div class="sec-head"><div class="sec-num">6</div><h2>Bajar un proyecto existente — <code>git clone</code></h2></div>
+  <div class="sec-body">
+    <p>Cuando el repositorio ya existe en GitHub (por ejemplo, el profesor lo compartió, o es el repositorio del propio proyecto creado desde otra PC), se descarga completo con <code>clone</code>. Esto trae el código y <strong>todo el historial</strong> de commits.</p>
+
+    <div class="code-wrap">
+      <div class="code-label">PowerShell — Bajar el código por primera vez</div>
+      <pre><span class="cmt"># Ubicarse en la carpeta donde se quiere guardar el proyecto</span>
+cd C:\Users\usuario\Documents
+
+<span class="cmt"># Clonar el repositorio (trae una carpeta nueva con el nombre del repo)</span>
+git clone https://github.com/usuario/proyecto-web-pr2.git
+
+<span class="cmt"># Entrar a la carpeta descargada</span>
+cd proyecto-web-pr2</pre>
+    </div>
+
+    <div class="tree">
+<span class="folder">proyecto-web-pr2/</span>          <span class="desc"># carpeta creada por git clone</span>
+├── <span class="folder">.git/</span>                  <span class="desc"># historial de Git (no se toca a mano)</span>
+├── <span class="folder">js/</span>                    <span class="desc"># código del servidor Node.js</span>
+├── <span class="folder">public/</span>                <span class="desc"># vistas HTML</span>
+├── <span class="file">.gitignore</span>              <span class="desc"># archivos que Git debe ignorar</span>
+└── <span class="file">README.md</span>               <span class="desc"># descripción del proyecto</span>
+    </div>
+
+    <div class="ok"><code>git clone</code> se ejecuta <strong>una sola vez</strong> por proyecto y por PC. Para traer cambios nuevos después, no se vuelve a clonar: se usa <code>git pull</code> (sección 9).</div>
+    <div class="aviso">No clonar un repositorio <strong>dentro de otro repositorio</strong> ya existente. Ubicarse primero en una carpeta neutral (ej. <code>Documents</code>) antes de clonar.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ SECCIÓN 7 -->
+<section id="s7">
+  <div class="sec-head"><div class="sec-num">7</div><h2>Ver el estado y comparar cambios — <code>status</code> y <code>diff</code></h2></div>
+  <div class="sec-body">
+    <p>Antes de guardar o subir nada, siempre conviene mirar <strong>qué cambió</strong>. Git ofrece dos comandos clave para esto, y son los que más se usan en el día a día.</p>
+
+    <div class="sub"><h3>7.1 <code>git status</code> — qué archivos cambiaron</h3>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell — Ver el estado del repositorio</div>
+        <pre>git status</pre>
+      </div>
+      <div class="result">On branch main
+Changes not staged for commit:
+  modified:   public/menu.html
+Untracked files:
+  public/reporte.html</div>
+      <p>Este resultado dice: se modificó <code>menu.html</code> (Git ya lo conocía) y hay un archivo nuevo <code>reporte.html</code> (Git todavía no lo sigue).</p>
+    </div>
+
+    <div class="sub"><h3>7.2 <code>git diff</code> — qué líneas exactas cambiaron</h3>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell — Comparar línea por línea</div>
+        <pre><span class="cmt"># Ver cambios aún no agregados al área de preparación</span>
+git diff
+
+<span class="cmt"># Comparar contra una versión anterior específica</span>
+git diff HEAD~1
+
+<span class="cmt"># Comparar la rama actual contra otra rama</span>
+git diff main feature-login</pre>
+      </div>
+      <p>Las líneas que empiezan con <code>-</code> son las que se eliminaron; las que empiezan con <code>+</code> son las que se agregaron. Es la forma más precisa de comparar dos versiones del mismo archivo.</p>
+    </div>
+
+    <div class="sub"><h3>7.3 <code>git log</code> — historial de commits</h3>
+      <div class="code-wrap">
+        <div class="code-label">PowerShell — Ver el historial</div>
+        <pre><span class="cmt"># Historial resumido, un commit por línea</span>
+git log --oneline
+
+<span class="cmt"># Historial con gráfico de ramas</span>
+git log --oneline --graph --all</pre>
+      </div>
+    </div>
+
+    <div class="tip">En GitHub también se puede comparar visualmente sin usar la terminal: pestaña <strong>"Compare"</strong> del repositorio, o el botón <strong>"Compare & pull request"</strong> que aparece al subir una rama nueva.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ SECCIÓN 8 -->
+<section id="s8">
+  <div class="sec-head"><div class="sec-num">8</div><h2>Subir cambios — <code>add</code>, <code>commit</code> y <code>push</code></h2></div>
+  <div class="sec-body">
+    <p>Subir código a GitHub siempre sigue el mismo ciclo de tres pasos. Vale la pena aprenderlo de memoria porque se repite decenas de veces durante el proyecto.</p>
+
+    <ol class="steps">
+      <li><span><strong>Agregar</strong> los archivos que se quieren guardar al área de preparación (<em>staging</em>).</span></li>
+      <li><span><strong>Confirmar</strong> (commit) esos cambios con un mensaje que explique qué se hizo.</span></li>
+      <li><span><strong>Subir</strong> (push) los commits guardados localmente hacia GitHub.</span></li>
+    </ol>
+
+    <div class="code-wrap">
+      <div class="code-label">PowerShell — Ciclo completo de subida</div>
+      <pre><span class="cmt"># 1. Agregar todos los archivos modificados y nuevos</span>
+git add .
+
+<span class="cmt"># También se puede agregar un archivo puntual</span>
+git add public/reporte.html
+
+<span class="cmt"># 2. Confirmar los cambios con un mensaje descriptivo</span>
+git commit -m "Agrega pantalla de reporte de usuarios"
+
+<span class="cmt"># 3. Subir los commits a GitHub (rama main)</span>
+git push origin main</pre>
+    </div>
+
+    <div class="ok">Un buen mensaje de commit explica el <strong>"qué"</strong> en pocas palabras: <code>"Corrige validación del formulario de alta"</code> es útil; <code>"cambios"</code> o <code>"asd"</code> no lo es. Dentro de un año, ese mensaje es lo único que va a recordar por qué se hizo el cambio.</div>
+    <div class="aviso">Si <code>git push</code> devuelve un error de rechazo (<em>rejected</em>), significa que GitHub tiene commits que la PC local no tiene todavía. Hay que hacer <code>git pull</code> primero (sección 9) y luego reintentar el push.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ SECCIÓN 9 -->
+<section id="s9">
+  <div class="sec-head"><div class="sec-num">9</div><h2>Actualizar el repositorio local — <code>fetch</code> y <code>pull</code></h2></div>
+  <div class="sec-body">
+    <p>Cuando se trabaja en equipo, otras personas suben cambios a GitHub que la copia local todavía no tiene. Antes de empezar a trabajar cada día, conviene actualizar la carpeta local.</p>
+
+    <div class="compare">
+      <div class="cbox">
+        <div class="chead">git fetch</div>
+        <ul>
+          <li>Descarga los cambios nuevos de GitHub.</li>
+          <li><strong>No los mezcla</strong> con los archivos locales todavía.</li>
+          <li>Sirve para "mirar" qué hay de nuevo antes de aplicarlo.</li>
+        </ul>
+      </div>
+      <div class="cbox">
+        <div class="chead">git pull</div>
+        <ul>
+          <li>Descarga los cambios nuevos de GitHub.</li>
+          <li><strong>Los combina automáticamente</strong> con los archivos locales.</li>
+          <li>Equivale a hacer <code>fetch</code> + <code>merge</code> en un solo paso.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-label">PowerShell — Actualizar antes de trabajar</div>
+      <pre><span class="cmt"># Forma recomendada para el día a día del curso</span>
+git pull origin main</pre>
+    </div>
+
+    <div class="tip">Regla simple para todo el curso: <strong>pull antes de empezar, push al terminar.</strong> Actualizar primero evita la mayoría de los conflictos.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ SECCIÓN 10 -->
+<section id="s10">
+  <div class="sec-head"><div class="sec-num">10</div><h2>Trabajar con ramas (branches)</h2></div>
+  <div class="sec-body">
+    <p>Una <strong>rama</strong> permite probar o desarrollar algo nuevo sin tocar la versión principal del proyecto (<code>main</code>). Es especialmente útil en equipo: cada integrante trabaja en su propia rama y luego se une todo a <code>main</code>.</p>
+
+    <div class="code-wrap">
+      <div class="code-label">PowerShell — Crear, cambiar y fusionar ramas</div>
+      <pre><span class="cmt"># Ver en qué rama se está y cuáles existen</span>
+git branch
+
+<span class="cmt"># Crear una rama nueva y moverse a ella en un solo paso</span>
+git checkout -b feature-login
+
+<span class="cmt"># Trabajar normalmente: add, commit, push en esta rama</span>
+git add .
+git commit -m "Implementa formulario de login"
+git push origin feature-login
+
+<span class="cmt"># Volver a la rama principal</span>
+git checkout main
+
+<span class="cmt"># Traer los cambios de feature-login hacia main</span>
+git merge feature-login</pre>
+    </div>
+
+    <table class="tbl">
+      <tr><th>Comando</th><th>Qué hace</th></tr>
+      <tr><td>git branch</td><td>Lista las ramas del repositorio local.</td></tr>
+      <tr><td>git checkout -b nombre</td><td>Crea una rama nueva y se posiciona en ella.</td></tr>
+      <tr><td>git checkout nombre</td><td>Cambia a una rama ya existente.</td></tr>
+      <tr><td>git merge nombre</td><td>Fusiona la rama indicada dentro de la rama actual.</td></tr>
+      <tr><td>git branch -d nombre</td><td>Elimina una rama ya fusionada.</td></tr>
+    </table>
+
+    <div class="tip">En este curso, con un proyecto individual, alcanza con trabajar directo en <code>main</code>. Las ramas se vuelven imprescindibles cuando <strong>dos o más personas</strong> tocan el mismo repositorio al mismo tiempo.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ SECCIÓN 11 -->
+<section id="s11">
+  <div class="sec-head"><div class="sec-num">11</div><h2>Errores frecuentes y cómo resolverlos</h2></div>
+  <div class="sec-body">
+
+    <table class="tbl">
+      <tr><th>Error o síntoma</th><th>Causa probable</th><th>Solución</th></tr>
+      <tr><td>git no se reconoce</td><td>Git no está instalado o el PATH no se actualizó.</td><td>Cerrar y reabrir PowerShell. Reinstalar si persiste.</td></tr>
+      <tr><td>fatal: not a git repository</td><td>El comando se ejecuta fuera de la carpeta del proyecto clonado.</td><td>Verificar con <code>cd</code> y entrar a la carpeta correcta antes de usar git.</td></tr>
+      <tr><td>Updates were rejected</td><td>GitHub tiene commits que la copia local no tiene.</td><td>Ejecutar <code>git pull origin main</code> y luego reintentar <code>git push</code>.</td></tr>
+      <tr><td>Please tell me who you are</td><td>Falta configurar <code>user.name</code> y <code>user.email</code>.</td><td>Ejecutar los comandos de la sección 4 antes de commitear.</td></tr>
+      <tr><td>CONFLICT (content)</td><td>Dos personas modificaron las mismas líneas del mismo archivo.</td><td>Abrir el archivo, resolver manualmente las marcas <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>, luego <code>git add</code> y <code>git commit</code>.</td></tr>
+      <tr><td>remote: Support for password authentication was removed</td><td>GitHub ya no acepta la contraseña de la cuenta para autenticar por HTTPS.</td><td>Usar el inicio de sesión del navegador (Credential Manager) o crear un Personal Access Token.</td></tr>
+      <tr><td>nothing to commit, working tree clean</td><td>No hay cambios nuevos desde el último commit.</td><td>No es un error: significa que todo ya está guardado.</td></tr>
+    </table>
+
+    <div class="sub"><h3>11.1 Resolver un conflicto de fusión</h3>
+      <p>Cuando aparece un conflicto, Git marca el archivo con símbolos especiales que hay que editar a mano:</p>
+      <div class="code-wrap">
+        <div class="code-label">Archivo con conflicto sin resolver</div>
+        <pre>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+&lt;h1&gt;Bienvenido al sistema&lt;/h1&gt;
+=======
+&lt;h1&gt;Bienvenido, iniciar sesión&lt;/h1&gt;
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; feature-login</pre>
+      </div>
+      <ol class="steps">
+        <li><span>Decidir qué versión queda (una, la otra, o una combinación de ambas).</span></li>
+        <li><span>Borrar las líneas <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>, <code>=======</code> y <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code>.</span></li>
+        <li><span>Guardar el archivo y ejecutar <code>git add archivo</code>.</span></li>
+        <li><span>Completar la fusión con <code>git commit</code>.</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ SECCIÓN 12 -->
+<section id="s12">
+  <div class="sec-head"><div class="sec-num">12</div><h2>Checklist final y resumen de comandos</h2></div>
+  <div class="sec-body">
+    <p>Verificar cada punto antes de considerar dominado el flujo básico de GitHub:</p>
+    <ul class="check-list">
+      <li>Git instalado y verificado con <code>git --version</code>.</li>
+      <li>Nombre y correo configurados con <code>git config --global</code>.</li>
+      <li>Cuenta de GitHub creada y repositorio del proyecto disponible.</li>
+      <li>Proyecto descargado correctamente con <code>git clone</code>.</li>
+      <li>Capaz de revisar cambios con <code>git status</code> y <code>git diff</code>.</li>
+      <li>Ciclo <code>add → commit → push</code> ejecutado sin errores.</li>
+      <li>Repositorio local actualizado con <code>git pull</code> antes de empezar a trabajar.</li>
+      <li>Concepto de rama (branch) comprendido, aunque no se use a diario.</li>
+    </ul>
+
+    <table class="rubrica">
+      <tr><th>Comando</th><th>Qué hace</th></tr>
+      <tr><td>git --version</td><td>Confirma que Git está instalado</td></tr>
+      <tr><td>git config --global</td><td>Configura nombre y correo del autor de los commits</td></tr>
+      <tr><td>git clone URL</td><td>Baja un repositorio completo por primera vez</td></tr>
+      <tr><td>git status</td><td>Muestra qué archivos cambiaron</td></tr>
+      <tr><td>git diff</td><td>Compara los cambios línea por línea</td></tr>
+      <tr><td>git log --oneline</td><td>Muestra el historial de commits</td></tr>
+      <tr><td>git add .</td><td>Prepara todos los cambios para el commit</td></tr>
+      <tr><td>git commit -m "mensaje"</td><td>Guarda una versión con un mensaje descriptivo</td></tr>
+      <tr><td>git push origin main</td><td>Sube los commits locales a GitHub</td></tr>
+      <tr><td>git pull origin main</td><td>Baja y combina los cambios nuevos de GitHub</td></tr>
+      <tr><td>git branch / checkout -b</td><td>Lista o crea ramas de trabajo</td></tr>
+      <tr><td>git merge nombre</td><td>Fusiona una rama dentro de la actual</td></tr>
+    </table>
+
+    <div class="ok">Con estos doce comandos se cubre prácticamente todo el trabajo diario con GitHub en un proyecto académico. El resto de las funciones (Pull Requests, Issues, Actions) se aprenden progresivamente cuando el proyecto lo requiere.</div>
+  </div>
+</section>
+
+</main>
+
+<!-- ═══════════════════════════════ PIE DE PÁGINA -->
+<footer>
+  <strong>GitHub — Instalación y Uso Básico para el Trabajo en Equipo</strong><br>
+  Programación 2 (PR2) · Universidad Columbia del Paraguay · Prof. Richard Steven · 2026<br>
+  Git · GitHub · PowerShell · Visual Studio Code
+</footer>
+
+</body>
+</html>
